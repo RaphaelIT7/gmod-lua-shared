@@ -56,7 +56,7 @@ void CLuaShared::DumpStats()
 
 ILuaInterface* CLuaShared::CreateLuaInterface(unsigned char, bool)
 {
-
+	return nullptr;
 }
 
 void CLuaShared::CloseLuaInterface(ILuaInterface*)
@@ -66,17 +66,17 @@ void CLuaShared::CloseLuaInterface(ILuaInterface*)
 
 ILuaInterface* CLuaShared::GetLuaInterface(unsigned char)
 {
-
+	return nullptr;
 }
 
 File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile)
 {
-
+	return new File;
 }
 
 File* CLuaShared::GetCache(const std::string&)
 {
-
+	return new File;
 }
 
 void CLuaShared::MountLua(const char*)

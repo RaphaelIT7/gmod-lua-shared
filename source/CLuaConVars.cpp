@@ -24,12 +24,12 @@ void CLuaConVars::Init()
 
 ConVar* CLuaConVars::CreateConVar(const char*, const char*, const char*, int)
 {
-
+	return nullptr;
 }
 
 ConCommand* CLuaConVars::CreateConCommand(const char*, const char*, int, void (*)(const CCommand&), int (*)(const char*, char(*)[128]))
 {
-
+	return nullptr;
 }
 
 void CLuaConVars::DestroyManaged()

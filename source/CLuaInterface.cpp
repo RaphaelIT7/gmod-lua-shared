@@ -2,7 +2,7 @@
 
 int ILuaBase::Top()
 {
-	lua_gettop(state);
+	return lua_gettop(state);
 }
 
 void ILuaBase::Push(int iStackPos)
@@ -385,11 +385,14 @@ int ILuaBase::CreateMetaTable(const char* strName)
 	lua_pushstring(state, "MetaID");
 	lua_pushinteger(state, 1);
 	lua_settable(state, -3);
+
+	return 0; // ToDo: What should I return? :<
 }
 
 bool ILuaBase::PushMetaTable(int iType)
 {
 	// ToDo. Idk how to do it yet.
+	return false;
 }
 
 void ILuaBase::PushUserType(void* data, int iType)
@@ -411,7 +414,7 @@ int LuaPanic(lua_State* lua)
 }
 
 int AdvancedLuaErrorReporter(lua_State *L) {
-
+	return 0;
 }
 
 
@@ -457,4 +460,6 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 
     lua_pushinteger(L, 7);
     lua_setglobal(L, "CanExitVehicle");
+
+	return 0;
 }
