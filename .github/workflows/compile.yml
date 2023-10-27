@@ -10,3 +10,7 @@ jobs:
       BUILD_64x: "true"
       LINUX_FILEEXTENTION: "so"
       BUILD_WINDOWS: "true"
+      SOURCESDK_MINIMAL: "RaphaelIT7/sourcesdk-gmod"
+      SOURCESDK_MINIMAL_BRANCH: "main"
+      SOURCESDK_MINIMAL_64XBRANCH: "x86-64"
+      ARTIFACT_EXPIRE: "1"
