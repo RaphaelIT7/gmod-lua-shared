@@ -9,4 +9,4 @@ jobs:
       PROJECT_NAME: "lua_shared"
       BUILD_64x: "true"
       LINUX_FILEEXTENTION: "so"
-      BUILD_WINDOWS: "trur"
+      BUILD_WINDOWS: "true"
