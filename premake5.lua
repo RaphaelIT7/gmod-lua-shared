@@ -39,16 +39,13 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
         --IncludeDetouring()
         --IncludeScanning()
 
-        externalincludedirs("libs")
-        links("lua5.1")
-        links("luajit")
+        links({
+            "libs/lua51",
+            "libs/luajit"
+        })
 
         files({
             [[garrysmod_common\sourcesdk-minimal\public\tier2\tier2.cpp]],
-            [[garrysmod_common\sourcesdk-minimal\public\tier2\tier2.h]],
-            [[garrysmod_common\sourcesdk-minimal\public\tier0\platform.h]],
-            [[garrysmod_common\sourcesdk-minimal\public\tier0\dbg.h]],
-            [[garrysmod_common\sourcesdk-minimal\public\Color.h]],
         })
 
         filter("system:windows")
