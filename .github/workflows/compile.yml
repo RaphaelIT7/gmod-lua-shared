@@ -1,0 +1,12 @@
+name: Build Plugin
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    uses: RaphaelIT7/gmod-common-module-base/.github/workflows/compile.yml@workflow
+    with:
+      PROJECT_NAME: "lua_shared"
+      BUILD_64x: "true"
+      LINUX_FILEEXTENTION: "so"
+      BUILD_WINDOWS: "trur"
