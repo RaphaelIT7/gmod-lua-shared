@@ -45,6 +45,10 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
 
         files({
             [[garrysmod_common\sourcesdk-minimal\public\tier2\tier2.cpp]],
+            [[garrysmod_common\sourcesdk-minimal\public\tier2\tier2.h]],
+            [[garrysmod_common\sourcesdk-minimal\public\tier0\platform.h]],
+            [[garrysmod_common\sourcesdk-minimal\public\tier0\dbg.h]],
+            [[garrysmod_common\sourcesdk-minimal\public\Color.h]],
         })
 
         filter("system:windows")
