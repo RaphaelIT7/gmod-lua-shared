@@ -54,14 +54,14 @@ void CLuaShared::DumpStats()
 	Msg("Time Spent Checking Filestamps: %f seconds (%f milliseconds)", 0.0f, 0.0f);
 }
 
-ILuaInterface* CLuaShared::CreateLuaInterface(unsigned char, bool)
+ILuaInterface* CLuaShared::CreateLuaInterface(unsigned char , bool bIsServer)
 {
-	return nullptr;
+	return ::CreateLuaInterface(bIsServer);
 }
 
-void CLuaShared::CloseLuaInterface(ILuaInterface*)
+void CLuaShared::CloseLuaInterface(ILuaInterface* LuaInterface)
 {
-
+	CloseLuaInterface(LuaInterface);
 }
 
 ILuaInterface* CLuaShared::GetLuaInterface(unsigned char)

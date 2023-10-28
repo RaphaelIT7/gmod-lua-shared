@@ -4,11 +4,80 @@
 #include "lua/lua.h"
 #include "lua/luajit_rolling.h"
 #include "lua/lauxlib.h"
+#include "CLuaGameCallback.h"
+#include "CLuaObject.h"
 
 #define GMOD
 #include "Types.h"
 
+// ToDo: verify and lua_init_stack_gmod and edit lj_state_new to call that function.
+/*
+void lua_init_stack_gmod(lua_State* L, lua_State* gmodL) {
+    if (gmodL == nullptr) {
+        return;
+    }
+
+    lua_pushnil(gmodL);
+    lua_pushstring(gmodL, "coroutine");
+    lua_rawget(gmodL, LUA_GLOBALSINDEX);
+    lua_getfield(gmodL, -1, "running");
+    lua_insert(gmodL, -2);
+    lua_rawset(L, LUA_GLOBALSINDEX);
+}
+*/
+
+// ToDo: Verify and Add GMODLUA_GetUserType and edit lua_typename to call this function.
+/*
+void GMODLUA_GetUserType(lua_State* L, int index) {
+    if (!lua_isuserdata(L, index)) {
+        return; // Not a userdata
+    }
+
+    // Get metatable of the userdata
+    lua_getmetatable(L, index);
+    
+    // Set "MetaName" field to "UserData"
+    lua_pushstring(L, "MetaName");
+    lua_pushstring(L, "UserData");
+    lua_settable(L, -3);
+
+    // Check if the metatable already has a string field
+    lua_pushstring(L, "ExistingField");
+    lua_gettable(L, -2);
+    const char* existingField = nullptr;
+    if (lua_isstring(L, -1)) {
+        existingField = lua_tostring(L, -1);
+    }
+
+    // If there is an existing string field, copy it to a buffer
+    char buffer[128];
+    if (existingField) {
+        strncpy(buffer, existingField, sizeof(buffer) - 1);
+        buffer[sizeof(buffer) - 1] = '\0'; // Ensure null-terminated
+    } else {
+        buffer[0] = '\0'; // No existing string field
+    }
+
+    // Clean up the Lua stack
+    lua_pop(L, 2); // Pop the existing field and metatable
+
+    // If you want to use the existing string field in C++, you can use the 'buffer' variable
+}
+*/
+
+// ToDo: Add GMOD_LuaPrint and edit lj_cf_print to call this function.
+
+// ToDo: Verify and Add GMOD_LuaCreateEmptyUserdata and edit lj_cf_newproxy to callt this function
+/*
+void GMOD_LuaCreateEmptyUserdata(LuaState* L) {
+	void* userdata = lua_newuserdata(L, 0);
+}
+*/
+
+#ifndef TypeNum
+#define TypeNum
 int g_iTypeNum = 0;
+#endif
 
 // For use with ILuaBase::PushSpecial
 enum
@@ -27,7 +96,9 @@ enum
 	INDEX_REGISTRY,         // Registry table
 };
 
+#ifndef CFunc
 typedef int ( *CFunc )( lua_State* L );
+#endif
 
 class ILuaBase
 {
@@ -424,12 +495,12 @@ public:
 	}
 
 private:
+	friend class CLuaInterface;
+
 	lua_State* state;
 };
 
 class ILuaThreadedCall;
-class ILuaGameCallback;
-class ILuaObject;
 
 class ILuaInterface : public ILuaBase
 {
@@ -506,15 +577,168 @@ public:
 	virtual void *AddThreadedCall( ILuaThreadedCall * ) = 0;
 	virtual void AppendStackTrace( char *, unsigned long ) = 0;
 	virtual void *CreateConVar( const char *, const char *, const char *, int ) = 0;
-	virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) ) = 0;
-};
+	virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) ) = 0;};
 
 class CLuaInterface : public ILuaInterface
 {
 public:
-	bool Init(ILuaGameCallback*, bool);
+	virtual int Top(void);
+	virtual void Push(int iStackPos);
+	virtual void Pop(int iAmt = 1);
+	virtual void GetTable(int iStackPos);
+	virtual void GetField(int iStackPos, const char* strName);
+	virtual void SetField(int iStackPos, const char* strName);
+	virtual void CreateTable();
+	virtual void SetTable(int iStackPos);
+	virtual void SetMetaTable(int iStackPos);
+	virtual bool GetMetaTable(int i);
+	virtual void Call(int iArgs, int iResults);
+	virtual int PCall(int iArgs, int iResults, int iErrorFunc);
+	virtual int Equal(int iA, int iB);
+	virtual int RawEqual(int iA, int iB);
+	virtual void Insert(int iStackPos);
+	virtual void Remove(int iStackPos);
+	virtual int Next(int iStackPos);
 
-	inline ILuaGameCallback *GetLuaGameCallback( ) const
+//#ifndef GMOD_ALLOW_DEPRECATED
+//protected:
+//#endif
+	virtual void* NewUserdata(unsigned int iSize);
+
+//public:
+	[[noreturn]]
+	virtual void ThrowError(const char* strError);
+	virtual void CheckType(int iStackPos, int iType);
+	[[noreturn]]
+	virtual void ArgError(int iArgNum, const char* strMessage);
+	virtual void RawGet(int iStackPos);
+	virtual void RawSet(int iStackPos);
+	virtual const char* GetString(int iStackPos = -1, unsigned int* iOutLen = nullptr);
+	virtual double GetNumber(int iStackPos = -1);
+	virtual bool GetBool(int iStackPos = -1);
+	virtual CFunc GetCFunction(int iStackPos = -1);
+
+//#if !defined( GMOD_ALLOW_DEPRECATED ) && !defined( GMOD_ALLOW_LIGHTUSERDATA )
+//protected:
+//#endif
+	virtual void* GetUserdata(int iStackPos = -1);
+//public:
+	virtual void PushNil();
+	virtual void PushString(const char* val, unsigned int iLen = 0);
+	virtual void PushNumber(double val);
+	virtual void PushBool(bool val);
+	virtual void PushCFunction(CFunc val);
+	virtual void PushCClosure(CFunc val, int iVars);
+
+//#if !defined( GMOD_ALLOW_DEPRECATED ) && !defined( GMOD_ALLOW_LIGHTUSERDATA )
+//protected:
+//#endif
+	virtual void PushUserdata(void*);
+
+//public:
+	virtual int ReferenceCreate();
+	virtual void ReferenceFree(int i);
+	virtual void ReferencePush(int i);
+	virtual void PushSpecial(int iType);
+	virtual bool IsType(int iStackPos, int iType);
+	virtual int GetType(int iStackPos);
+	virtual const char* GetTypeName(int iType);
+
+//#ifndef GMOD_ALLOW_DEPRECATED
+//protected:
+//#endif
+	virtual void CreateMetaTableType(const char* strName, int iType);
+//public:
+	virtual const char* CheckString(int iStackPos = -1);
+	virtual double CheckNumber(int iStackPos = -1);
+	virtual int ObjLen(int iStackPos = -1);
+	virtual const QAngle& GetAngle(int iStackPos = -1);
+	virtual const Vector& GetVector(int iStackPos = -1);
+	virtual void PushAngle(const QAngle& val);
+	virtual void PushVector(const Vector& val);
+	virtual void SetState(lua_State* L);
+	virtual int CreateMetaTable(const char* strName);
+	virtual bool PushMetaTable(int iType);
+	virtual void PushUserType(void* data, int iType);
+	virtual void SetUserType(int iStackPos, void* data);
+
+public:
+	bool Init(ILuaGameCallback *, bool);
+	void Shutdown();
+	void Cycle();
+	ILuaObject *Global();
+	ILuaObject *GetObject(int index);
+	void PushLuaObject(ILuaObject *obj);
+	void PushLuaFunction(CFunc func);
+	void LuaError(const char *err, int index);
+	void TypeError(const char *name, int index);
+	void CallInternal(int args, int rets);
+	void CallInternalNoReturns(int args);
+	bool CallInternalGetBool( int args );
+	const char *CallInternalGetString( int args );
+	bool CallInternalGet( int args, ILuaObject *obj );
+	void NewGlobalTable( const char *name );
+	ILuaObject *NewTemporaryObject( );
+	bool isUserData( int index );
+	ILuaObject *GetMetaTableObject( const char *name, int type );
+	ILuaObject *GetMetaTableObject( int index );
+	ILuaObject *GetReturn( int index );
+	bool IsServer( );
+	bool IsClient( );
+	bool IsMenu( );
+	void DestroyObject( ILuaObject *obj );
+	ILuaObject *CreateObject( );
+	void SetMember( ILuaObject *table, ILuaObject *key, ILuaObject *value );
+	void GetNewTable( );
+	void SetMember( ILuaObject *table, float key );
+	void SetMember( ILuaObject *table, float key, ILuaObject *value );
+	void SetMember( ILuaObject *table, const char *key );
+	void SetMember( ILuaObject *table, const char *key, ILuaObject *value );
+	void SetType( unsigned char );
+	void PushLong( long num );
+	int GetFlags( int index );
+	bool FindOnObjectsMetaTable( int objIndex, int keyIndex );
+	bool FindObjectOnTable( int tableIndex, int keyIndex );
+	void SetMemberFast( ILuaObject *table, int keyIndex, int valueIndex );
+	bool RunString( const char *filename, const char *path, const char *stringToRun, bool run, bool showErrors );
+	bool IsEqual( ILuaObject *objA, ILuaObject *objB );
+	void Error( const char *err );
+	const char *GetStringOrError( int index );
+	bool RunLuaModule( const char *name );
+	bool FindAndRunScript( const char *filename, bool run, bool showErrors, const char *stringToRun, bool noReturns );
+	void SetPathID( const char *pathID );
+	const char *GetPathID( );
+	void ErrorNoHalt( const char *fmt, ... );
+	void Msg( const char *fmt, ... );
+	void PushPath( const char *path );
+	void PopPath( );
+	const char *GetPath( );
+	int GetColor( int index );
+	void PushColor( Color color );
+	int GetStack( int level, lua_Debug *dbg );
+	int GetInfo( const char *what, lua_Debug *dbg );
+	const char *GetLocal( lua_Debug *dbg, int n );
+	const char *GetUpvalue( int funcIndex, int n );
+	bool RunStringEx( const char *filename, const char *path, const char *stringToRun, bool run, bool printErrors, bool dontPushErrors, bool noReturns );
+	size_t GetDataString( int index, const char **str );
+	void ErrorFromLua( const char *fmt, ... );
+	const char *GetCurrentLocation( );
+	void MsgColour( const Color &col, const char *fmt, ... );
+	void GetCurrentFile( std::string &outStr );
+	void CompileString( Bootil::Buffer &dumper, const std::string &stringToCompile );
+	bool CallFunctionProtected( int, int, bool );
+	void Require( const char *name );
+	const char *GetActualTypeName( int type );
+	void PreCreateTable( int arrelems, int nonarrelems );
+	void PushPooledString( int index );
+	const char *GetPooledString( int index );
+	void *AddThreadedCall( ILuaThreadedCall * );
+	void AppendStackTrace( char *, unsigned long );
+	void *CreateConVar( const char *, const char *, const char *, int );
+	void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) );
+
+public:
+	inline ILuaGameCallback *GetLuaGameCallback() const
 	{
 		return gamecallback;
 	}
@@ -522,6 +746,11 @@ public:
 	inline void SetLuaGameCallback( ILuaGameCallback *callback )
 	{
 		gamecallback = callback;
+	}
+
+	void RunThreadedCalls();
+	inline void DoStackCheck() {
+		
 	}
 
 private:
@@ -544,3 +773,10 @@ private:
 	// macOS adds an offset of 4 bytes (total 192) on x86 and 8 bytes (total 376) on x86-64
 	ILuaGameCallback *gamecallback;
 };
+
+// Some functions declared inside CLuaInterface_cpp
+extern int ReadStackIntoError(lua_State* L);
+extern int AdvancedLuaErrorReporter(lua_State* L);
+
+extern ILuaInterface* CreateLuaInterface(bool bIsServer);
+extern void CloseLuaInterface(ILuaInterface*);
