@@ -22,7 +22,7 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
         kind "SharedLib"
         symbols "On"
         -- Remove some or all of these includes if they're not needed
-        IncludeHelpersExtended()
+        --IncludeHelpersExtended()
         --IncludeLuaShared()
         --IncludeSDKEngine()
         --IncludeSDKCommon()
@@ -30,7 +30,7 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
         IncludeSDKTier0()
         IncludeSDKTier1()
         --IncludeSDKTier2()
-        IncludeSDKTier3()
+        --IncludeSDKTier3()
         --IncludeSDKMathlib()
         --IncludeSDKRaytrace()
         --IncludeSDKBitmap()
