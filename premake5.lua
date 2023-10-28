@@ -44,21 +44,5 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
             "libs/luajit"
         })
 
-        files({
-            [[garrysmod_common\sourcesdk-minimal\public\tier2\tier2.cpp]],
-        })
-
         filter("system:windows")
             files({"source/win32/*.cpp", "source/win32/*.hpp"})
-
-        filter("system:linux")
-            targetextension(".so")
-            links -- this fixes the undefined reference to `dlopen' errors.
-                {
-                    "dl",
-                    "tier0",
-                }
-
-        filter("system:linux or macosx")
-            files({"source/posix/*.cpp", "source/posix/*.hpp"})
-                filter "system:linux"
