@@ -1,4 +1,4 @@
-#include <tier1.h>
+#include <convar.h>
 #include <KeyValues.h>
 
 class ILuaConVars
