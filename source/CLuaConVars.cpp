@@ -22,26 +22,54 @@ void CLuaConVars::Init()
 	pServerCVars->LoadFromFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/client.vdf", "MOD");
 }
 
-ConVar* CLuaConVars::CreateConVar(const char*, const char*, const char*, int)
+char* AllocString( const char *pStr, int nMaxChars = -1 )
 {
-	return nullptr;
+	int allocLen;
+	if ( nMaxChars == -1 )
+		allocLen = strlen( pStr ) + 1;
+	else
+		allocLen = min( (int)strlen(pStr), nMaxChars ) + 1;
+
+	char *pOut = new char[allocLen];
+	V_strncpy( pOut, pStr, allocLen );
+	return pOut;
 }
 
-ConCommand* CLuaConVars::CreateConCommand(const char*, const char*, int, void (*)(const CCommand&), int (*)(const char*, char(*)[128]))
+ConVar* CLuaConVars::CreateConVar(const char* name, const char* defaultValue, const char* helpString, int flags)
 {
-	return nullptr;
+	char* nameStr = AllocString(name);
+	char* defaultValueStr = AllocString(defaultValue);
+	char* helpStringStr = AllocString(helpString);
+
+	ConVar* cvar = new ConVar(nameStr, defaultValueStr, flags, helpStringStr);
+
+	// ToDo: Verify this -> managedConVar.push_back(ManagedConVar(cvar));
+
+	return cvar;
+}
+
+ConCommand* CLuaConVars::CreateConCommand(const char* name, const char* helpString, int flags, FnCommandCallback_t callback, FnCommandCompletionCallback completionFunc)
+{
+	char* nameStr = AllocString(name);
+	char* helpStringStr = AllocString(helpString);
+
+	ConCommand* ccmd = new ConCommand(nameStr, callback, helpStringStr, flags, completionFunc);
+
+	// ToDo: Verify this -> managedCommand.push_back(ManagedConVar(ccmd));
+
+	return ccmd;
 }
 
 void CLuaConVars::DestroyManaged()
 {
 	// Do some magic ToDo
 
-	if (pClientCVars->IsEmpty("")) // ToDo find out what the input is.
+	if (pClientCVars->IsEmpty("CVars")) // ToDo find out what the input is.
 	{
 		pClientCVars->SaveToFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/client.vdf", "MOD");
 	}
 
-	if (pServerCVars->IsEmpty("")) // ToDo find out what the input is.
+	if (pServerCVars->IsEmpty("CVars")) // ToDo find out what the input is.
 	{
 		pServerCVars->SaveToFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/server.vdf", "MOD");
 	}

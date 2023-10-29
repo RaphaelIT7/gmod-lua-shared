@@ -19,7 +19,7 @@ public:
 	~CLuaConVars();
 	void Init();
 	ConVar* CreateConVar(const char*, const char*, const char*, int);
-	ConCommand* CreateConCommand(const char*, const char*, int, void (*)(const CCommand&), int (*)(const char*, char(*)[128]));
+	ConCommand* CreateConCommand(const char*, const char*, int, FnCommandCallback_t, FnCommandCompletionCallback);
 	void DestroyManaged();
 	void Cache(const char*, const char*);
 	void ClearCache();
