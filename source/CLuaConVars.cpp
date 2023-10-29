@@ -44,6 +44,11 @@ ConVar* CLuaConVars::CreateConVar(const char* name, const char* defaultValue, co
 	ConVar* cvar = new ConVar(nameStr, defaultValueStr, flags, helpStringStr);
 
 	// ToDo: Verify this -> managedConVar.push_back(ManagedConVar(cvar));
+	ManagedCVar* mcvar = new ManagedCVar;
+	mcvar->name = name;
+	mcvar->cvar = cvar;
+	mcvar->iscvar = true;
+	pManagedCVars.push_back(mcvar);
 
 	return cvar;
 }
@@ -56,6 +61,11 @@ ConCommand* CLuaConVars::CreateConCommand(const char* name, const char* helpStri
 	ConCommand* ccmd = new ConCommand(nameStr, callback, helpStringStr, flags, completionFunc);
 
 	// ToDo: Verify this -> managedCommand.push_back(ManagedConVar(ccmd));
+	ManagedCVar* mcmd = new ManagedCVar;
+	mcmd->name = name;
+	mcmd->cmd = ccmd;
+	mcmd->iscvar = false;
+	pManagedCVars.push_back(mcmd);
 
 	return ccmd;
 }
@@ -75,7 +85,7 @@ void CLuaConVars::DestroyManaged()
 	}
 }
 
-void CLuaConVars::Cache(const char*, const char*)
+void CLuaConVars::Cache(const char* key, const char* value)
 {
 
 }
