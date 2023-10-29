@@ -6,7 +6,7 @@
 
 CLuaShared g_CLuaShared;
 
-/*void _GMOD_LuaPrint(const char* msg)
+/*void GMOD_LuaPrint(const char* msg)
 {
 	ConColorMsg(Color(255, 241, 122, 200), "%s", msg);
 }*/
