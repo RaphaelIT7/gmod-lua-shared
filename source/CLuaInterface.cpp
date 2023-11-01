@@ -544,5 +544,28 @@ void CLuaInterface::Cycle()
 
 void CLuaInterface::RunThreadedCalls()
 {
+	pThreadedcalls.remove_if([] (ILuaThreadedCall* call) {
+		return call->Execute();
+	});
+}
 
+void* CLuaInterface::AddThreadedCall(ILuaThreadedCall* call)
+{
+	pThreadedcalls.push_back(call);
+	return nullptr;
+}
+
+ILuaObject* CLuaInterface::Global()
+{
+	return pGlobal;
+}
+
+ILuaObject* CLuaInterface::GetObject(int index)
+{
+	return (ILuaObject*)GetUserdata(index);
+}
+
+void CLuaInterface::PushLuaObject(ILuaObject* obj)
+{
+	obj->Push(); // It could be that CLuaObject calls this. Then we got a loop. ToDo: Verify and fix this.
 }

@@ -500,7 +500,12 @@ private:
 	lua_State* state;
 };
 
-class ILuaThreadedCall;
+// NOTE: This is a custom class! (Gmod's real class is unknown)
+class ILuaThreadedCall {
+public:
+    virtual ~ILuaThreadedCall() {}
+    virtual bool Execute() = 0;
+};
 
 class ILuaInterface : public ILuaBase
 {
@@ -747,12 +752,6 @@ public:
 	{
 		gamecallback = callback;
 	}
-
-	void RunThreadedCalls();
-	inline void DoStackCheck() {
-		
-	}
-
 private:
 	// vtable: 1 * sizeof(void **) = 4 (x86) or 8 (x86-64) bytes
 	// luabase: 1 * sizeof(LuaBase *) = 4 (x86) or 8 (x86-64) bytes
@@ -772,6 +771,14 @@ private:
 	// x86-64: offset of 368 bytes
 	// macOS adds an offset of 4 bytes (total 192) on x86 and 8 bytes (total 376) on x86-64
 	ILuaGameCallback *gamecallback;
+public:
+	void RunThreadedCalls();
+	inline void DoStackCheck() {
+		
+	}
+private:
+	std::list<ILuaThreadedCall*> pThreadedcalls;
+	CLuaObject* pGlobal;
 };
 
 // Some functions declared inside CLuaInterface_cpp
