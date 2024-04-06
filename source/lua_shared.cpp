@@ -81,12 +81,22 @@ File* CLuaShared::GetCache(const std::string&)
 
 void CLuaShared::MountLua(const char*)
 {
+	// Do some stuff = Push somthing 3x & Call a function
 
+	// Do some stuff with "lua"
+
+	// Do some stuff with "gamemodes"
+
+	// Do some stuff
 }
 
-void CLuaShared::MountLuaAdd(const char*, const char*)
+void CLuaShared::MountLuaAdd(const char* file, const char* path)
 {
+	// Fancy code
 
+	// AddSearchPath(file, path)
+
+	// Other Fancy code?
 }
 
 void CLuaShared::UnMountLua(const char*)
@@ -96,7 +106,7 @@ void CLuaShared::UnMountLua(const char*)
 
 void CLuaShared::SetFileContents(const char*, const char*)
 {
-
+	// Does nothing.
 }
 
 void CLuaShared::SetLuaFindHook(LuaClientDatatableHook*)

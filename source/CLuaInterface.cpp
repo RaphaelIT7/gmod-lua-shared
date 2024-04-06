@@ -1,8 +1,20 @@
 #include "CLuaInterface.h"
+#include "lua/lj_obj.h"
+
+int g_iTypeNum = 0;
 
 // =================================
 // First functions
 // =================================
+void lua_init_stack_gmod(lua_State* L1, lua_State* L)
+{
+    if (L && L != L1)
+	{
+		L1->luabase = L->luabase;
+		if (L->luabase)
+			((ILuaBase*)L->luabase)->SetState(L);
+	}
+}
 
 std::string g_LastError;
 std::vector<lua_Debug*> stackErrors;
@@ -418,7 +430,8 @@ void CLuaInterface::PushAngle(const QAngle& val)
 	lua_pushnumber(state, val.z);
 	lua_setfield(state, -2, "3");
 
-	//lua_setmetatable(state, -2);
+	PushMetaTable(Type::Angle);
+	SetMetaTable(-2);
 }
 
 void CLuaInterface::PushVector(const Vector& val)
@@ -434,7 +447,8 @@ void CLuaInterface::PushVector(const Vector& val)
 	lua_pushnumber(state, val.z);
 	lua_setfield(state, -2, "3");
 
-	//lua_setmetatable(state, -2);
+	PushMetaTable(Type::Vector);
+	SetMetaTable(-2);
 }
 
 void CLuaInterface::SetState(lua_State* L)
