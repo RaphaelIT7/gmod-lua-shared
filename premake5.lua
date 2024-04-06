@@ -14,6 +14,7 @@ include(gmcommon)
 
 include("source/bootil")
 
+local current_dir = _SCRIPT_DIR
 CreateWorkspace({name = "lua_shared", abi_compatible = false})
     -- Serverside module (gmsv prefix)
     -- Can define "source_path", where the source files are located
@@ -41,7 +42,7 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
         --IncludeDetouring()
         --IncludeScanning()
 
-        libdirs("libs")
+        libdirs(current_dir .. "/libs")
         links({
             "lua51",
             "luajit"

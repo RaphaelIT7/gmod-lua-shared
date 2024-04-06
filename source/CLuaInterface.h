@@ -11,20 +11,7 @@
 #include "Types.h"
 
 // ToDo: verify and lua_init_stack_gmod and edit lj_state_new to call that function.
-/*
-void lua_init_stack_gmod(lua_State* L, lua_State* gmodL) {
-    if (gmodL == nullptr) {
-        return;
-    }
-
-    lua_pushnil(gmodL);
-    lua_pushstring(gmodL, "coroutine");
-    lua_rawget(gmodL, LUA_GLOBALSINDEX);
-    lua_getfield(gmodL, -1, "running");
-    lua_insert(gmodL, -2);
-    lua_rawset(L, LUA_GLOBALSINDEX);
-}
-*/
+extern void lua_init_stack_gmod(lua_State* L1, lua_State* L);
 
 // ToDo: Verify and Add GMODLUA_GetUserType and edit lua_typename to call this function.
 /*
@@ -74,10 +61,7 @@ void GMOD_LuaCreateEmptyUserdata(LuaState* L) {
 }
 */
 
-#ifndef TypeNum
-#define TypeNum
-int g_iTypeNum = 0;
-#endif
+extern int g_iTypeNum;
 
 // For use with ILuaBase::PushSpecial
 enum
