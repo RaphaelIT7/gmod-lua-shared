@@ -1,4 +1,3 @@
-#include "interface.h"
 #include "lua_shared.h"
 #include "CLuaConVars.h"
 

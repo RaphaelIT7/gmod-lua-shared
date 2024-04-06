@@ -1,8 +1,7 @@
 #include "CLuaInterface.h"
-#include "Color.h"
 
-Color server_msg(156, 241, 255, 200);
-Color server_error(136, 221, 255, 255);
+//Color server_msg(156, 241, 255, 200);
+//Color server_error(136, 221, 255, 255);
 //Color client_msg(255, 241, 122, 200);
 //Color client_error(255, 221, 102, 255);
 //Color menu_msg(100, 220, 100, 200);
@@ -29,13 +28,13 @@ void CLuaGameCallback::ErrorPrint(const char* error, bool print)
 {
 	// Write into the lua_errors_server.txt if error logging is enabled.
 
-	Color ErrorColor = server_error; // ToDo: Change this later and finish this function.
-	ColorSpewMessage(SPEW_MESSAGE, &ErrorColor, "%s\n", error);
+	//Color ErrorColor = server_error; // ToDo: Change this later and finish this function.
+	//ColorSpewMessage(SPEW_MESSAGE, &ErrorColor, "%s\n", error);
 }
 
 void CLuaGameCallback::Msg(const char* msg, bool unknown)
 {
-	MsgColour(msg, server_msg);
+	//MsgColour(msg, server_msg);
 }
 
 void CLuaGameCallback::MsgColour(const char* msg, const Color& color)

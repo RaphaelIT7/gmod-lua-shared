@@ -1,5 +1,7 @@
 #include "CLuaConVars.h"
-#include "tier2/tier2.h"
+#include <tier2/tier2.h>
+
+IFileSystem *g_pFullFileSystem;
 
 CLuaConVars g_CLuaConVars;
 
