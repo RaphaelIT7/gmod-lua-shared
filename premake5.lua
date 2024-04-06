@@ -43,14 +43,16 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
         --IncludeDetouring()
         --IncludeScanning()
 
-        libdirs(current_dir .. "/libs")
-        links({
-            "lua51.lib",
-            "luajit.lib"
-        })
 
+        libdirs(current_dir .. "/libs")
         filter("system:windows")
+	        links({
+	            "lua51.lib",
+	            "luajit.lib"
+	        })
+
             files({"source/win32/*.cpp", "source/win32/*.hpp"})
 
         filter("system:linux or macosx")
             files({"source/posix/*.cpp", "source/posix/*.hpp"})
+            links("libluajit")
