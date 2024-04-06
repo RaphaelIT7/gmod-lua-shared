@@ -1,7 +1,5 @@
 #include "interface.h"
 #include "lua_shared.h"
-#include "color.h"
-#include "tier3.h"
 #include "CLuaConVars.h"
 
 CLuaShared g_CLuaShared;
@@ -23,9 +21,9 @@ CLuaShared::~CLuaShared()
 
 void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext*, IGet*)
 {
-	ConnectTier1Libraries(&interfaceFactory, 1);
-	ConnectTier2Libraries(&interfaceFactory, 1);
-	ConnectTier3Libraries(&interfaceFactory, 1);
+	//ConnectTier1Libraries(&interfaceFactory, 1);
+	//ConnectTier2Libraries(&interfaceFactory, 1);
+	//ConnectTier3Libraries(&interfaceFactory, 1);
 
 	ConVar_Register(0);
 
@@ -36,9 +34,9 @@ void CLuaShared::Shutdown()
 {
 	ConVar_Unregister();
 
-	DisconnectTier3Libraries();
-	DisconnectTier2Libraries();
-	DisconnectTier1Libraries();
+	//DisconnectTier3Libraries();
+	//DisconnectTier2Libraries();
+	//DisconnectTier1Libraries();
 }
 
 void CLuaShared::DumpStats()
