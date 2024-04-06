@@ -43,8 +43,8 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
 
         libdirs("libs")
         links({
-            "libs/lua51",
-            "libs/luajit"
+            "lua51",
+            "luajit"
         })
 
         filter("system:windows")
