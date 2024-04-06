@@ -1,5 +1,8 @@
 name: Build Project
 
+on:
+  push:
+
 jobs:
   build:
     uses: RaphaelIT7/gmod-common-module-base/.github/workflows/compile.yml@workflow
