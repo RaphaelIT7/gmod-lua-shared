@@ -1,0 +1,57 @@
+name: Build JIT
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Generate libs
+        run: |
+          cd LuaJIT-2.1/src/
+          msvcbuild.bat
+
+      - uses: actions/upload-artifact@v4
+        name: Upload lua51.lib
+        with:
+          name: lua51.lib
+          path: LuaJIT-2.1/src/lua51.lib
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        name: Upload luajit.lib
+        with:
+          name: luajit.lib
+          path: LuaJIT-2.1/src/luajit.lib
+          retention-days: 1
+
+  build-windows:
+    runs-on: ubuntu-latest
+    container: debian:bullseye
+    steps:
+      - name: Install Dependencies
+        run: |
+          dpkg --add-architecture i386
+          apt update
+          apt install -y build-essential git libstdc++6:i386 gcc-multilib g++-multilib wget curl
+
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Generate libs
+        run: |
+          cd LuaJIT-2.1/src/
+          make
+
+      - uses: actions/upload-artifact@v4
+        name: Upload luajit.a
+        with:
+          name: luajit.a
+          path: LuaJIT-2.1/src/luajit.a
+          retention-days: 1
