@@ -18,4 +18,4 @@ jobs:
       ARTIFACT_EXPIRE: "1"
       SOURCESDK_MINIMAL: "RaphaelIT7/sourcesdk-minimal"
       SOURCESDK_MINIMAL_BRANCH: "patch-2"
-      SOURCESDK_MINIMAL_64XBRANCH: "temp-64x"
+      SOURCESDK_MINIMAL_64XBRANCH: "temp_64x"
