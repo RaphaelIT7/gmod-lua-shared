@@ -8,6 +8,9 @@ Maybe if I finish this I also try to get Lua 5.4 to work :D
 
 # ToDo
 
+## Current Issues
+- [ ] Engine Error: `Error loading lua_shared (Sys_GetFactory)`
+
 ## ILuaBase
 
 - ILuaBase::PushMetaTable(int iType)
