@@ -39,9 +39,8 @@ jobs:
     steps:
       - name: Install Dependencies
         run: |
-          dpkg --add-architecture i386
           apt update
-          apt install -y build-essential git libstdc++6:i386 gcc-multilib g++-multilib wget curl
+          apt install -y build-essential
 
       - uses: actions/checkout@v4
         name: Checkout
@@ -74,7 +73,7 @@ jobs:
         run: |
           dpkg --add-architecture i386
           apt update
-          apt install -y build-essential git libstdc++6:i386 gcc-multilib g++-multilib wget curl
+          apt install -y build-essential gcc-multilib g++-multilib
 
       - uses: actions/checkout@v4
         name: Checkout
