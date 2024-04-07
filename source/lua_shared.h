@@ -55,7 +55,7 @@ public:
 	virtual void EmptyCache() = 0;
 };
 
-class CLuaShared : public ILuaShared
+class __declspec(dllexport) CLuaShared : public ILuaShared
 {
 public:
 	~CLuaShared();

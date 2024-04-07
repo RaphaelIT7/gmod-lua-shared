@@ -27,7 +27,7 @@ public:
 	virtual void InterfaceCreated(ILuaInterface *iface) = 0;
 };
 
-class CLuaGameCallback : public ILuaGameCallback
+class __declspec(dllexport) CLuaGameCallback : public ILuaGameCallback
 {
 public:
 	GarrysMod::Lua::ILuaObject *CreateLuaObject();
