@@ -33,7 +33,7 @@ jobs:
           path: LuaJIT-2.1/src/luajit.lib
           retention-days: 1
 
-  build-linux:
+  build-linux-64:
     runs-on: ubuntu-latest
     container: debian:bullseye
     steps:
@@ -53,15 +53,50 @@ jobs:
           make
 
       - uses: actions/upload-artifact@v4
-        name: Upload libluajit.a
+        name: Upload libluajit.a (64x)
         with:
-          name: libluajit.a
+          name: libluajit_64.a
           path: LuaJIT-2.1/src/libluajit.a
           retention-days: 1
 
       - uses: actions/upload-artifact@v4
-        name: Upload libluajit.so
+        name: Upload libluajit.so (64x)
         with:
-          name: libluajit.so
+          name: libluajit_64.so
+          path: LuaJIT-2.1/src/libluajit.so
+          retention-days: 1
+
+  build-linux-32:
+    runs-on: ubuntu-latest
+    container: debian:bullseye
+    steps:
+      - name: Install Dependencies
+        run: |
+          dpkg --add-architecture i386
+          apt update
+          apt install -y build-essential git libstdc++6:i386 gcc-multilib g++-multilib wget curl
+
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Generate libs
+        run: |
+          cd LuaJIT-2.1/src/
+          export TARGET=i686
+          export HOST=i686
+          make
+
+      - uses: actions/upload-artifact@v4
+        name: Upload libluajit.a (32x)
+        with:
+          name: libluajit_32.a
+          path: LuaJIT-2.1/src/libluajit.a
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        name: Upload libluajit.so (32x)
+        with:
+          name: libluajit_32.so
           path: LuaJIT-2.1/src/libluajit.so
           retention-days: 1
