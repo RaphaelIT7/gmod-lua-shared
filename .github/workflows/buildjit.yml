@@ -2,6 +2,9 @@ name: Build JIT
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'LuaJIT-2.1/**'
 
 jobs:
   build-windows:
