@@ -49,8 +49,7 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
         	linkoptions("/MD")
 	        links({
 	            "lua51.lib",
-	            "luajit.lib",
-	            "msvcrt.lib"
+	            "luajit.lib"
 	        })
 
             files({"source/win32/*.cpp", "source/win32/*.hpp"})
