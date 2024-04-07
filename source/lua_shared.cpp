@@ -158,11 +158,3 @@ void CLuaShared::EmptyCache()
 }
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaShared, ILuaShared, "LUASHARED003", g_CLuaShared);
-
-#ifdef WIN32
-#include "Windows.h"
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
-{
-    return TRUE;
-}
-#endif
