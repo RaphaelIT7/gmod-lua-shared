@@ -17,7 +17,7 @@ jobs:
       - name: Generate libs
         run: |
           cd LuaJIT-2.1/src/
-          msvcbuild.bat
+          .\msvcbuild.bat
 
       - uses: actions/upload-artifact@v4
         name: Upload lua51.lib
@@ -53,8 +53,15 @@ jobs:
           make
 
       - uses: actions/upload-artifact@v4
-        name: Upload luajit.a
+        name: Upload libluajit.a
         with:
-          name: luajit.a
-          path: LuaJIT-2.1/src/luajit.a
+          name: libluajit.a
+          path: LuaJIT-2.1/src/libluajit.a
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        name: Upload libluajit.so
+        with:
+          name: libluajit.so
+          path: LuaJIT-2.1/src/libluajit.so
           retention-days: 1
