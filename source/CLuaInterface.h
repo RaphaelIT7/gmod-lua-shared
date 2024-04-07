@@ -1,14 +1,13 @@
 #include <cstdarg>
 #include <convar.h>
 #include <Bootil/Bootil.h>
-#include "lua/lua.h"
-#include "lua/luajit_rolling.h"
-#include "lua/lauxlib.h"
 #include "CLuaGameCallback.h"
-#include "CLuaObject.h"
+#include <GarrysMod/Lua/LuaObject.h>
 
 #define GMOD
 #include "Types.h"
+
+struct lua_Debug;
 
 // ToDo: verify and lua_init_stack_gmod and edit lj_state_new to call that function.
 extern void lua_init_stack_gmod(lua_State* L1, lua_State* L);
@@ -467,7 +466,7 @@ public:
 	}
 
 	// Get information about the interpreter runtime stack
-	inline int GetStack(int level, lua_Debug* ar)
+	/*inline int GetStack(int level, lua_Debug* ar)
 	{
 		return lua_getstack(state, level, ar);
 	}
@@ -476,7 +475,7 @@ public:
 	inline int GetInfo(const char* what, lua_Debug* ar)
 	{
 		return lua_getinfo(state, what, ar);
-	}
+	}*/
 
 private:
 	friend class CLuaInterface;
@@ -497,9 +496,9 @@ public:
 	virtual bool Init( ILuaGameCallback *, bool ) = 0;
 	virtual void Shutdown( ) = 0;
 	virtual void Cycle( ) = 0;
-	virtual ILuaObject *Global( ) = 0;
-	virtual ILuaObject *GetObject( int index ) = 0;
-	virtual void PushLuaObject( ILuaObject *obj ) = 0;
+	virtual GarrysMod::Lua::ILuaObject *Global( ) = 0;
+	virtual GarrysMod::Lua::ILuaObject *GetObject( int index ) = 0;
+	virtual void PushLuaObject( GarrysMod::Lua::ILuaObject *obj ) = 0;
 	virtual void PushLuaFunction( CFunc func ) = 0;
 	virtual void LuaError( const char *err, int index ) = 0;
 	virtual void TypeError( const char *name, int index ) = 0;
@@ -507,32 +506,32 @@ public:
 	virtual void CallInternalNoReturns( int args ) = 0;
 	virtual bool CallInternalGetBool( int args ) = 0;
 	virtual const char *CallInternalGetString( int args ) = 0;
-	virtual bool CallInternalGet( int args, ILuaObject *obj ) = 0;
+	virtual bool CallInternalGet( int args, GarrysMod::Lua::ILuaObject *obj ) = 0;
 	virtual void NewGlobalTable( const char *name ) = 0;
-	virtual ILuaObject *NewTemporaryObject( ) = 0;
+	virtual GarrysMod::Lua::ILuaObject *NewTemporaryObject( ) = 0;
 	virtual bool isUserData( int index ) = 0;
-	virtual ILuaObject *GetMetaTableObject( const char *name, int type ) = 0;
-	virtual ILuaObject *GetMetaTableObject( int index ) = 0;
-	virtual ILuaObject *GetReturn( int index ) = 0;
+	virtual GarrysMod::Lua::ILuaObject *GetMetaTableObject( const char *name, int type ) = 0;
+	virtual GarrysMod::Lua::ILuaObject *GetMetaTableObject( int index ) = 0;
+	virtual GarrysMod::Lua::ILuaObject *GetReturn( int index ) = 0;
 	virtual bool IsServer( ) = 0;
 	virtual bool IsClient( ) = 0;
 	virtual bool IsMenu( ) = 0;
-	virtual void DestroyObject( ILuaObject *obj ) = 0;
-	virtual ILuaObject *CreateObject( ) = 0;
-	virtual void SetMember( ILuaObject *table, ILuaObject *key, ILuaObject *value ) = 0;
+	virtual void DestroyObject( GarrysMod::Lua::ILuaObject *obj ) = 0;
+	virtual GarrysMod::Lua::ILuaObject *CreateObject( ) = 0;
+	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, GarrysMod::Lua::ILuaObject *key, GarrysMod::Lua::ILuaObject *value ) = 0;
 	virtual void GetNewTable( ) = 0;
-	virtual void SetMember( ILuaObject *table, float key ) = 0;
-	virtual void SetMember( ILuaObject *table, float key, ILuaObject *value ) = 0;
-	virtual void SetMember( ILuaObject *table, const char *key ) = 0;
-	virtual void SetMember( ILuaObject *table, const char *key, ILuaObject *value ) = 0;
+	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, float key ) = 0;
+	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, float key, GarrysMod::Lua::ILuaObject *value ) = 0;
+	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, const char *key ) = 0;
+	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, const char *key, GarrysMod::Lua::ILuaObject *value ) = 0;
 	virtual void SetType( unsigned char ) = 0;
 	virtual void PushLong( long num ) = 0;
 	virtual int GetFlags( int index ) = 0;
 	virtual bool FindOnObjectsMetaTable( int objIndex, int keyIndex ) = 0;
 	virtual bool FindObjectOnTable( int tableIndex, int keyIndex ) = 0;
-	virtual void SetMemberFast( ILuaObject *table, int keyIndex, int valueIndex ) = 0;
+	virtual void SetMemberFast( GarrysMod::Lua::ILuaObject *table, int keyIndex, int valueIndex ) = 0;
 	virtual bool RunString( const char *filename, const char *path, const char *stringToRun, bool run, bool showErrors ) = 0;
-	virtual bool IsEqual( ILuaObject *objA, ILuaObject *objB ) = 0;
+	virtual bool IsEqual( GarrysMod::Lua::ILuaObject *objA, GarrysMod::Lua::ILuaObject *objB ) = 0;
 	virtual void Error( const char *err ) = 0;
 	virtual const char *GetStringOrError( int index ) = 0;
 	virtual bool RunLuaModule( const char *name ) = 0;
@@ -655,9 +654,9 @@ public:
 	bool Init(ILuaGameCallback *, bool);
 	void Shutdown();
 	void Cycle();
-	ILuaObject *Global();
-	ILuaObject *GetObject(int index);
-	void PushLuaObject(ILuaObject *obj);
+	GarrysMod::Lua::ILuaObject *Global();
+	GarrysMod::Lua::ILuaObject *GetObject(int index);
+	void PushLuaObject(GarrysMod::Lua::ILuaObject *obj);
 	void PushLuaFunction(CFunc func);
 	void LuaError(const char *err, int index);
 	void TypeError(const char *name, int index);
@@ -665,32 +664,32 @@ public:
 	void CallInternalNoReturns(int args);
 	bool CallInternalGetBool( int args );
 	const char *CallInternalGetString( int args );
-	bool CallInternalGet( int args, ILuaObject *obj );
+	bool CallInternalGet( int args, GarrysMod::Lua::ILuaObject *obj );
 	void NewGlobalTable( const char *name );
-	ILuaObject *NewTemporaryObject( );
+	GarrysMod::Lua::ILuaObject *NewTemporaryObject( );
 	bool isUserData( int index );
-	ILuaObject *GetMetaTableObject( const char *name, int type );
-	ILuaObject *GetMetaTableObject( int index );
-	ILuaObject *GetReturn( int index );
+	GarrysMod::Lua::ILuaObject *GetMetaTableObject( const char *name, int type );
+	GarrysMod::Lua::ILuaObject *GetMetaTableObject( int index );
+	GarrysMod::Lua::ILuaObject *GetReturn( int index );
 	bool IsServer( );
 	bool IsClient( );
 	bool IsMenu( );
-	void DestroyObject( ILuaObject *obj );
-	ILuaObject *CreateObject( );
-	void SetMember( ILuaObject *table, ILuaObject *key, ILuaObject *value );
+	void DestroyObject( GarrysMod::Lua::ILuaObject *obj );
+	GarrysMod::Lua::ILuaObject *CreateObject( );
+	void SetMember( GarrysMod::Lua::ILuaObject *table, GarrysMod::Lua::ILuaObject *key, GarrysMod::Lua::ILuaObject *value );
 	void GetNewTable( );
-	void SetMember( ILuaObject *table, float key );
-	void SetMember( ILuaObject *table, float key, ILuaObject *value );
-	void SetMember( ILuaObject *table, const char *key );
-	void SetMember( ILuaObject *table, const char *key, ILuaObject *value );
+	void SetMember( GarrysMod::Lua::ILuaObject *table, float key );
+	void SetMember( GarrysMod::Lua::ILuaObject *table, float key, GarrysMod::Lua::ILuaObject *value );
+	void SetMember( GarrysMod::Lua::ILuaObject *table, const char *key );
+	void SetMember( GarrysMod::Lua::ILuaObject *table, const char *key, GarrysMod::Lua::ILuaObject *value );
 	void SetType( unsigned char );
 	void PushLong( long num );
 	int GetFlags( int index );
 	bool FindOnObjectsMetaTable( int objIndex, int keyIndex );
 	bool FindObjectOnTable( int tableIndex, int keyIndex );
-	void SetMemberFast( ILuaObject *table, int keyIndex, int valueIndex );
+	void SetMemberFast( GarrysMod::Lua::ILuaObject *table, int keyIndex, int valueIndex );
 	bool RunString( const char *filename, const char *path, const char *stringToRun, bool run, bool showErrors );
-	bool IsEqual( ILuaObject *objA, ILuaObject *objB );
+	bool IsEqual( GarrysMod::Lua::ILuaObject *objA, GarrysMod::Lua::ILuaObject *objB );
 	void Error( const char *err );
 	const char *GetStringOrError( int index );
 	bool RunLuaModule( const char *name );
@@ -715,7 +714,7 @@ public:
 	void MsgColour( const Color &col, const char *fmt, ... );
 	void GetCurrentFile( std::string &outStr );
 	void CompileString( Bootil::Buffer &dumper, const std::string &stringToCompile );
-	bool CallFunctionProtected( int, int, bool );
+	bool CallFunctionProtected( int iArgs, int iRets, bool showError );
 	void Require( const char *name );
 	const char *GetActualTypeName( int type );
 	void PreCreateTable( int arrelems, int nonarrelems );
@@ -762,7 +761,7 @@ public:
 	}
 private:
 	std::list<ILuaThreadedCall*> pThreadedcalls;
-	CLuaObject* pGlobal;
+	GarrysMod::Lua::ILuaObject* pGlobal;
 };
 
 // Some functions declared inside CLuaInterface_cpp

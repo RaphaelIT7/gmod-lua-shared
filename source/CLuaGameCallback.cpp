@@ -14,12 +14,12 @@ void UTLVarArgs(char* buffer, const char* format, ...) {
 	va_end(args);
 }
 
-ILuaObject* CLuaGameCallback::CreateLuaObject()
+GarrysMod::Lua::ILuaObject* CLuaGameCallback::CreateLuaObject()
 {
-	return new CLuaObject();
+	return nullptr;// new CLuaObject();
 }
 
-void CLuaGameCallback::DestroyLuaObject(ILuaObject* pObject)
+void CLuaGameCallback::DestroyLuaObject(GarrysMod::Lua::ILuaObject* pObject)
 {
 	delete pObject;
 }

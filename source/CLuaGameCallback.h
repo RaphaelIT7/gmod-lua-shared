@@ -1,5 +1,4 @@
-#include "CLuaObject.h"
-
+#include <GarrysMod/Lua/LuaObject.h>
 class ILuaInterface;
 
 struct CLuaError
@@ -19,8 +18,8 @@ struct CLuaError
 class ILuaGameCallback
 {
 public:
-	virtual ILuaObject *CreateLuaObject() = 0;
-	virtual void DestroyLuaObject(ILuaObject *pObject) = 0;
+	virtual GarrysMod::Lua::ILuaObject *CreateLuaObject() = 0;
+	virtual void DestroyLuaObject(GarrysMod::Lua::ILuaObject *pObject) = 0;
 	virtual void ErrorPrint(const char *error, bool print) = 0;
 	virtual void Msg(const char *msg, bool useless) = 0;
 	virtual void MsgColour(const char *msg, const Color &color) = 0;
@@ -31,8 +30,8 @@ public:
 class CLuaGameCallback : public ILuaGameCallback
 {
 public:
-	ILuaObject *CreateLuaObject();
-	void DestroyLuaObject(ILuaObject* pObject);
+	GarrysMod::Lua::ILuaObject *CreateLuaObject();
+	void DestroyLuaObject(GarrysMod::Lua::ILuaObject* pObject);
 	void ErrorPrint(const char* error, bool);
 	void Msg(const char* msg, bool);
 	void MsgColour(const char* msg, const Color& color);
