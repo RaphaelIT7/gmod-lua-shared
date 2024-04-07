@@ -46,7 +46,7 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
 
         libdirs(current_dir .. "/libs")
         filter("system:windows")
-        	linkoptions("/NOENTRY")
+        	linkoptions("/ENTRY")
 	        links({
 	            "lua51.lib",
 	            "luajit.lib"
