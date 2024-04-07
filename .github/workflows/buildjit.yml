@@ -82,9 +82,7 @@ jobs:
       - name: Generate libs
         run: |
           cd LuaJIT-2.1/src/
-          export TARGET=i686
-          export HOST=i686
-          make
+          make CC='$(DEFAULT_CC) -m32'
 
       - uses: actions/upload-artifact@v4
         name: Upload libluajit.a (32x)
