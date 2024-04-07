@@ -20,4 +20,3 @@ jobs:
       SOURCESDK_MINIMAL_BRANCH: "patch-2"
       SOURCESDK_MINIMAL_64XBRANCH: "temp_64x"
       USE_PREFIX: "false"
-      LINUX_FILEEXTENTION: "so"
