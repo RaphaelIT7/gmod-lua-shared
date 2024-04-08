@@ -732,8 +732,7 @@ void CLuaInterface::NewGlobalTable(const char* name)
 	pGlobal = gamecallback->CreateLuaObject();
 
 	PushSpecial(SPECIAL_GLOB);
-	int ref = ReferenceCreate();
-	pGlobal->SetReference(ref);
+	pGlobal->SetFromStack(-1);
 	Pop(1);
 }
 
