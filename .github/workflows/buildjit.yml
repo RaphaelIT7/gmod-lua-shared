@@ -7,7 +7,7 @@ on:
       - 'LuaJIT-2.1/**'
 
 jobs:
-  build-windows:
+  build-windows-64:
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v4
@@ -22,14 +22,40 @@ jobs:
       - uses: actions/upload-artifact@v4
         name: Upload lua51.lib
         with:
-          name: lua51.lib
+          name: lua51_64.lib
           path: LuaJIT-2.1/src/lua51.lib
           retention-days: 1
 
       - uses: actions/upload-artifact@v4
         name: Upload luajit.lib
         with:
-          name: luajit.lib
+          name: luajit_64.lib
+          path: LuaJIT-2.1/src/luajit.lib
+          retention-days: 1
+
+  build-windows-32:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Generate libs
+        run: |
+          cd LuaJIT-2.1/src/
+          .\msvcbuild_86.bat
+
+      - uses: actions/upload-artifact@v4
+        name: Upload lua51.lib
+        with:
+          name: lua51_32.lib
+          path: LuaJIT-2.1/src/lua51.lib
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        name: Upload luajit.lib
+        with:
+          name: luajit_32.lib
           path: LuaJIT-2.1/src/luajit.lib
           retention-days: 1
 
