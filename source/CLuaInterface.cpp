@@ -956,7 +956,7 @@ void CLuaInterface::ErrorNoHalt( const char* fmt, ... )
 
 void CLuaInterface::Msg( const char* fmt, ... )
 {
-	Msg("CLuaInterface::Msg %s\n", fmt);
+	::Msg("CLuaInterface::Msg %s\n", fmt);
 	// ToDo
 }
 
