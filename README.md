@@ -10,7 +10,8 @@ Maybe if I finish this I also try to get Lua 5.4 to work :D
 
 ## Current Issues
 - [x] Engine Error: `Error loading lua_shared (Sys_GetFactory)`
-- [ ] `Segmentation fault (core dumped) ../../../source/CLuaInterface.cpp:958`
+- [x] `Segmentation fault (core dumped) ../../../source/CLuaInterface.cpp:958`
+- [ ] CLuaInterface::Global needs to be implemented. Or else we crash.
 
 ## ILuaBase
 
