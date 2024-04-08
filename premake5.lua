@@ -41,6 +41,10 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
         --IncludeDetouring()
         --IncludeScanning()
 
+		files({
+			[[garrysmod_common\sourcesdk-minimal\tier1\convar.cpp]],
+		})
+
         targetsuffix("")
         libdirs(current_dir .. "/libs")
         filter("system:windows")
