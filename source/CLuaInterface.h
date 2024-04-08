@@ -774,7 +774,7 @@ private:
 	// x86: offset of 188 bytes
 	// x86-64: offset of 368 bytes
 	// macOS adds an offset of 4 bytes (total 192) on x86 and 8 bytes (total 376) on x86-64
-	ILuaGameCallback *gamecallback;
+	ILuaGameCallback* gamecallback = nullptr;
 public:
 	void RunThreadedCalls();
 	inline void DoStackCheck() {
@@ -782,9 +782,9 @@ public:
 	}
 private:
 	std::list<ILuaThreadedCall*> pThreadedcalls;
-	GarrysMod::Lua::ILuaObject* pGlobal;
-	const char* pPathID; // lsv, lsc or LuaMenu
-	unsigned char pRealm; // CLIENT = 0, SERVER = 1, MENU = 2
+	GarrysMod::Lua::ILuaObject* pGlobal = nullptr;
+	const char* pPathID = NULL; // lsv, lsc or LuaMenu
+	unsigned char pRealm = -1; // CLIENT = 0, SERVER = 1, MENU = 2
 };
 
 // Some functions declared inside CLuaInterface_cpp

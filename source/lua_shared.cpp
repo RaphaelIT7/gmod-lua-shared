@@ -166,28 +166,3 @@ void CLuaShared::EmptyCache()
 }
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaShared, ILuaShared, "LUASHARED003", g_CLuaShared);
-
-// NOTE: Workaround.
-void Load()
-{
-	Msg("This should not be loaded\n");
-	CLuaShared funny_class;
-	funny_class.DumpStats();
-}
-
-#if SYSTEM_WINDOWS
-#include <windows.h>
-BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
-{
-	Load();
-
-	return TRUE;
-}
-
-#else
-typedef void (*plugin_main)();
-void __attribute__((constructor)) SO_load()
-{
-	Load();
-}
-#endif
