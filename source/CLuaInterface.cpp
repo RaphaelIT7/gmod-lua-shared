@@ -608,7 +608,7 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
     lua_pushinteger(state, 7);
     lua_setglobal(state, "CanExitVehicle");
 
-	return 0;
+	return true;
 }
 
 void CLuaInterface::Shutdown()

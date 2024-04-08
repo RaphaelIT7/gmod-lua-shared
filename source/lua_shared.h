@@ -1,5 +1,6 @@
 #include "CLuaInterface.h"
 #include <filesystem.h>
+#include <GarrysMod/IGet.h>
 
 struct File
 {
@@ -58,4 +59,6 @@ public:
 	const char* GetStackTraces();
 	void InvalidateCache(const std::string&);
 	void EmptyCache();
+private:
+	IGet* pGet;
 };

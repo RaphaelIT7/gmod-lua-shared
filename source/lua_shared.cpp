@@ -20,7 +20,7 @@ CLuaShared::~CLuaShared()
 
 }
 
-void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext*, IGet*)
+void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext*, IGet* get)
 {
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);
@@ -31,6 +31,8 @@ void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext
 	ConVar_Register(0);
 
 	LuaConVars();
+
+	pGet = get;
 }
 
 void CLuaShared::Shutdown()
