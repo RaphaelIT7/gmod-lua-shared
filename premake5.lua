@@ -45,13 +45,24 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
         libdirs(current_dir .. "/libs")
         filter("system:windows")
         	linkoptions("/NODEFAULTLIB:LIBCMT")
-	        links({
+	        links("msvcrt.lib")
 				"lua51.lib",
-				"luajit.lib",
-				"msvcrt.lib"
+				"luajit.lib"
 	        })
 
             files({"source/win32/*.cpp", "source/win32/*.hpp"})
+
+		filter("system:windows", "platforms:x86_64")
+			links({
+				"lua51_64.lib",
+				"luajit_64.lib"
+	        })
+
+		filter("system:windows", "platforms:x86")
+			links({
+				"lua51_64.lib",
+				"luajit_64.lib"
+	        })
 
 		filter({"system:linux", "platforms:x86_64"})
 			links("luajit_64")
