@@ -9,9 +9,9 @@
 #include "filesystem.h"
 //#include "materialsystem/imaterialsystem.h"
 //#include "materialsystem/imaterialsystemhardwareconfig.h"
-#include "materialsystem/IColorCorrection.h"
-#include "materialsystem/idebugtextureinfo.h"
-#include "materialsystem/ivballoctracker.h"
+//#include "materialsystem/IColorCorrection.h"
+//#include "materialsystem/idebugtextureinfo.h"
+//#include "materialsystem/ivballoctracker.h"
 //#include "inputsystem/iinputsystem.h"
 //#include <networksystem/inetworksystem.h>
 // dimhotepus: No perforce
@@ -62,7 +62,7 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		}
 		if ( !materials )
 		{
-			g_pMaterialSystem = materials = ( IMaterialSystem * )pFactoryList[i]( MATERIAL_SYSTEM_INTERFACE_VERSION, NULL );
+			//g_pMaterialSystem = materials = ( IMaterialSystem * )pFactoryList[i]( MATERIAL_SYSTEM_INTERFACE_VERSION, NULL );
 		}
 		if ( !g_pInputSystem )
 		{
@@ -74,15 +74,15 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		}
 		if ( !g_pMaterialSystemHardwareConfig )
 		{
-			g_pMaterialSystemHardwareConfig = ( IMaterialSystemHardwareConfig * )pFactoryList[i]( MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION, NULL );
+			//g_pMaterialSystemHardwareConfig = ( IMaterialSystemHardwareConfig * )pFactoryList[i]( MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION, NULL );
 		}
 		if ( !g_pMaterialSystemDebugTextureInfo )
 		{
-			g_pMaterialSystemDebugTextureInfo = (IDebugTextureInfo*)pFactoryList[i]( DEBUG_TEXTURE_INFO_VERSION, 0 );
+			//g_pMaterialSystemDebugTextureInfo = (IDebugTextureInfo*)pFactoryList[i]( DEBUG_TEXTURE_INFO_VERSION, 0 );
 		}
 		if ( !g_VBAllocTracker )
 		{
-			g_VBAllocTracker = (IVBAllocTracker*)pFactoryList[i]( VB_ALLOC_TRACKER_INTERFACE_VERSION, 0 );
+			//g_VBAllocTracker = (IVBAllocTracker*)pFactoryList[i]( VB_ALLOC_TRACKER_INTERFACE_VERSION, 0 );
 		}
 		// dimhotepus: No perforce
 		/*if ( !p4 )
@@ -91,7 +91,7 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		}*/
 		if ( !colorcorrection )
 		{
-			colorcorrection = ( IColorCorrectionSystem * )pFactoryList[i]( COLORCORRECTION_INTERFACE_VERSION, NULL );
+			//colorcorrection = ( IColorCorrectionSystem * )pFactoryList[i]( COLORCORRECTION_INTERFACE_VERSION, NULL );
 		}
 		if ( !mdllib )
 		{
