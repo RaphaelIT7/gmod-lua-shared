@@ -4,7 +4,7 @@
 #include "CLuaGameCallback.h"
 #include <GarrysMod/Lua/LuaObject.h>
 
-#include <lua.h>
+#include <lua.hpp>
 #define GARRYSMOD_LUA_LUABASE_H 1
 
 #define GMOD
