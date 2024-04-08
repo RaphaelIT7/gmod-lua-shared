@@ -30,7 +30,7 @@ char* AllocString( const char *pStr, int nMaxChars = -1 )
 	if ( nMaxChars == -1 )
 		allocLen = strlen( pStr ) + 1;
 	else
-		allocLen = min( (int)strlen(pStr), nMaxChars ) + 1;
+		allocLen = MIN( (int)strlen(pStr), nMaxChars ) + 1;
 
 	char *pOut = new char[allocLen];
 	V_strncpy( pOut, pStr, allocLen );
