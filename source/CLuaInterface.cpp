@@ -250,7 +250,7 @@ void CLuaInterface::RawSet(int iStackPos)
 const char* CLuaInterface::GetString(int iStackPos, unsigned int* iOutLen)
 {
 	Msg("CLuaInterface::GetString\n");
-	return lua_tolstring(state, iStackPos, iOutLen);
+	return lua_tolstring(state, iStackPos, reinterpret_cast<std::size_t*>(iOutLen));
 }
 
 double CLuaInterface::GetNumber(int iStackPos)
