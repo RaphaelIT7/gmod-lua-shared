@@ -731,9 +731,12 @@ void CLuaInterface::NewGlobalTable(const char* name)
 
 	pGlobal = gamecallback->CreateLuaObject();
 
-	PushSpecial(SPECIAL_GLOB);
-	pGlobal->SetFromStack(-1);
-	Pop(1);
+	if (pGlobal)
+	{
+		PushSpecial(SPECIAL_GLOB);
+		pGlobal->SetFromStack(-1);
+		Pop(1);
+	}
 }
 
 GarrysMod::Lua::ILuaObject* CLuaInterface::NewTemporaryObject()
