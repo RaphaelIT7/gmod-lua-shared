@@ -1,6 +1,5 @@
 #include "CLuaInterface.h"
 #include <filesystem.h>
-#include <Bootil/Bootil.h>
 
 namespace State
 {
@@ -25,7 +24,7 @@ struct File
 	std::string name;
 	std::string source;
 	std::string contents;
-	Bootil::AutoBuffer compressed;
+	void* compressed; // Bootil::Autobuffer
 	unsigned int timesloadedserver;
 	unsigned int timesloadedclient;
 };
@@ -36,7 +35,7 @@ class ILuaShared
 {
 public:
 	virtual ~ILuaShared() {};
-	virtual void Init(void *(*)(const char *, int *), bool, CSteamAPIContext *, IGet *) = 0;
+	virtual void Init(CreateInterfaceFn, bool, CSteamAPIContext *, IGet *) = 0;
 	virtual void Shutdown() = 0;
 	virtual void DumpStats() = 0;
 	virtual ILuaInterface *CreateLuaInterface(unsigned char, bool) = 0;

@@ -1,0 +1,125 @@
+name: Build Bootil
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Bootil/**'
+
+env:
+  PROJECT_PATH: "Bootil/projects/"
+
+jobs:
+  build-windows:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - name: Install Premake
+        run: |
+          cd ${{env.PROJECT_PATH}}
+          wget https://github.com/danielga/garrysmod_common/releases/download/premake-build%2F5.0.0-beta2/premake-5.0.0-beta2-linux.tar.gz -O premake.tar.gz
+          tar -xvf premake.tar.gz --directory=/usr/bin
+          gcc --version
+
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Generate libs
+        run: |
+          cd ${{env.PROJECT_PATH}}
+          ./premake5.exe vs2019
+
+      - uses: actions/upload-artifact@v4
+        name: Upload lua51.lib
+        with:
+          name: lua51.lib
+          path: LuaJIT-2.1/src/lua51.lib
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        name: Upload luajit.lib
+        with:
+          name: luajit.lib
+          path: LuaJIT-2.1/src/luajit.lib
+          retention-days: 1
+
+  build-linux-64:
+    runs-on: ubuntu-latest
+    container: debian:bullseye
+    steps:
+      - name: Install Dependencies
+        run: |
+          apt update
+          apt install -y build-essential
+
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - name: Install Premake
+        run: |
+          cd ${{env.PROJECT_PATH}}
+          wget https://github.com/danielga/garrysmod_common/releases/download/premake-build%2F5.0.0-beta2/premake-5.0.0-beta2-linux.tar.gz -O premake.tar.gz
+          tar -xvf premake.tar.gz --directory=/usr/bin
+          gcc --version
+
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Generate libs
+        run: |
+          cd ${{env.PROJECT_PATH}}
+          premake5 gmake
+          make
+
+      - uses: actions/upload-artifact@v4
+        name: Upload libluajit.a (64x)
+        with:
+          name: libluajit_64.a
+          path: LuaJIT-2.1/src/libluajit.a
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        name: Upload libluajit.so (64x)
+        with:
+          name: libluajit_64.so
+          path: LuaJIT-2.1/src/libluajit.so
+          retention-days: 1
+
+  build-linux-32:
+    runs-on: ubuntu-latest
+    container: debian:bullseye
+    steps:
+      - name: Install Dependencies
+        run: |
+          dpkg --add-architecture i386
+          apt update
+          apt install -y build-essential gcc-multilib g++-multilib
+
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - name: Install Premake
+        run: |
+          cd ${{env.PROJECT_PATH}}
+          wget https://github.com/danielga/garrysmod_common/releases/download/premake-build%2F5.0.0-beta2/premake-5.0.0-beta2-linux.tar.gz -O premake.tar.gz
+          tar -xvf premake.tar.gz --directory=/usr/bin
+          gcc --version
+
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Generate libs
+        run: |
+          cd ${{env.PROJECT_PATH}}
+          premake5 gmake
+          make
+
+      - uses: actions/upload-artifact@v4
+        name: Upload libluajit.a (32x)
+        with:
+          name: libluajit_32.a
+          path: LuaJIT-2.1/src/libluajit.a
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        name: Upload libluajit.so (32x)
+        with:
+          name: libluajit_32.so
+          path: LuaJIT-2.1/src/libluajit.so
+          retention-days: 1
