@@ -1,23 +1,6 @@
 #include "CLuaInterface.h"
 #include <filesystem.h>
 
-namespace State
-{
-	enum
-	{
-		CLIENT = 0,
-		SERVER,
-		MENU
-	};
-
-	static const char *Name[] = {
-		"client",
-		"server",
-		"menu",
-		nullptr
-	};
-}
-
 struct File
 {
 	int time;

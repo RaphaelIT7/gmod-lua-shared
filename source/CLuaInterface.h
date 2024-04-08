@@ -10,6 +10,24 @@
 #define GMOD
 #include "Types.h"
 
+namespace State
+{
+	enum
+	{
+		CLIENT = 0,
+		SERVER,
+		MENU
+	};
+
+	static const char *Name[] = {
+		"client",
+		"server",
+		"menu",
+		nullptr
+	};
+}
+
+
 struct lua_Debug;
 
 // ToDo: verify and lua_init_stack_gmod and edit lj_state_new to call that function.
@@ -765,7 +783,8 @@ public:
 private:
 	std::list<ILuaThreadedCall*> pThreadedcalls;
 	GarrysMod::Lua::ILuaObject* pGlobal;
-	const char* pathID; // lsv or lsc
+	const char* pPathID; // lsv or lsc
+	unsigned char pRealm; // CLIENT = 0, SERVER = 1, MENU = 2
 };
 
 // Some functions declared inside CLuaInterface_cpp

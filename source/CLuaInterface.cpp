@@ -775,25 +775,22 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::GetReturn(int iStackPos)
 bool CLuaInterface::IsServer()
 {
 	::Msg("CLuaInterface::IsServer\n");
-	// ToDo
 
-	return false;
+	return pRealm == State::SERVER;
 }
 
 bool CLuaInterface::IsClient()
 {
 	::Msg("CLuaInterface::IsClient\n");
-	// ToDo
 
-	return false;
+	return pRealm == State::CLIENT;
 }
 
 bool CLuaInterface::IsMenu()
 {
 	::Msg("CLuaInterface::IsMenu\n");
-	// ToDo
 
-	return true;
+	return pRealm == State::MENU;
 }
 
 void CLuaInterface::DestroyObject(GarrysMod::Lua::ILuaObject* obj)
@@ -846,10 +843,10 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, 
 	// ToDo
 }
 
-void CLuaInterface::SetType(unsigned char unknown)
+void CLuaInterface::SetType(unsigned char realm)
 {
-	::Msg("CLuaInterface::SetType %u\n", unknown);
-	// ToDo
+	::Msg("CLuaInterface::SetType %u\n", realm);
+	pRealm = realm;
 }
 
 void CLuaInterface::PushLong(long number)
@@ -951,7 +948,7 @@ const char* CLuaInterface::GetPathID()
 {
 	::Msg("CLuaInterface::GetPathID\n");
 
-	return pathID;
+	return pPathID;
 }
 
 void CLuaInterface::ErrorNoHalt( const char* fmt, ... )
