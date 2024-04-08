@@ -37,11 +37,11 @@ void CLuaShared::Shutdown()
 {
 	ConVar_Unregister();
 
-	DisconnectTier3Libraries();
-	DisconnectTier2Libraries();
 #ifdef ARCHITECTURE_X86
-	DisconnectTier1Libraries();
+	DisconnectTier3Libraries();
 #endif
+	DisconnectTier2Libraries();
+	DisconnectTier1Libraries();
 }
 
 void CLuaShared::DumpStats()
