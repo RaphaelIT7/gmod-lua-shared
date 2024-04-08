@@ -944,14 +944,14 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 void CLuaInterface::SetPathID(const char* pathID)
 {
 	::Msg("CLuaInterface::SetPathID %s\n", pathID);
-	// ToDo
+	pathID = pathID;
 }
 
 const char* CLuaInterface::GetPathID()
 {
 	::Msg("CLuaInterface::GetPathID\n");
-	// ToDo
-	return "";
+
+	return pathID;
 }
 
 void CLuaInterface::ErrorNoHalt( const char* fmt, ... )

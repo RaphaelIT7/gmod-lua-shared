@@ -765,6 +765,7 @@ public:
 private:
 	std::list<ILuaThreadedCall*> pThreadedcalls;
 	GarrysMod::Lua::ILuaObject* pGlobal;
+	const char* pathID; // lsv or lsc
 };
 
 // Some functions declared inside CLuaInterface_cpp
