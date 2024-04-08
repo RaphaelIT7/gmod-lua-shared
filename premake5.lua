@@ -60,6 +60,9 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
 			links("luajit_32")
             linkoptions(current_dir .. "/libs/libluajit_32.a")
 
-        filter("system:linux or macosx")
-            files({"source/posix/*.cpp", "source/posix/*.hpp"})
-            targetextension(".so")
+		filter("system:linux or macosx")
+			files({"source/posix/*.cpp", "source/posix/*.hpp"})
+			targetextension(".so")
+			links({
+				"dl"
+			})
