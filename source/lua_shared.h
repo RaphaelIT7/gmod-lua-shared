@@ -35,7 +35,7 @@ class LuaClientDatatableHook;
 class ILuaShared
 {
 public:
-	virtual ~ILuaShared() = 0;
+	virtual ~ILuaShared() {};
 	virtual void Init(void *(*)(const char *, int *), bool, CSteamAPIContext *, IGet *) = 0;
 	virtual void Shutdown() = 0;
 	virtual void DumpStats() = 0;
