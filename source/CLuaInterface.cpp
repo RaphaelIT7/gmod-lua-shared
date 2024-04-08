@@ -980,7 +980,7 @@ const char* CLuaInterface::GetPath()
 	::Msg("CLuaInterface::GetPath\n");
 	// ToDo
 
-	return "";
+	return NULL;
 }
 
 int CLuaInterface::GetColor(int iStackPos) // Probably returns the StackPos
