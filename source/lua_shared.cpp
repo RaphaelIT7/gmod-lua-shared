@@ -24,7 +24,9 @@ void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext
 {
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);
+#ifdef ARCHITECTURE_X86
 	ConnectTier3Libraries(&interfaceFactory, 1);
+#endif
 
 	ConVar_Register(0);
 
@@ -35,9 +37,11 @@ void CLuaShared::Shutdown()
 {
 	ConVar_Unregister();
 
-	//DisconnectTier3Libraries();
-	//DisconnectTier2Libraries();
-	//DisconnectTier1Libraries();
+	DisconnectTier3Libraries();
+	DisconnectTier2Libraries();
+#ifdef ARCHITECTURE_X86
+	DisconnectTier1Libraries();
+#endif
 }
 
 void CLuaShared::DumpStats()

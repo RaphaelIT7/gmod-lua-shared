@@ -29,8 +29,7 @@
 #include "Platform.hpp"
 #ifdef ARCHITECTURE_X86
 IFileSystem *g_pFullFileSystem = 0;
-#endif
-/*IMaterialSystem *materials = 0;
+IMaterialSystem *materials = 0;
 IMaterialSystem *g_pMaterialSystem = 0;
 IInputSystem *g_pInputSystem = 0;
 INetworkSystem *g_pNetworkSystem = 0;
@@ -40,7 +39,8 @@ IVBAllocTracker *g_VBAllocTracker = 0;
 IColorCorrectionSystem *colorcorrection = 0;
 IP4 *p4 = 0;
 IMdlLib *mdllib = 0;
-IQueuedLoader *g_pQueuedLoader = 0;*/
+IQueuedLoader *g_pQueuedLoader = 0;
+#endif
 
 #define NETWORKSYSTEM_INTERFACE_VERSION "NetworkSystemVersion001"
 #define INPUTSYSTEM_INTERFACE_VERSION "InputSystemVersion001"
@@ -63,7 +63,7 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		{
 			g_pFullFileSystem = ( IFileSystem * )pFactoryList[i]( FILESYSTEM_INTERFACE_VERSION, NULL );
 		}
-		/*if ( !materials )
+		if ( !materials )
 		{
 			//g_pMaterialSystem = materials = ( IMaterialSystem * )pFactoryList[i]( MATERIAL_SYSTEM_INTERFACE_VERSION, NULL );
 		}
@@ -103,7 +103,7 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		if ( !g_pQueuedLoader )
 		{
 			//g_pQueuedLoader = (IQueuedLoader *)pFactoryList[i]( QUEUEDLOADER_INTERFACE_VERSION, NULL );
-		}*/
+		}
 	}
 }
 
@@ -111,7 +111,7 @@ void DisconnectTier2Libraries()
 {
 
 	g_pFullFileSystem = 0;
-	/*materials = g_pMaterialSystem = 0;
+	materials = g_pMaterialSystem = 0;
 	g_pMaterialSystemHardwareConfig = 0;
 	g_pMaterialSystemDebugTextureInfo = 0;
 	g_pInputSystem = 0;
@@ -119,6 +119,6 @@ void DisconnectTier2Libraries()
 	colorcorrection = 0;
 	p4 = 0;
 	mdllib = 0;
-	g_pQueuedLoader = 0;*/
+	g_pQueuedLoader = 0;
 }
 
