@@ -13,7 +13,7 @@
 #include "materialsystem/idebugtextureinfo.h"
 #include "materialsystem/ivballoctracker.h"
 #include "inputsystem/iinputsystem.h"
-#include "networksystem/inetworksystem.h"
+//#include <networksystem/inetworksystem.h>
 // dimhotepus: No perforce
 // #include "p4lib/ip4.h"
 #include "mdllib/mdllib.h"
@@ -38,6 +38,8 @@ IColorCorrectionSystem *colorcorrection = 0;
 IP4 *p4 = 0;
 IMdlLib *mdllib = 0;
 IQueuedLoader *g_pQueuedLoader = 0;
+
+#define NETWORKSYSTEM_INTERFACE_VERSION "NetworkSystemVersion001"
 
 
 //-----------------------------------------------------------------------------
