@@ -12,7 +12,6 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#include "gmod.h"
 #include "luaconf.h"
 
 
@@ -49,6 +48,7 @@
 
 
 typedef struct lua_State lua_State;
+#include "gmod.h"
 
 typedef int (*lua_CFunction) (lua_State *L);
 
