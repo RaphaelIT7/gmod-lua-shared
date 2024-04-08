@@ -730,6 +730,10 @@ void CLuaInterface::NewGlobalTable(const char* name)
 		gamecallback->DestroyLuaObject(pGlobal);
 
 	pGlobal = gamecallback->CreateLuaObject();
+
+	PushSpecial(SPECIAL_GLOB);
+	pGlobal->SetReference(ReferenceCreate());
+	Pop(1);
 }
 
 GarrysMod::Lua::ILuaObject* CLuaInterface::NewTemporaryObject()
@@ -894,7 +898,8 @@ bool CLuaInterface::RunString(const char* filename, const char* path, const char
 bool CLuaInterface::IsEqual(GarrysMod::Lua::ILuaObject* objA, GarrysMod::Lua::ILuaObject* objB)
 {
 	::Msg("CLuaInterface::IsEqual\n");
-	return false;
+	// Still ToDo
+	return objA == objB;
 }
 
 void CLuaInterface::Error(const char* err)

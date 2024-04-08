@@ -783,7 +783,7 @@ public:
 private:
 	std::list<ILuaThreadedCall*> pThreadedcalls;
 	GarrysMod::Lua::ILuaObject* pGlobal;
-	const char* pPathID; // lsv or lsc
+	const char* pPathID; // lsv, lsc or LuaMenu
 	unsigned char pRealm; // CLIENT = 0, SERVER = 1, MENU = 2
 };
 
