@@ -24,7 +24,7 @@ void CLuaConVars::Init()
 	pServerCVars->LoadFromFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/client.vdf", "MOD");
 }
 
-char* AllocString( const char *pStr, int nMaxChars = -1 )
+char* AAllocString( const char *pStr, int nMaxChars = -1 )
 {
 	int allocLen;
 	if ( nMaxChars == -1 )
@@ -39,9 +39,9 @@ char* AllocString( const char *pStr, int nMaxChars = -1 )
 
 ConVar* CLuaConVars::CreateConVar(const char* name, const char* defaultValue, const char* helpString, int flags)
 {
-	char* nameStr = AllocString(name);
-	char* defaultValueStr = AllocString(defaultValue);
-	char* helpStringStr = AllocString(helpString);
+	char* nameStr = AAllocString(name);
+	char* defaultValueStr = AAllocString(defaultValue);
+	char* helpStringStr = AAllocString(helpString);
 
 	ConVar* cvar = new ConVar(nameStr, defaultValueStr, flags, helpStringStr);
 
@@ -57,8 +57,8 @@ ConVar* CLuaConVars::CreateConVar(const char* name, const char* defaultValue, co
 
 ConCommand* CLuaConVars::CreateConCommand(const char* name, const char* helpString, int flags, FnCommandCallback_t callback, FnCommandCompletionCallback completionFunc)
 {
-	char* nameStr = AllocString(name);
-	char* helpStringStr = AllocString(helpString);
+	char* nameStr = AAllocString(name);
+	char* helpStringStr = AAllocString(helpString);
 
 	ConCommand* ccmd = new ConCommand(nameStr, callback, helpStringStr, flags, completionFunc);
 
