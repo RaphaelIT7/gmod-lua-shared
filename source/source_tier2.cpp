@@ -26,6 +26,10 @@
 // It is hoped that setting this, and using this library will be the common mechanism for
 // allowing link libraries to access tier2 library interfaces
 //-----------------------------------------------------------------------------
+#include "Platform.hpp"
+#ifdef ARCHITECTURE_X86
+IFileSystem *g_pFullFileSystem = 0;
+#endif
 /*IMaterialSystem *materials = 0;
 IMaterialSystem *g_pMaterialSystem = 0;
 IInputSystem *g_pInputSystem = 0;
