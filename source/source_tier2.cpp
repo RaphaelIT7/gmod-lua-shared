@@ -60,7 +60,7 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		{
 			g_pFullFileSystem = ( IFileSystem * )pFactoryList[i]( FILESYSTEM_INTERFACE_VERSION, NULL );
 		}
-		if ( !materials )
+		/*if ( !materials )
 		{
 			//g_pMaterialSystem = materials = ( IMaterialSystem * )pFactoryList[i]( MATERIAL_SYSTEM_INTERFACE_VERSION, NULL );
 		}
@@ -85,10 +85,10 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 			//g_VBAllocTracker = (IVBAllocTracker*)pFactoryList[i]( VB_ALLOC_TRACKER_INTERFACE_VERSION, 0 );
 		}
 		// dimhotepus: No perforce
-		/*if ( !p4 )
-		{
-			p4 = ( IP4 * )pFactoryList[i]( P4_INTERFACE_VERSION, NULL );
-		}*/
+		//if ( !p4 )
+		//{
+		//	p4 = ( IP4 * )pFactoryList[i]( P4_INTERFACE_VERSION, NULL );
+		//}
 		if ( !colorcorrection )
 		{
 			//colorcorrection = ( IColorCorrectionSystem * )pFactoryList[i]( COLORCORRECTION_INTERFACE_VERSION, NULL );
@@ -100,7 +100,7 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		if ( !g_pQueuedLoader )
 		{
 			//g_pQueuedLoader = (IQueuedLoader *)pFactoryList[i]( QUEUEDLOADER_INTERFACE_VERSION, NULL );
-		}
+		}*/
 	}
 }
 
@@ -108,7 +108,7 @@ void DisconnectTier2Libraries()
 {
 
 	g_pFullFileSystem = 0;
-	materials = g_pMaterialSystem = 0;
+	/*materials = g_pMaterialSystem = 0;
 	g_pMaterialSystemHardwareConfig = 0;
 	g_pMaterialSystemDebugTextureInfo = 0;
 	g_pInputSystem = 0;
@@ -116,6 +116,6 @@ void DisconnectTier2Libraries()
 	colorcorrection = 0;
 	p4 = 0;
 	mdllib = 0;
-	g_pQueuedLoader = 0;
+	g_pQueuedLoader = 0;*/
 }
 
