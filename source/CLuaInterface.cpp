@@ -726,6 +726,9 @@ void CLuaInterface::NewGlobalTable(const char* name)
 {
 	::Msg("CLuaInterface::NewGlobalTable %s\n", name);
 
+	if (pGlobal)
+		gamecallback->DestroyLuaObject(pGlobal);
+
 	pGlobal = gamecallback->CreateLuaObject();
 }
 
@@ -845,7 +848,7 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, 
 
 void CLuaInterface::SetType(unsigned char unknown)
 {
-	::Msg("CLuaInterface::SetType %s\n", unknown);
+	::Msg("CLuaInterface::SetType %u\n", unknown);
 	// ToDo
 }
 
