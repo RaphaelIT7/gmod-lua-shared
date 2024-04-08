@@ -1,5 +1,6 @@
 #include "lua_shared.h"
 #include "CLuaConVars.h"
+#include "tier3/tier3.h"
 
 CLuaShared g_CLuaShared;
 
@@ -20,9 +21,9 @@ CLuaShared::~CLuaShared()
 
 void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext*, IGet*)
 {
-	//ConnectTier1Libraries(&interfaceFactory, 1);
-	//ConnectTier2Libraries(&interfaceFactory, 1);
-	//ConnectTier3Libraries(&interfaceFactory, 1);
+	ConnectTier1Libraries(&interfaceFactory, 1);
+	ConnectTier2Libraries(&interfaceFactory, 1);
+	ConnectTier3Libraries(&interfaceFactory, 1);
 
 	ConVar_Register(0);
 
