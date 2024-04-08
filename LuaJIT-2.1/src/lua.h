@@ -12,7 +12,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-
+#include "gmod.h"
 #include "luaconf.h"
 
 
