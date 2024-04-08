@@ -12,7 +12,8 @@ Maybe if I finish this I also try to get Lua 5.4 to work :D
 - [x] Engine Error: `Error loading lua_shared (Sys_GetFactory)`
 - [x] `Segmentation fault (core dumped) ../../../source/CLuaInterface.cpp:958`
 - [x] CLuaInterface::Global needs to be implemented. Or else we crash.
-- [ ] CLuaInterface::SetMember needs to be implemented.
+- [x] CLuaInterface::SetMember needs to be implemented.
+- [ ] CLuaInterface::GetMetaTableObject needs to be implemented.
 
 ## ILuaBase
 
@@ -39,3 +40,8 @@ Most of it.
 ## ILuaThreadedCall
 This is not even used in Gmod :|  
 But the code to use it exists `AddThreadedCall` and `RunThreadedCalls`
+
+## Collection of random Engine Errors
+![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/aa4143fc-75f2-4311-b23b-d2de1394d59b)
+![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/85631077-ec8d-4831-8fe1-5789f8090493)
+
