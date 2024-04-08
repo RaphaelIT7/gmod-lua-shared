@@ -13,7 +13,8 @@ Maybe if I finish this I also try to get Lua 5.4 to work :D
 - [x] `Segmentation fault (core dumped) ../../../source/CLuaInterface.cpp:958`
 - [x] CLuaInterface::Global needs to be implemented. Or else we crash.
 - [x] CLuaInterface::SetMember needs to be implemented.
-- [ ] CLuaInterface::GetMetaTableObject needs to be implemented.
+- [x] CLuaInterface::GetMetaTableObject needs to be implemented.
+- [ ] CLuaInterface::FindAndRunScript needs to be implemented.
 
 ## ILuaBase
 
