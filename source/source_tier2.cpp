@@ -27,7 +27,7 @@
 // allowing link libraries to access tier2 library interfaces
 //-----------------------------------------------------------------------------
 IFileSystem *g_pFullFileSystem = 0;
-IMaterialSystem *materials = 0;
+/*IMaterialSystem *materials = 0;
 IMaterialSystem *g_pMaterialSystem = 0;
 IInputSystem *g_pInputSystem = 0;
 INetworkSystem *g_pNetworkSystem = 0;
@@ -37,7 +37,7 @@ IVBAllocTracker *g_VBAllocTracker = 0;
 IColorCorrectionSystem *colorcorrection = 0;
 IP4 *p4 = 0;
 IMdlLib *mdllib = 0;
-IQueuedLoader *g_pQueuedLoader = 0;
+IQueuedLoader *g_pQueuedLoader = 0;*/
 
 #define NETWORKSYSTEM_INTERFACE_VERSION "NetworkSystemVersion001"
 #define INPUTSYSTEM_INTERFACE_VERSION "InputSystemVersion001"
@@ -66,11 +66,11 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		}
 		if ( !g_pInputSystem )
 		{
-			g_pInputSystem = ( IInputSystem * )pFactoryList[i]( INPUTSYSTEM_INTERFACE_VERSION, NULL );
+			//g_pInputSystem = ( IInputSystem * )pFactoryList[i]( INPUTSYSTEM_INTERFACE_VERSION, NULL );
 		}
 		if ( !g_pNetworkSystem )
 		{
-			g_pNetworkSystem = ( INetworkSystem * )pFactoryList[i]( NETWORKSYSTEM_INTERFACE_VERSION, NULL );
+			//g_pNetworkSystem = ( INetworkSystem * )pFactoryList[i]( NETWORKSYSTEM_INTERFACE_VERSION, NULL );
 		}
 		if ( !g_pMaterialSystemHardwareConfig )
 		{
@@ -95,11 +95,11 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		}
 		if ( !mdllib )
 		{
-			mdllib = ( IMdlLib * )pFactoryList[i]( MDLLIB_INTERFACE_VERSION, NULL );
+			//mdllib = ( IMdlLib * )pFactoryList[i]( MDLLIB_INTERFACE_VERSION, NULL );
 		}
 		if ( !g_pQueuedLoader )
 		{
-			g_pQueuedLoader = (IQueuedLoader *)pFactoryList[i]( QUEUEDLOADER_INTERFACE_VERSION, NULL );
+			//g_pQueuedLoader = (IQueuedLoader *)pFactoryList[i]( QUEUEDLOADER_INTERFACE_VERSION, NULL );
 		}
 	}
 }
