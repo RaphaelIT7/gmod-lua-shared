@@ -1,4 +1,6 @@
 #include "gmod.h"
+#include "lj_obj.h"
+
 class ILuaBase
 {
 public:
