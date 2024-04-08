@@ -567,7 +567,7 @@ public:
 	virtual void *CreateConVar( const char *, const char *, const char *, int ) = 0;
 	virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) ) = 0;};
 
-class __declspec(dllexport) CLuaInterface : public ILuaInterface
+class CLuaInterface : public ILuaInterface
 {
 public:
 	virtual int Top(void);

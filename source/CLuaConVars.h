@@ -22,7 +22,7 @@ struct ManagedCVar
 	ConVar* cvar;
 };
 
-class __declspec(dllexport) CLuaConVars : public ILuaConVars
+class CLuaConVars : public ILuaConVars
 {
 public:
 	~CLuaConVars();
