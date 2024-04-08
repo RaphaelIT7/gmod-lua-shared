@@ -1,6 +1,12 @@
 #include <convar.h>
-#include <KeyValues.h>
 #include <vector>
+#include "Platform.hpp"
+
+#ifdef ARCHITECTURE_X86_64
+#include <keyvalues.h>
+#else
+#include <KeyValues.h>
+#endif
 
 class ILuaConVars
 {
