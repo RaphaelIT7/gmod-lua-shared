@@ -442,13 +442,13 @@ public:
 
 	// Throws an error related to type differences
 	[[noreturn]]
-	inline void TypeError(int iStackPos, const char* tname)
+	/*inline void TypeError(int iStackPos, const char* tname)
 	{
 		luaL_typerror(state, iStackPos, tname);
 
 		// Should never be reached since 'luaL_typerror' never returns.
 		std::abort();
-	}
+	}*/
 
 	// Converts the value at the given index to a generic C pointer (void*)
 	inline const void* GetPointer(int iStackPos)
@@ -457,10 +457,10 @@ public:
 	}
 
 	// Calls a metamethod on the object at iStackPos
-	inline int CallMeta(int iStackPos, const char* e)
+	/*inline int CallMeta(int iStackPos, const char* e)
 	{
 		return luaL_callmeta(state, iStackPos, e);
-	}
+	}*/
 
 	// Produces the pseudo-index of an upvalue at iPos
 	static inline int GetUpvalueIndex(int iPos)
