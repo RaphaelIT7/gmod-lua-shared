@@ -8,7 +8,7 @@
 #include "tier0/dbg.h"
 #include "filesystem.h"
 #include "materialsystem/imaterialsystem.h"
-#include "materialsystem/imaterialsystemhardwareconfig.h"
+//#include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "materialsystem/IColorCorrection.h"
 #include "materialsystem/idebugtextureinfo.h"
 #include "materialsystem/ivballoctracker.h"
