@@ -70,7 +70,7 @@ CCWARN= -Wall
 # as dynamic mode.
 #
 # Mixed mode creates a static + dynamic library and a statically linked luajit.
-BUILDMODE= mixed
+BUILDMODE= static
 #
 # Static mode creates a static library and a statically linked luajit.
 #BUILDMODE= static
