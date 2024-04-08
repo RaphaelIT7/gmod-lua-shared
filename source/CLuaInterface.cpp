@@ -3,7 +3,12 @@
 #include "lua/lj_obj.h"
 #include "lua/luajit_rolling.h"
 #include "lua/lauxlib.h"
+
+#ifdef ARCHITECTURE_X86
 #include "Color.h"
+#else
+#include "color.h"
+#endif
 
 int g_iTypeNum = 0;
 
