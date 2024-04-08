@@ -29,6 +29,7 @@
 #include "lj_lex.h"
 #include "lj_alloc.h"
 #include "luajit.h"
+#include "gmod.h"
 
 /* -- Stack handling ------------------------------------------------------ */
 
