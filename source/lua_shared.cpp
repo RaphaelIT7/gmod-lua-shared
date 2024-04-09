@@ -35,11 +35,15 @@ void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext
 
 	Detouring::Hook detour_lua_init_stack_gmod;
 	SourceSDK::ModuleLoader lua_shared_loader("lua_shared");
-	void* func_lua_init_stack_gmod = (lua_init_stack_gmod_t)FindFunction(lua_shared_loader.GetModule(), lua_init_stack_gmodSym);
+	void* func_lua_init_stack_gmod = FindFunction(lua_shared_loader.GetModule(), lua_init_stack_gmodSym);
 	CheckFunction(func_lua_init_stack_gmod, "lua_init_stack_gmod");
 	CreateDetour(&detour_lua_init_stack_gmod, "lua_init_stack_gmod", reinterpret_cast<void*>(func_lua_init_stack_gmod), reinterpret_cast<void*>(&hook_lua_init_stack_gmod));
 
-	Msg("Detouring worked %s\n", detour_lua_init_stack_gmod.IsValid() ? "Yes" : "No");
+	/*Detouring::Hook detour_GMOD_LuaPrint;
+	void* func_GMOD_LuaPrint = FindFunction(lua_shared_loader.GetModule(), GMOD_LuaPrintSym);
+	CheckFunction(func_GMOD_LuaPrint, "GMOD_LuaPrint");
+	CreateDetour(&detour_GMOD_LuaPrint, "GMOD_LuaPrint", reinterpret_cast<void*>(func_GMOD_LuaPrint), reinterpret_cast<void*>(&hook_GMOD_LuaPrint));*/
+
 
 	pGet = get;
 }
