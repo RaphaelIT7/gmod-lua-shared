@@ -14,7 +14,9 @@ Maybe if I finish this I also try to get Lua 5.4 to work :D
 - [x] CLuaInterface::Global needs to be implemented. Or else we crash.
 - [x] CLuaInterface::SetMember needs to be implemented.
 - [x] CLuaInterface::GetMetaTableObject needs to be implemented.
-- [ ] CLuaInterface::FindAndRunScript needs to be implemented.
+- [x] CLuaInterface::FindAndRunScript needs to be implemented.
+- [ ] CLuaInterface::PushUserType needs to be implemented?
+- - [ ] Random Crashes on Windows?
 
 ## ILuaBase
 
