@@ -38,8 +38,8 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
         --IncludeSDKBitmap()
         --IncludeSDKVTF()
         --IncludeSteamAPI()
-        --IncludeDetouring()
-        --IncludeScanning()
+        IncludeDetouring()
+        IncludeScanning()
 
 		files({
 			[[garrysmod_common\sourcesdk-minimal\tier1\convar.cpp]],
