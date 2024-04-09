@@ -1,6 +1,7 @@
 #include "CLuaInterface.h"
 #include <filesystem.h>
 #include <GarrysMod/IGet.h>
+#include <unordered_map>
 
 struct File
 {
@@ -59,6 +60,12 @@ public:
 	const char* GetStackTraces();
 	void InvalidateCache(const std::string&);
 	void EmptyCache();
+
+	IGet* GetIGet() { return pGet; };
+	void AddSearchPath(const char*, const char*);
 private:
 	IGet* pGet;
+	ILuaInterface* pInterfaces[3];
+	std::unordered_map<std::string, File*> pCache;
+	std::unordered_map<std::string, std::vector<std::string>> pMount;
 };

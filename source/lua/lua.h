@@ -12,7 +12,6 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-
 #include "luaconf.h"
 
 

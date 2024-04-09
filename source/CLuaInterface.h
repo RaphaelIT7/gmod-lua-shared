@@ -1,3 +1,6 @@
+#ifndef GMOD_CLUAINTERFACE
+
+#define GMOD_CLUAINTERFACE
 #include <cstdarg>
 #include <convar.h>
 #include <Bootil/Bootil.h>
@@ -9,6 +12,9 @@
 
 #define GMOD
 #include "Types.h"
+
+class ILuaShared;
+extern ILuaShared* LuaShared();
 
 namespace State
 {
@@ -29,9 +35,7 @@ namespace State
 
 
 struct lua_Debug;
-
-// ToDo: verify and lua_init_stack_gmod and edit lj_state_new to call that function.
-extern void lua_init_stack_gmod(lua_State* L1, lua_State* L);
+extern void lua_init_stack_gmod(lua_State*, lua_State*);
 
 // ToDo: Verify and Add GMODLUA_GetUserType and edit lua_typename to call this function.
 /*
@@ -608,13 +612,7 @@ public:
 	virtual void Insert(int iStackPos);
 	virtual void Remove(int iStackPos);
 	virtual int Next(int iStackPos);
-
-//#ifndef GMOD_ALLOW_DEPRECATED
-//protected:
-//#endif
 	virtual void* NewUserdata(unsigned int iSize);
-
-//public:
 	[[noreturn]]
 	virtual void ThrowError(const char* strError);
 	virtual void CheckType(int iStackPos, int iType);
@@ -626,25 +624,14 @@ public:
 	virtual double GetNumber(int iStackPos = -1);
 	virtual bool GetBool(int iStackPos = -1);
 	virtual CFunc GetCFunction(int iStackPos = -1);
-
-//#if !defined( GMOD_ALLOW_DEPRECATED ) && !defined( GMOD_ALLOW_LIGHTUSERDATA )
-//protected:
-//#endif
 	virtual void* GetUserdata(int iStackPos = -1);
-//public:
 	virtual void PushNil();
 	virtual void PushString(const char* val, unsigned int iLen = 0);
 	virtual void PushNumber(double val);
 	virtual void PushBool(bool val);
 	virtual void PushCFunction(CFunc val);
 	virtual void PushCClosure(CFunc val, int iVars);
-
-//#if !defined( GMOD_ALLOW_DEPRECATED ) && !defined( GMOD_ALLOW_LIGHTUSERDATA )
-//protected:
-//#endif
 	virtual void PushUserdata(void*);
-
-//public:
 	virtual int ReferenceCreate();
 	virtual void ReferenceFree(int i);
 	virtual void ReferencePush(int i);
@@ -652,12 +639,7 @@ public:
 	virtual bool IsType(int iStackPos, int iType);
 	virtual int GetType(int iStackPos);
 	virtual const char* GetTypeName(int iType);
-
-//#ifndef GMOD_ALLOW_DEPRECATED
-//protected:
-//#endif
 	virtual void CreateMetaTableType(const char* strName, int iType);
-//public:
 	virtual const char* CheckString(int iStackPos = -1);
 	virtual double CheckNumber(int iStackPos = -1);
 	virtual int ObjLen(int iStackPos = -1);
@@ -745,6 +727,8 @@ public:
 	void AppendStackTrace( char *, unsigned long );
 	void *CreateConVar( const char *, const char *, const char *, int );
 	void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) );
+public:
+	std::string RunMacros(std::string script);
 
 public:
 	inline ILuaGameCallback *GetLuaGameCallback() const
@@ -783,13 +767,14 @@ public:
 private:
 	std::list<ILuaThreadedCall*> pThreadedcalls;
 	GarrysMod::Lua::ILuaObject* pGlobal = nullptr;
-	const char* pPathID = NULL; // lsv, lsc or LuaMenu
+	const char* pPathID = "LuaMenu"; // lsv, lsc or LuaMenu
 	unsigned char pRealm = -1; // CLIENT = 0, SERVER = 1, MENU = 2
 };
 
 // Some functions declared inside CLuaInterface_cpp
-extern int ReadStackIntoError(lua_State* L);
+extern CLuaError* ReadStackIntoError(lua_State* L);
 extern int AdvancedLuaErrorReporter(lua_State* L);
 
 extern ILuaInterface* CreateLuaInterface(bool bIsServer);
 extern void CloseLuaInterface(ILuaInterface*);
+#endif
