@@ -18,8 +18,8 @@ jobs:
         run: |
           cd LuaJIT-2.1/src/
           .\msvcbuild.bat
-          rename lua51.lib lua51_64.lib
-          rename luajit.lib luajit_64.lib
+          ren lua51.lib lua51_64.lib
+          ren luajit.lib luajit_64.lib
 
       - uses: actions/upload-artifact@v4
         name: Upload lua51.lib
@@ -46,8 +46,8 @@ jobs:
         run: |
           cd LuaJIT-2.1/src/
           .\msvcbuild_86.bat
-          rename lua51.lib lua51_32.lib
-          rename luajit.lib luajit_32.lib
+          ren lua51.lib lua51_32.lib
+          ren luajit.lib luajit_32.lib
 
       - uses: actions/upload-artifact@v4
         name: Upload lua51.lib
