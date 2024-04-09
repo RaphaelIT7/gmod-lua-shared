@@ -43,13 +43,17 @@ void DebugPrint(int level, const char* fmt, ...) {
 // =================================
 void hook_lua_init_stack_gmod(lua_State* L1, lua_State* L)
 {
-	Msg("Called\n");
     if (L && L != L1)
 	{
 		L1->luabase = L->luabase;
 		if (L->luabase)
 			((ILuaBase*)L->luabase)->SetState(L);
 	}
+}
+
+void hook_GMOD_LuaPrint(const char* str)
+{
+	Msg("%s", str);
 }
 
 void lua_run_menu_f( const CCommand &args )
@@ -224,7 +228,7 @@ void CLuaInterface::Call(int iArgs, int iResults)
 
 int CLuaInterface::PCall(int iArgs, int iResults, int iErrorFunc)
 {
-	::DebugPrint(3, "CLuaInterface::PCall\n");
+	::DebugPrint(2, "CLuaInterface::PCall\n");
 	return lua_pcall(state, iArgs, iResults, iErrorFunc);
 }
 
@@ -616,9 +620,8 @@ void CLuaInterface::SetUserType(int iStackPos, void* data)
 int LuaPanic(lua_State* lua)
 {
 	::DebugPrint(1, "CLuaInterface::LuaPanic\n");
-	//lua_tolstring ToDo: Get the exact Lua and JIT Build gmod uses.
 
-	Error("Lua Panic! Something went horribly wrong!\n %s", lua_tolstring(lua, 0, 0));
+	Error("Lua Panic! Something went horribly wrong!\n %s", lua_tolstring(lua, -1, 0));
 	return 0;
 }
 
