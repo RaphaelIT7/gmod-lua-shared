@@ -15,7 +15,7 @@
 
 int g_iTypeNum = 0;
 
-ConVar lua_debugmode("lua_debugmode", "2", 0);
+ConVar lua_debugmode("lua_debugmode", "5", 0);
 void DebugPrint(int level, const char* fmt, ...) {
 	if (lua_debugmode.GetInt() < level)
 		return;
@@ -64,8 +64,8 @@ void lua_run_menu_f( const CCommand &args )
 		return;
 	}
  
-	Msg("Code: %s\n", args.Arg(1));
-	LuaShared()->GetLuaInterface(State::MENU)->RunString("RunString", "", args.Arg(1), true, true);
+	Msg("Code: %s\n", args.ArgS());
+	LuaShared()->GetLuaInterface(State::MENU)->RunString("RunString", "", args.ArgS(), true, true);
 }
  
 ConCommand lua_run_menu( "lua_run_menu", lua_run_menu_f , "lua_run_menu", 0);
@@ -592,19 +592,36 @@ int CLuaInterface::CreateMetaTable(const char* strName)
 bool CLuaInterface::PushMetaTable(int iType)
 {
 	::DebugPrint(2, "CLuaInterface::PushMetaTable\n");
-	// ToDo. Idk how to do it yet.
+	
+	int ref = -1;
+	const char* type = GetActualTypeName(iType);
+	PushSpecial(SPECIAL_ENV);
+		GetField(-1, type);
+		if (IsType(-1, Type::Table))
+		{
+			ref = ReferenceCreate();
+		}
+	Pop(2);
+
+	if (ref != -1)
+	{
+		ReferencePush(ref);
+		ReferenceFree(ref);
+		return true;
+	}
+
 	return false;
 }
 
 void CLuaInterface::PushUserType(void* data, int iType)
 {
 	::DebugPrint(2, "CLuaInterface::PushUserType %i\n", iType);
-	// ToDo
+	// ToDo?
 
-	void** ud = static_cast<void**>(lua_newuserdata(state, sizeof(data)));
-	*ud = data;
+	void* userdata = lua_newuserdata(state, sizeof(data));
+	userdata = data;
 
-	luaL_newmetatable(state, "ConVar");
+	luaL_newmetatable(state, GetActualTypeName(iType));
 	SetMetaTable(-2);
 }
 
@@ -622,7 +639,7 @@ int LuaPanic(lua_State* lua)
 {
 	::DebugPrint(1, "CLuaInterface::LuaPanic\n");
 
-	Error("Lua Panic! Something went horribly wrong!\n %s", lua_tolstring(lua, -1, 0));
+	Error("Lua Panic! Something went horribly wrong!\n%s", lua_tolstring(lua, -1, 0));
 	return 0;
 }
 
@@ -822,29 +839,40 @@ void CLuaInterface::TypeError(const char* str, int iStackPos)
 void CLuaInterface::CallInternal(int args, int rets)
 {
 	::DebugPrint(2, "CLuaInterface::CallInternal %i %i\n", args, rets);
-	// ToDo
+	if (!ThreadInMainThread())
+		Error("Calling Lua function in a thread other than main!");
+
+	if (IsType(-(args + 1), Type::Function))
+	{
+		CallFunctionProtected(args, rets, true);
+	} else {
+		//Error("Lua tried to call non functions");
+	}
 }
 
 void CLuaInterface::CallInternalNoReturns(int args)
 {
 	::DebugPrint(2, "CLuaInterface::CallInternalNoReturns %i\n", args);
+	CallInternal(args, 0);
 	// ToDo
 }
 
 bool CLuaInterface::CallInternalGetBool(int args)
 {
 	::DebugPrint(2, "CLuaInterface::CallInternalGetBool %i\n", args);
+	CallInternal(args, 1);
 	// ToDo
 
-	return false;
+	return GetBool(1);
 }
 
 const char* CLuaInterface::CallInternalGetString(int args)
 {
-	::DebugPrint(2, "CLuaInterface::CallInternalGetBool %i\n", args);
+	::DebugPrint(2, "CLuaInterface::CallInternalGetString %i\n", args);
+	CallInternal(args, 1);
 	// ToDo
 
-	return "Nope";
+	return GetString(1);
 }
 
 bool CLuaInterface::CallInternalGet(int args, GarrysMod::Lua::ILuaObject* obj)
@@ -1098,7 +1126,7 @@ bool CLuaInterface::RunString(const char* filename, const char* path, const char
 
 bool CLuaInterface::IsEqual(GarrysMod::Lua::ILuaObject* objA, GarrysMod::Lua::ILuaObject* objB)
 {
-	::DebugPrint(3, "CLuaInterface::IsEqual\n");
+	::DebugPrint(2, "CLuaInterface::IsEqual\n");
 	// Still ToDo
 	return objA == objB;
 }
@@ -1141,7 +1169,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	::DebugPrint(2, "CLuaInterface::FindAndRunScript %s, %s, %s, %s, %s\n", filename, run ? "Yes" : "No", showErrors ? "Yes" : "No", stringToRun, noReturns ? "Yes" : "No");
 	
 	ILuaShared* shared = LuaShared();
-	File* file = nullptr;//shared->LoadFile(filename, pPathID, true, true);
+	File* file = shared->LoadFile(filename, pPathID, true, true);
 	if (file)
 		return RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 
@@ -1272,6 +1300,7 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 {
 	::DebugPrint(2, "CLuaInterface::ErrorFromLua %s\n", fmt);
 	CLuaError* error = ReadStackIntoError(state);
+	Pop(1);
 
 	va_list args;
 	va_start(args, fmt);
@@ -1374,10 +1403,9 @@ void CLuaInterface::Require(const char* name)
 
 const char* CLuaInterface::GetActualTypeName(int type)
 {
-	::DebugPrint(2, "CLuaInterface::GetActualTypeName\n");
-	// ToDo
+	::DebugPrint(4, "CLuaInterface::GetActualTypeName\n");
 
-	return "RandomType :D";
+	return Type::Name[type];
 }
 
 void CLuaInterface::PreCreateTable(int arrelems, int nonarrelems)
@@ -1431,11 +1459,10 @@ std::string CLuaInterface::RunMacros(std::string code)
 	code = std::regex_replace(code, std::regex("&&"), "and");
 	code = std::regex_replace(code, std::regex("\\|\\|"), "or");
 	code = std::regex_replace(code, std::regex("!="), "~=");
-	code = std::regex_replace(code, std::regex("!"), "not");
+	code = std::regex_replace(code, std::regex("!"), "not ");
 	code = std::regex_replace(code, std::regex("/\\*"), "--[[");
 	code = std::regex_replace(code, std::regex("\\*/"), "]]");
 	code = std::regex_replace(code, std::regex("//"), "--");
-	code = std::regex_replace(code, std::regex("CreateConVar"), "CCreateConVar");
 
 	// ToDo do Baseclass macro
 
