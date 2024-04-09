@@ -4,6 +4,7 @@
 #include "lua/luajit_rolling.h"
 #include "lua/lauxlib.h"
 #include "lua_shared.h"
+#include "lua/lj_obj.h"
 #include <regex>
 
 #ifdef ARCHITECTURE_X86
@@ -14,23 +15,35 @@
 
 int g_iTypeNum = 0;
 
-ConVar lua_debugmode("lua_debugmode", "0", 0);
-void DebugPrint(int level, const char* fmt, ...)
-{
+ConVar lua_debugmode("lua_debugmode", "2", 0);
+void DebugPrint(int level, const char* fmt, ...) {
 	if (lua_debugmode.GetInt() < level)
 		return;
 
 	va_list args;
 	va_start(args, fmt);
-	Msg(fmt, args);
+
+	int size = vsnprintf(NULL, 0, fmt, args);
+	if (size < 0) {
+		va_end(args);
+		return;
+	}
+
+	char* buffer = new char[size + 1];
+	vsnprintf(buffer, size + 1, fmt, args);
+
+	Msg("%s", buffer);
+
+	delete[] buffer;
 	va_end(args);
 }
 
 // =================================
 // First functions
 // =================================
-void lua_init_stack_gmod(lua_State* L1, lua_State* L)
+void hook_lua_init_stack_gmod(lua_State* L1, lua_State* L)
 {
+	Msg("Called\n");
     if (L && L != L1)
 	{
 		L1->luabase = L->luabase;
@@ -38,6 +51,20 @@ void lua_init_stack_gmod(lua_State* L1, lua_State* L)
 			((ILuaBase*)L->luabase)->SetState(L);
 	}
 }
+
+void lua_run_menu_f( const CCommand &args )
+{
+	if ( args.ArgC() < 1 || args.Arg(1) == "" )
+	{
+		Msg("Usage: lua_run_menu <code>\n");
+		return;
+	}
+ 
+	Msg("Code: %s\n", args.Arg(1));
+	LuaShared()->GetLuaInterface(State::MENU)->RunString("RunString", "", args.Arg(1), true, true);
+}
+ 
+ConCommand lua_run_menu( "lua_run_menu", lua_run_menu_f , "lua_run_menu", 0);
 
 std::string g_LastError;
 std::vector<lua_Debug*> stackErrors;
@@ -88,10 +115,8 @@ ILuaInterface* CreateLuaInterface(bool bIsServer)
 {
 	::DebugPrint(1, "CreateLuaInterface\n");
 	// ToDo: Create ILuaGameCallback and pass it to interface->Init as the first argument!
-	CLuaGameCallback* callback = new CLuaGameCallback;
 
 	CLuaInterface* LuaInterface = new CLuaInterface;
-	LuaInterface->Init(callback, bIsServer);
 
 	return LuaInterface;
 }
@@ -115,12 +140,12 @@ void luaL_newmetatable_type(lua_State* L, const char* strName, int iType)
 	luaL_newmetatable(L, strName);
 	g_iTypeNum++;
 
-	lua_pushstring(L, "MetaName");
-	lua_pushstring(L, strName);
-	lua_settable(L, -3);
-
 	if (iType != -1)
 	{
+		lua_pushstring(L, "MetaName");
+		lua_pushstring(L, strName);
+		lua_settable(L, -3);
+
 		lua_pushstring(L, "MetaID");
 		lua_pushinteger(L, iType);
 		lua_settable(L, -3);
@@ -313,7 +338,7 @@ void CLuaInterface::PushNil()
 
 void CLuaInterface::PushString(const char* val, unsigned int iLen)
 {
-	::DebugPrint(4, "CLuaInterface::PushString\n");
+	::DebugPrint(4, "CLuaInterface::PushString %s\n", val);
 	if (iLen > 0) {
 		lua_pushlstring(state, val, iLen);
 	} else {
@@ -436,7 +461,7 @@ void CLuaInterface::CreateMetaTableType(const char* strName, int iType)
 const char* CLuaInterface::CheckString(int iStackPos)
 {
 	::DebugPrint(4, "CLuaInterface::CheckString\n");
-	return luaL_checklstring(state, iStackPos, nullptr);
+	return luaL_checklstring(state, iStackPos, NULL);
 }
 
 double CLuaInterface::CheckNumber(int iStackPos)
@@ -569,8 +594,13 @@ bool CLuaInterface::PushMetaTable(int iType)
 
 void CLuaInterface::PushUserType(void* data, int iType)
 {
-	::DebugPrint(2, "CLuaInterface::PushUserType\n");
-	// ToDo. Same
+	::DebugPrint(2, "CLuaInterface::PushUserType %i\n", iType);
+
+	void** ud = static_cast<void**>(lua_newuserdata(state, sizeof(data)));
+	*ud = data;
+
+	luaL_newmetatable(state, "ConVar");
+	SetMetaTable(-2);
 }
 
 void CLuaInterface::SetUserType(int iStackPos, void* data)
@@ -608,6 +638,10 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	gamecallback = callback;
 
 	state = luaL_newstate();
+	luaL_openlibs(state);
+
+	state->luabase = this;
+	SetState(state);
 
 	lua_atpanic(state, LuaPanic);
 
@@ -624,15 +658,6 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	DoStackCheck();
 
 	NewGlobalTable("");
-
-	GarrysMod::Lua::ILuaObject* obj = Global();
-	if (obj)
-	{
-		obj->Push();
-		PushCFunction(func_Include);
-		SetField(-2, "include");
-		Pop(1);
-	}
 
     lua_pushinteger(state, 1);
     lua_setglobal(state, "AcceptInput");
@@ -784,6 +809,7 @@ void CLuaInterface::NewGlobalTable(const char* name)
 		PushSpecial(SPECIAL_GLOB);
 		pGlobal->SetFromStack(-1);
 		Pop(1);
+		::DebugPrint(1, "Global type: %i\n", pGlobal->GetType());
 	}
 }
 
@@ -924,12 +950,21 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 	::DebugPrint(3, "CLuaInterface::SetMember 4 %s\n", key);
 	if (obj->isTable())
 	{
-		obj->Push();
 		PushString(key);
 		Push(-3);
 		SetTable(-3);
-		Pop(2);
+		Pop(1);
 	}
+
+	if (obj == pGlobal)
+	{
+		PushSpecial(SPECIAL_GLOB);
+		PushString(key);
+		Push(-3);
+		SetTable(-3);
+		Pop(1);
+	}
+	Pop(1);
 }
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, GarrysMod::Lua::ILuaObject* value)
@@ -1045,7 +1080,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	::DebugPrint(2, "CLuaInterface::FindAndRunScript %s, %s, %s, %s, %s\n", filename, run ? "Yes" : "No", showErrors ? "Yes" : "No", stringToRun, noReturns ? "Yes" : "No");
 	
 	ILuaShared* shared = LuaShared();
-	File* file = shared->LoadFile(filename, pPathID, true, true);
+	File* file = nullptr;//shared->LoadFile(filename, pPathID, true, true);
 	if (file)
 		return RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 
@@ -1176,6 +1211,23 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 {
 	::DebugPrint(2, "CLuaInterface::ErrorFromLua %s\n", fmt);
 	CLuaError* error = ReadStackIntoError(state);
+
+	va_list args;
+	va_start(args, fmt);
+
+	int size = vsnprintf(NULL, 0, fmt, args);
+	if (size < 0) {
+		va_end(args);
+		return;
+	}
+
+	char* buffer = new char[size + 1];
+	vsnprintf(buffer, size + 1, fmt, args);
+
+	error->message = buffer;
+
+	delete[] buffer;
+	va_end(args);
 	
 	std::string realm;
 	switch(pRealm)
@@ -1195,9 +1247,9 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 	}
 	error->side = realm;
 
-	delete error;
+	gamecallback->LuaError(error);
 
-	// NOTE: Unfinished
+	delete error;
 }
 
 const char* CLuaInterface::GetCurrentLocation()
@@ -1217,7 +1269,12 @@ void CLuaInterface::MsgColour(const Color& col, const char* fmt, ...)
 void CLuaInterface::GetCurrentFile(std::string &outStr)
 {
 	::DebugPrint(2, "CLuaInterface::GetCurrentFile\n");
-	// ToDo
+
+	lua_Debug ar;
+	lua_getstack(state, 1, &ar);
+	lua_getinfo(state, "S", &ar);
+
+	outStr = ar.source ? ar.source : "!UNKNOWN";
 }
 
 void CLuaInterface::CompileString(Bootil::Buffer& dumper, const std::string& stringToCompile)
@@ -1239,6 +1296,8 @@ bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 			gamecallback->LuaError(err);
 		}
 		delete err;
+		Pop(1);
+		::Msg("Top: %i\n", Top());
 	}
 
 	return ret != 0;
@@ -1246,8 +1305,10 @@ bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 
 void CLuaInterface::Require(const char* name)
 {
-	::DebugPrint(2, "CLuaInterface::Require\n");
+	::DebugPrint(2, "CLuaInterface::Require %s\n", name);
 	// ToDo
+
+	RunLuaModule(name);
 }
 
 const char* CLuaInterface::GetActualTypeName(int type)
@@ -1287,7 +1348,6 @@ void CLuaInterface::AppendStackTrace(char *, unsigned long)
 void* CLuaInterface::CreateConVar(const char* name, const char* defaultValue, const char* helpString, int flags)
 {
 	::DebugPrint(2, "CLuaInterface::CreateConVar\n");
-	// ToDo
 
 	return LuaConVars()->CreateConVar(name, defaultValue, helpString, flags);
 }
@@ -1295,24 +1355,26 @@ void* CLuaInterface::CreateConVar(const char* name, const char* defaultValue, co
 void* CLuaInterface::CreateConCommand(const char* name, const char* helpString, int flags, FnCommandCallback_t callback, FnCommandCompletionCallback completionFunc)
 {
 	::DebugPrint(2, "CLuaInterface::CreateConCommand\n");
-	// ToDo
 
 	return LuaConVars()->CreateConCommand(name, helpString, flags, callback, completionFunc);
 }
 
 std::string CLuaInterface::RunMacros(std::string code)
 {
+	::Msg("Top: %i\n", Top());
+
 	::DebugPrint(2, "CLuaInterface::RunMacros\n");
 	
 	// ToDo Move syntax to LuaJIT
 
 	code = std::regex_replace(code, std::regex("&&"), "and");
 	code = std::regex_replace(code, std::regex("\\|\\|"), "or");
-	code = std::regex_replace(code, std::regex("!"), "not");
 	code = std::regex_replace(code, std::regex("!="), "~=");
+	code = std::regex_replace(code, std::regex("!"), "not");
 	code = std::regex_replace(code, std::regex("/\\*"), "--[[");
 	code = std::regex_replace(code, std::regex("\\*/"), "]]");
 	code = std::regex_replace(code, std::regex("//"), "--");
+	code = std::regex_replace(code, std::regex("CreateConVar"), "CCreateConVar");
 
 	// ToDo do Baseclass macro
 

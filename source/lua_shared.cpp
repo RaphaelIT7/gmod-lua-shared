@@ -37,7 +37,9 @@ void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext
 	SourceSDK::ModuleLoader lua_shared_loader("lua_shared");
 	void* func_lua_init_stack_gmod = (lua_init_stack_gmod_t)FindFunction(lua_shared_loader.GetModule(), lua_init_stack_gmodSym);
 	CheckFunction(func_lua_init_stack_gmod, "lua_init_stack_gmod");
-	CreateDetour(&detour_lua_init_stack_gmod, "lua_init_stack_gmod", reinterpret_cast<void*>(func_lua_init_stack_gmod), reinterpret_cast<void*>(&lua_init_stack_gmod));
+	CreateDetour(&detour_lua_init_stack_gmod, "lua_init_stack_gmod", reinterpret_cast<void*>(func_lua_init_stack_gmod), reinterpret_cast<void*>(&hook_lua_init_stack_gmod));
+
+	Msg("Detouring worked %s\n", detour_lua_init_stack_gmod.IsValid() ? "Yes" : "No");
 
 	pGet = get;
 }
@@ -81,7 +83,7 @@ ILuaInterface* CLuaShared::CreateLuaInterface(unsigned char realm, bool unknown)
 
 void CLuaShared::CloseLuaInterface(ILuaInterface* LuaInterface)
 {
-	CloseLuaInterface(LuaInterface);
+	::CloseLuaInterface(LuaInterface);
 }
 
 ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
@@ -107,6 +109,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		g_pFullFileSystem->Read((void*)code, file_len, fh);
 		code[file_len] = 0;
 
+		file->name = path.c_str();
 		file->contents = code;
 		file->time = g_pFullFileSystem->GetFileTime(path.c_str(), pathId.c_str());
 		file->timesloadedclient = 0;
