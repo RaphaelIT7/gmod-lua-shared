@@ -18,19 +18,21 @@ jobs:
         run: |
           cd LuaJIT-2.1/src/
           .\msvcbuild.bat
+          rename lua51.lib lua51_64.lib
+          rename luajit.lib luajit_64.lib
 
       - uses: actions/upload-artifact@v4
         name: Upload lua51.lib
         with:
           name: lua51_64.lib
-          path: LuaJIT-2.1/src/lua51.lib
+          path: LuaJIT-2.1/src/lua51_64.lib
           retention-days: 1
 
       - uses: actions/upload-artifact@v4
         name: Upload luajit.lib
         with:
           name: luajit_64.lib
-          path: LuaJIT-2.1/src/luajit.lib
+          path: LuaJIT-2.1/src/luajit_64.lib
           retention-days: 1
 
   build-windows-32:
@@ -44,19 +46,21 @@ jobs:
         run: |
           cd LuaJIT-2.1/src/
           .\msvcbuild_86.bat
+          rename lua51.lib lua51_32.lib
+          rename luajit.lib luajit_32.lib
 
       - uses: actions/upload-artifact@v4
         name: Upload lua51.lib
         with:
           name: lua51_32.lib
-          path: LuaJIT-2.1/src/lua51.lib
+          path: LuaJIT-2.1/src/lua51_32.lib
           retention-days: 1
 
       - uses: actions/upload-artifact@v4
         name: Upload luajit.lib
         with:
           name: luajit_32.lib
-          path: LuaJIT-2.1/src/luajit.lib
+          path: LuaJIT-2.1/src/luajit_32.lib
           retention-days: 1
 
   build-linux-64:
@@ -76,19 +80,13 @@ jobs:
         run: |
           cd LuaJIT-2.1/src/
           make CC='$(DEFAULT_CC) -fPIC'
+          mv libluajit.a libluajit_64.a
 
       - uses: actions/upload-artifact@v4
         name: Upload libluajit.a (64x)
         with:
           name: libluajit_64.a
-          path: LuaJIT-2.1/src/libluajit.a
-          retention-days: 1
-
-      - uses: actions/upload-artifact@v4
-        name: Upload libluajit.so (64x)
-        with:
-          name: libluajit_64.so
-          path: LuaJIT-2.1/src/libluajit.so
+          path: LuaJIT-2.1/src/libluajit_64.a
           retention-days: 1
 
   build-linux-32:
@@ -109,17 +107,11 @@ jobs:
         run: |
           cd LuaJIT-2.1/src/
           make CC='$(DEFAULT_CC) -m32'
+          mv libluajit.a libluajit_32.a
 
       - uses: actions/upload-artifact@v4
         name: Upload libluajit.a (32x)
         with:
           name: libluajit_32.a
-          path: LuaJIT-2.1/src/libluajit.a
-          retention-days: 1
-
-      - uses: actions/upload-artifact@v4
-        name: Upload libluajit.so (32x)
-        with:
-          name: libluajit_32.so
-          path: LuaJIT-2.1/src/libluajit.so
+          path: LuaJIT-2.1/src/libluajit_32.a
           retention-days: 1
