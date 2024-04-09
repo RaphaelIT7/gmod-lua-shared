@@ -953,14 +953,15 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 	::DebugPrint(3, "CLuaInterface::SetMember 4 %s\n", key);
 	if (obj->isTable())
 	{
+		::DebugPrint(3, "CLuaInterface::SetMember case 1\n");
+		obj->Push();
 		PushString(key);
 		Push(-3);
 		SetTable(-3);
 		Pop(1);
-	}
-
-	if (obj == pGlobal)
+	} else if (obj == pGlobal)
 	{
+		::DebugPrint(3, "CLuaInterface::SetMember case 2\n");
 		PushSpecial(SPECIAL_GLOB);
 		PushString(key);
 		Push(-3);
