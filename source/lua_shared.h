@@ -66,6 +66,7 @@ public:
 private:
 	IGet* pGet;
 	ILuaInterface* pInterfaces[3];
+	//std::vector<File*> pCache;
 	std::unordered_map<std::string, File*> pCache;
 	std::unordered_map<std::string, std::vector<std::string>> pMount;
 };

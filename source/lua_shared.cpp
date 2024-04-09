@@ -97,10 +97,6 @@ ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
 
 File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile)
 {
-	auto it = pCache.find(path);
-	if (it != pCache.end())
-		return it->second;
-
 	Msg("CLuaShared::LoadFile: %s\n", path.c_str());
 
 	File* file = new File;
@@ -136,6 +132,14 @@ File* CLuaShared::GetCache(const std::string& unknown)
 	auto it = pCache.find(unknown);
 	if (it != pCache.end())
 		return it->second;
+
+	/*for (File* f : pCache)
+	{
+		if (f->name == unknown)
+		{
+			return f;
+		}
+	}*/
 
 	return nullptr;
 }
