@@ -48,7 +48,6 @@
 
 
 typedef struct lua_State lua_State;
-#include "gmod.h"
 
 typedef int (*lua_CFunction) (lua_State *L);
 
