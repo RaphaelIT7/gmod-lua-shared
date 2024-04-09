@@ -36,6 +36,7 @@
 #include "lj_strscan.h"
 #include "lj_strfmt.h"
 #include "lj_lib.h"
+#include "gmod2.h"
 
 /* -- Base library: checks ------------------------------------------------ */
 
@@ -538,10 +539,13 @@ LJLIB_CF(print)
       L->top--;
     }
     if (i)
-      putchar('\t');
-    fwrite(str, 1, size, stdout);
+    	GMOD_LuaPrint("\t");
+      //putchar('\t');
+    GMOD_LuaPrint(str);
+    //fwrite(str, 1, size, stdout);
   }
-  putchar('\n');
+  //putchar('\n');
+  GMOD_LuaPrint("\n");
   return 0;
 }
 

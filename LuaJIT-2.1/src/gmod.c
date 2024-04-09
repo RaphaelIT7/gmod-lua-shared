@@ -23,5 +23,13 @@
 // IDK what I need to compile this shit but this should hopefully work
 void lua_init_stack_gmod(lua_State* L1, lua_State* L)
 {
+	if (L && L != L1)
+	{
+		L1->luabase = L->luabase;
+	}
+}
+
+void GMOD_LuaPrint(const char* str)
+{
 
 }
