@@ -38,7 +38,7 @@ if exist minilua.exe.manifest^
 @endlocal
 
 @set DASMFLAGS=-D WIN -D JIT -D FFI -D ENDIAN_LE -D FPU -D P64
-@set LJARCH=x64
+@set LJARCH=x86
 @minilua
 @if errorlevel 8 goto :NO32
 @set DASC=vm_x86.dasc
