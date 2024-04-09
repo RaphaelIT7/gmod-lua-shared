@@ -39,10 +39,10 @@ void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext
 	CheckFunction(func_lua_init_stack_gmod, "lua_init_stack_gmod");
 	CreateDetour(&detour_lua_init_stack_gmod, "lua_init_stack_gmod", reinterpret_cast<void*>(func_lua_init_stack_gmod), reinterpret_cast<void*>(&hook_lua_init_stack_gmod));
 
-	/*Detouring::Hook detour_GMOD_LuaPrint;
+	Detouring::Hook detour_GMOD_LuaPrint;
 	void* func_GMOD_LuaPrint = FindFunction(lua_shared_loader.GetModule(), GMOD_LuaPrintSym);
 	CheckFunction(func_GMOD_LuaPrint, "GMOD_LuaPrint");
-	CreateDetour(&detour_GMOD_LuaPrint, "GMOD_LuaPrint", reinterpret_cast<void*>(func_GMOD_LuaPrint), reinterpret_cast<void*>(&hook_GMOD_LuaPrint));*/
+	CreateDetour(&detour_GMOD_LuaPrint, "GMOD_LuaPrint", reinterpret_cast<void*>(func_GMOD_LuaPrint), reinterpret_cast<void*>(&hook_GMOD_LuaPrint));
 
 
 	pGet = get;

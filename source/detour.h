@@ -38,3 +38,6 @@ void CreateDetour(Detouring::Hook* hook, const char* name, Detouring::Hook::Targ
 struct lua_State;
 typedef void (*lua_init_stack_gmod_t)(lua_State* L1, lua_State* L);
 const Symbol lua_init_stack_gmodSym = Symbol::FromName("lua_init_stack_gmod");
+
+typedef void (*GMOD_LuaPrint_t)(const char*);
+const Symbol GMOD_LuaPrintSym = Symbol::FromName("GMOD_LuaPrint");

@@ -50,7 +50,7 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
         filter("system:windows")
         	linkoptions("/NODEFAULTLIB:LIBCMT")
         	linkoptions("/EXPORT:lua_init_stack_gmod")
-        	--linkoptions("/EXPORT:GMOD_LuaPrint")
+        	linkoptions("/EXPORT:GMOD_LuaPrint")
 	        links("msvcrt.lib")
 
             files({"source/win32/*.cpp", "source/win32/*.hpp"})

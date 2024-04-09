@@ -599,6 +599,7 @@ bool CLuaInterface::PushMetaTable(int iType)
 void CLuaInterface::PushUserType(void* data, int iType)
 {
 	::DebugPrint(2, "CLuaInterface::PushUserType %i\n", iType);
+	// ToDo
 
 	void** ud = static_cast<void**>(lua_newuserdata(state, sizeof(data)));
 	*ud = data;
@@ -625,12 +626,60 @@ int LuaPanic(lua_State* lua)
 	return 0;
 }
 
-int func_Include(lua_State* L)
+int func_print(lua_State* L)
 {
 	CLuaInterface* LUA = (CLuaInterface*)L->luabase;
 
-	const char* file = LUA->CheckString(1);
-	LUA->FindAndRunScript(file, true, true, "!UNKNOWN", true);
+	std::stringstream ss;
+	for (int i=1; i <= LUA->Top(); ++i)
+	{
+		const char* arg_str = lua_tolstring(LUA->GetState(), i, NULL);
+		if (arg_str)
+		{
+			ss << arg_str;
+		} else {
+			int type = LUA->GetType(i);
+			bool meta = false;
+			void* ref = nullptr;
+			switch(type)
+			{
+				case GarrysMod::Lua::Type::Bool:
+					ss << (LUA->GetBool(i) ? "true" : "false");
+					break;
+				case GarrysMod::Lua::Type::Function:
+					ss << "function: 0x" << std::hex << LUA->GetUserdata(i);
+					break;
+				default:
+					LUA->Push(i);
+					if (LUA->GetMetaTable(-1))
+					{
+						LUA->GetField(-1, "__tostring");
+						if (LUA->IsType(-1, GarrysMod::Lua::Type::Function))
+						{
+							LUA->Push(-3);
+							LUA->CallFunctionProtected(1, 1, true);
+							
+							if (LUA->IsType(-1, GarrysMod::Lua::Type::String))
+							{
+								meta = true;
+								ss << LUA->GetString(-1);
+							}
+						}
+						LUA->Pop(2);
+					}
+					LUA->Pop(1);
+
+					if (!meta)
+						ss << "<Something Unknown. Scary>";
+
+					break;
+			}
+		}
+	}
+
+	ss<<"\n";
+
+	LUA->GetLuaGameCallback()->Msg(ss.str().c_str(), false);
 
 	return 0;
 }
@@ -661,6 +710,14 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	DoStackCheck();
 
 	NewGlobalTable("");
+	GarrysMod::Lua::ILuaObject* obj = Global();
+	if (obj)
+	{
+		obj->Push();
+		PushCFunction(func_print);
+		SetField(-2, "print"); // Workaround until I get LuaJIT to call GMOD_Print
+		Pop(1);
+	}
 
     lua_pushinteger(state, 1);
     lua_setglobal(state, "AcceptInput");
