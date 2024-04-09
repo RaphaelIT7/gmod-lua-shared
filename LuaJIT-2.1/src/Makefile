@@ -502,7 +502,7 @@ LJLIB_C= $(LJLIB_O:.o=.c)
 
 LJCORE_O= lj_assert.o lj_gc.o lj_err.o lj_char.o lj_bc.o lj_obj.o lj_buf.o \
 	  lj_str.o lj_tab.o lj_func.o lj_udata.o lj_meta.o lj_debug.o \
-	  lj_prng.o lj_state.o gmod.o lj_dispatch.o lj_vmevent.o lj_vmmath.o \
+	  lj_prng.o lj_state.o lj_dispatch.o lj_vmevent.o lj_vmmath.o \
 	  lj_strscan.o lj_strfmt.o lj_strfmt_num.o lj_serialize.o \
 	  lj_api.o lj_profile.o \
 	  lj_lex.o lj_parse.o lj_bcread.o lj_bcwrite.o lj_load.o \
