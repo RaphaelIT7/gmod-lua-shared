@@ -23,7 +23,7 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
     -- Can also define "abi_compatible", for project specific compatibility
     CreateProject({serverside = true, manual_files = false})
         -- Remove some or all of these includes if they're not needed
-        --IncludeHelpersExtended()
+        IncludeHelpersExtended()
         --IncludeLuaShared()
         --IncludeSDKEngine()
         --IncludeSDKCommon()
@@ -50,6 +50,7 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
         filter("system:windows")
         	linkoptions("/NODEFAULTLIB:LIBCMT")
         	linkoptions("/EXPORT:lua_init_stack_gmod")
+        	--linkoptions("/EXPORT:GMOD_LuaPrint")
 	        links("msvcrt.lib")
 
             files({"source/win32/*.cpp", "source/win32/*.hpp"})
