@@ -1093,6 +1093,24 @@ bool CLuaInterface::FindOnObjectsMetaTable(int iStackPos, int keyIndex)
 {
 	::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable\n");
 	// ToDo
+	if (lua_getmetatable(state, iStackPos) == 1)
+	{
+		lua_pushvalue(state, keyIndex);
+		GetTable(-2);
+		int ref = -1;
+		if (lua_type(state, -1) != Type::Nil)
+		{
+			ref = ReferenceCreate();
+		}
+
+		Pop(2);
+		if (ref != -1)
+		{
+			ReferencePush(ref);
+			ReferenceFree(ref);
+			return true;
+		}
+	}
 
 	return false;
 }
@@ -1198,7 +1216,17 @@ void CLuaInterface::ErrorNoHalt( const char* fmt, ... )
 void CLuaInterface::Msg( const char* fmt, ... )
 {
 	::DebugPrint(2, "CLuaInterface::Msg %s\n", fmt);
-	// ToDo
+
+	va_list args;
+	va_start(args, fmt);
+
+	char* buffer = new char[4096];
+	V_vsnprintf(buffer, sizeof(buffer), fmt, args);
+
+	va_end(args);
+
+	Msg("%s", buffer);
+	delete[] buffer;
 }
 
 void CLuaInterface::PushPath( const char* path )
@@ -1236,7 +1264,7 @@ void CLuaInterface::PushColor(Color color)
 
 int CLuaInterface::GetStack(int level, lua_Debug* dbg)
 {
-	::DebugPrint(2, "CLuaInterface::GetStack\n");
+	::DebugPrint(2, "CLuaInterface::GetStack %i\n", level);
 	// ToDo
 
 	return 0;
@@ -1244,7 +1272,7 @@ int CLuaInterface::GetStack(int level, lua_Debug* dbg)
 
 int CLuaInterface::GetInfo(const char* what, lua_Debug* dbg)
 {
-	::DebugPrint(2, "CLuaInterface::GetStack\n");
+	::DebugPrint(2, "CLuaInterface::GetStack %s\n", what);
 	// ToDo
 
 	return 0;
@@ -1252,7 +1280,7 @@ int CLuaInterface::GetInfo(const char* what, lua_Debug* dbg)
 
 const char* CLuaInterface::GetLocal(lua_Debug* dbg, int n)
 {
-	::DebugPrint(2, "CLuaInterface::GetLocal\n");
+	::DebugPrint(2, "CLuaInterface::GetLocal %i\n", n);
 	// ToDo
 
 	return "";
@@ -1260,7 +1288,7 @@ const char* CLuaInterface::GetLocal(lua_Debug* dbg, int n)
 
 const char* CLuaInterface::GetUpvalue(int funcIndex, int n)
 {
-	::DebugPrint(2, "CLuaInterface::GetUpvalue\n");
+	::DebugPrint(2, "CLuaInterface::GetUpvalue %i %i\n", funcIndex, n);
 	// ToDo
 
 	return "";
