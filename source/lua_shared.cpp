@@ -120,10 +120,6 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		g_pFullFileSystem->Close(fh);
 	} else {
 		delete file;
-		if (path.rfind("gamemodes/", 0) != 0)
-		{
-			LoadFile("gamemodes/" +  path, pathId, fromDatatable, fromFile); // Try the gamemodes folder
-		}
 	}
 
 	return file;
@@ -156,6 +152,8 @@ void CLuaShared::MountLua(const char* pathID)
 	gamepath = gamepath + '\\';
 
 	AddSearchPath((gamepath + "lua\\").c_str(), pathID);
+
+	AddSearchPath((gamepath + "lua\\gamemodes\\").c_str(), pathID);
 
 	// Do some stuff = Push somthing 3x & Call a function
 
