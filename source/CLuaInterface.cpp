@@ -262,10 +262,10 @@ int CLuaInterface::Next(int iStackPos)
 	return lua_next(state, iStackPos);
 }
 
-void* CLuaInterface::NewUserdata(unsigned int iSize)
+ILuaBase::UserData* CLuaInterface::NewUserdata(unsigned int iSize)
 {
 	::DebugPrint(3, "CLuaInterface::NewUserdata\n");
-	return lua_newuserdata(state, iSize);
+	return (UserData*)lua_newuserdata(state, iSize);
 }
 
 void CLuaInterface::ThrowError(const char* strError)
@@ -328,10 +328,10 @@ CFunc CLuaInterface::GetCFunction(int iStackPos)
 	return lua_tocfunction(state, iStackPos);
 }
 
-void* CLuaInterface::GetUserdata(int iStackPos)
+ILuaBase::UserData* CLuaInterface::GetUserdata(int iStackPos)
 {
 	::DebugPrint(4, "CLuaInterface::GetUserdata\n");
-	return lua_touserdata(state, iStackPos);
+	return (ILuaBase::UserData*)lua_touserdata(state, iStackPos);
 }
 
 void CLuaInterface::PushNil()
@@ -365,7 +365,6 @@ void CLuaInterface::PushBool(bool val)
 void CLuaInterface::PushCFunction(CFunc val)
 {
 	::DebugPrint(4, "CLuaInterface::PushCFunction\n");
-	//lua_pushcfunction(state, val);
 	lua_pushcclosure(state, val, 0);
 }
 
@@ -375,7 +374,7 @@ void CLuaInterface::PushCClosure(CFunc val, int iVars)
 	lua_pushcclosure(state, val, iVars);
 }
 
-void CLuaInterface::PushUserdata(void* val)
+void CLuaInterface::PushUserdata(ILuaBase::UserData* val)
 {
 	::DebugPrint(4, "CLuaInterface::PushUserdata\n");
 	lua_pushlightuserdata(state, val);
@@ -428,13 +427,35 @@ bool CLuaInterface::IsType(int iStackPos, int iType)
 		return true;
 	}
 
+	if (iType > 8)
+	{
+		ILuaBase::UserData* udata = GetUserdata(iStackPos);
+		if (udata && udata->type == iType)
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 
 int CLuaInterface::GetType(int iStackPos)
 {
 	::DebugPrint(4, "CLuaInterface::GetType\n");
-	return lua_type(state, iStackPos);
+	int type = lua_type(state, iStackPos);
+
+	if (type == GarrysMod::Lua::Type::UserData)
+	{
+		ILuaBase::UserData* udata = GetUserdata(iStackPos);
+		if (udata)
+		{
+			type = udata->type;
+		}
+	}
+
+	::DebugPrint(3, "Return Type: %i\n", type);
+
+	return type;
 }
 
 const char* CLuaInterface::GetTypeName(int iType)
@@ -484,90 +505,48 @@ int CLuaInterface::ObjLen(int iStackPos)
 // ToDo: Recheck every function below!
 // ------------------------------------------
 
-QAngle DefaultAngle = QAngle(0, 0, 0);
 const QAngle& CLuaInterface::GetAngle(int iStackPos)
 {
 	::DebugPrint(2, "CLuaInterface::GetAngle\n");
-	if (IsType(iStackPos, Type::Angle)) {
-		//luaL_checktype(state, iStackPos, LUA_TTABLE);
+	ILuaBase::UserData* udata = GetUserdata(iStackPos);
+	if (!udata || !udata->data || udata->type != GarrysMod::Lua::Type::Angle)
+		return QAngle(0, 0, 0);
 
-		lua_rawgeti(state, iStackPos, 1);
-		float pitch = static_cast<float>(luaL_optnumber(state, -1, 0));
-		lua_pop(state, 1);
-
-		lua_rawgeti(state, iStackPos, 2);
-		float yaw = static_cast<float>(luaL_optnumber(state, -1, 0));
-		lua_pop(state, 1);
-
-		lua_rawgeti(state, iStackPos, 3);
-		float roll = static_cast<float>(luaL_optnumber(state, -1, 0));
-		lua_pop(state, 1);
-
-		return QAngleByValue(pitch, yaw, roll);
-	} else {
-		return DefaultAngle;
-	}
+	return *(QAngle*)udata->data;
 }
 
-Vector DefaultVec = Vector(0, 0, 0);
 const Vector& CLuaInterface::GetVector(int iStackPos)
 {
 	::DebugPrint(2, "CLuaInterface::GetVector\n");
-	if (IsType(iStackPos, Type::Vector)) {
-		//luaL_checktype(state, iStackPos, LUA_TTABLE);
+	ILuaBase::UserData* udata = GetUserdata(iStackPos);
+	if (!udata || !udata->data || udata->type != GarrysMod::Lua::Type::Vector)
+		return Vector(0, 0, 0);
 
-		lua_rawgeti(state, iStackPos, 1);
-		float pitch = static_cast<float>(luaL_optnumber(state, -1, 0));
-		lua_pop(state, 1);
-
-		lua_rawgeti(state, iStackPos, 2);
-		float yaw = static_cast<float>(luaL_optnumber(state, -1, 0));
-		lua_pop(state, 1);
-
-		lua_rawgeti(state, iStackPos, 3);
-		float roll = static_cast<float>(luaL_optnumber(state, -1, 0));
-		lua_pop(state, 1);
-
-		return VectorByValue(pitch, yaw, roll);
-	} else {
-		return DefaultVec;
-	}
+	return *(Vector*)udata->data;
 }
 
 void CLuaInterface::PushAngle(const QAngle& val)
 {
 	::DebugPrint(2, "CLuaInterface::PushAngle\n");
-	lua_newtable(state);
+	
+	ILuaBase::UserData* udata = NewUserdata(20);
+	*(QAngle*)udata->data = val;
+	udata->type = GarrysMod::Lua::Type::Angle;
 
-	lua_pushnumber(state, val.x);
-	lua_setfield(state, -2, "1");
-
-	lua_pushnumber(state, val.y);
-	lua_setfield(state, -2, "2");
-
-	lua_pushnumber(state, val.z);
-	lua_setfield(state, -2, "3");
-
-	PushMetaTable(Type::Angle);
-	SetMetaTable(-2);
+	if (PushMetaTable(GarrysMod::Lua::Type::Angle))
+		SetMetaTable(-2);
 }
 
 void CLuaInterface::PushVector(const Vector& val)
 {
 	::DebugPrint(2, "CLuaInterface::PushVector\n");
-	lua_newtable(state);
 
-	lua_pushnumber(state, val.x);
-	lua_setfield(state, -2, "1");
+	ILuaBase::UserData* udata = NewUserdata(20);
+	*(Vector*)udata->data = val;
+	udata->type = GarrysMod::Lua::Type::Angle;
 
-	lua_pushnumber(state, val.y);
-	lua_setfield(state, -2, "2");
-
-	lua_pushnumber(state, val.z);
-	lua_setfield(state, -2, "3");
-
-	PushMetaTable(Type::Vector);
-	SetMetaTable(-2);
+	if (PushMetaTable(GarrysMod::Lua::Type::Angle))
+		SetMetaTable(-2);
 }
 
 void CLuaInterface::SetState(lua_State* L)
@@ -616,19 +595,22 @@ bool CLuaInterface::PushMetaTable(int iType)
 void CLuaInterface::PushUserType(void* data, int iType)
 {
 	::DebugPrint(2, "CLuaInterface::PushUserType %i\n", iType);
-	// ToDo?
 
-	void* userdata = lua_newuserdata(state, sizeof(data));
-	userdata = data;
+	UserData* udata = NewUserdata(8);
+	udata->data = data;
+	udata->type = iType;
 
-	luaL_newmetatable(state, GetActualTypeName(iType));
-	SetMetaTable(-2);
+	if (PushMetaTable(iType))
+		SetMetaTable(-2);
 }
 
 void CLuaInterface::SetUserType(int iStackPos, void* data)
 {
 	::DebugPrint(2, "CLuaInterface::SetUserType\n");
-	// ToDo. Same
+	
+	ILuaBase::UserData* udata = GetUserdata(iStackPos);
+	if (udata)
+		udata->data = data;
 }
 
 // =================================
@@ -712,6 +694,11 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	state->luabase = this;
 	SetState(state);
 
+	for (int i=0; i<LUA_MAX_TEMP_OBJECTS;++i)
+	{
+		m_TempObjects[i] = CreateObject();
+	}
+
 	lua_atpanic(state, LuaPanic);
 
 	lua_pushcclosure(state, AdvancedLuaErrorReporter, 0);
@@ -727,14 +714,13 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	DoStackCheck();
 
 	NewGlobalTable("");
-	GarrysMod::Lua::ILuaObject* obj = Global();
-	if (obj)
-	{
-		obj->Push();
-		PushCFunction(func_print);
-		SetField(-2, "print"); // Workaround until I get LuaJIT to call GMOD_Print
-		Pop(1);
-	}
+
+	::DebugPrint(3, "Table? %s\n", pGlobal->isTable() ? "Yes" : "No");
+
+	PushSpecial(SPECIAL_GLOB);
+	PushCFunction(func_print);
+	SetField(-2, "print"); // Workaround until I get LuaJIT to call GMOD_Print
+	Pop(1);
 
     lua_pushinteger(state, 1);
     lua_setglobal(state, "AcceptInput");
@@ -809,7 +795,12 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::GetObject(int index)
 void CLuaInterface::PushLuaObject(GarrysMod::Lua::ILuaObject* obj)
 {
 	::DebugPrint(4, "CLuaInterface::PushLuaObject\n");
-	obj->Push();
+	if (obj)
+	{
+		obj->Push();
+	} else {
+		PushNil();
+	}
 }
 
 void CLuaInterface::PushLuaFunction(CFunc func)
@@ -887,32 +878,35 @@ void CLuaInterface::NewGlobalTable(const char* name)
 {
 	::DebugPrint(1, "CLuaInterface::NewGlobalTable %s\n", name);
 
-	if (pGlobal)
-		gamecallback->DestroyLuaObject(pGlobal);
-
-	pGlobal = gamecallback->CreateLuaObject();
-
-	if (pGlobal)
-	{
-		PushSpecial(SPECIAL_GLOB);
-		pGlobal->SetFromStack(-1);
-		Pop(1);
-		::DebugPrint(1, "Global type: %i\n", pGlobal->GetType());
-	}
+	CreateTable();
+	pGlobal = CreateObject();
+	pGlobal->SetFromStack(-1);
+	SetField(LUA_GLOBALSINDEX, name);
 }
 
 GarrysMod::Lua::ILuaObject* CLuaInterface::NewTemporaryObject()
 {
 	::DebugPrint(2, "CLuaInterface::NewTemporaryObject\n");
-	// ToDo
 
-	return nullptr;
+	++m_iCurrentTempObject;
+	if (m_iCurrentTempObject >= LUA_MAX_TEMP_OBJECTS)
+		m_iCurrentTempObject = 0;
+
+	GarrysMod::Lua::ILuaObject* obj = m_TempObjects[m_iCurrentTempObject];
+	if (obj)
+	{
+		obj->UnReference();
+	} else {
+		obj = CreateObject();
+		m_TempObjects[m_iCurrentTempObject] = obj;
+	}
+
+	return obj;
 }
 
 bool CLuaInterface::isUserData(int iStackPos)
 {
 	::DebugPrint(4, "CLuaInterface::isUserData\n");
-	// ToDo
 
 	return lua_type(state, iStackPos) == Type::UserData;
 }
@@ -932,7 +926,7 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::GetMetaTableObject(const char* name, 
 		SetField(-2, name);
 	}
 
-	GarrysMod::Lua::ILuaObject* obj = CreateObject();
+	GarrysMod::Lua::ILuaObject* obj = NewTemporaryObject();
 	obj->SetFromStack(-1);
 	Pop(2);
 
@@ -942,9 +936,12 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::GetMetaTableObject(const char* name, 
 GarrysMod::Lua::ILuaObject* CLuaInterface::GetMetaTableObject(int iStackPos)
 {
 	::DebugPrint(2, "CLuaInterface::GetMetaTableObject\n");
-	// ToDo
 
-	return nullptr;
+	GarrysMod::Lua::ILuaObject* obj = NewTemporaryObject();
+	obj->SetFromStack(-1);
+	Pop(1);
+
+	return obj;
 }
 
 GarrysMod::Lua::ILuaObject* CLuaInterface::GetReturn(int iStackPos)
@@ -1035,25 +1032,15 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key, Garrys
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 {
-	::DebugPrint(3, "CLuaInterface::SetMember 4 %s\n", key);
+	::DebugPrint(3, "CLuaInterface::SetMember 4 %s %i %s\n", key, obj->GetType(), obj->isTable() ? "Yes" : "no");
 	if (obj->isTable())
 	{
-		::DebugPrint(3, "CLuaInterface::SetMember case 1\n");
 		obj->Push();
 		PushString(key);
 		Push(-3);
 		SetTable(-3);
-		Pop(1);
-	} else if (obj == pGlobal)
-	{
-		::DebugPrint(3, "CLuaInterface::SetMember case 2\n");
-		PushSpecial(SPECIAL_GLOB);
-		PushString(key);
-		Push(-3);
-		SetTable(-3);
-		Pop(1);
+		Pop(2);
 	}
-	Pop(1);
 }
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, GarrysMod::Lua::ILuaObject* value)
@@ -1252,7 +1239,7 @@ const char* CLuaInterface::GetPath()
 int CLuaInterface::GetColor(int iStackPos) // Probably returns the StackPos
 {
 	::DebugPrint(2, "CLuaInterface::GetColor\n");
-	// ToDo
+
 	return 0;
 }
 
@@ -1265,33 +1252,29 @@ void CLuaInterface::PushColor(Color color)
 int CLuaInterface::GetStack(int level, lua_Debug* dbg)
 {
 	::DebugPrint(2, "CLuaInterface::GetStack %i\n", level);
-	// ToDo
 
-	return 0;
+	return lua_getstack(state, level, dbg);
 }
 
 int CLuaInterface::GetInfo(const char* what, lua_Debug* dbg)
 {
 	::DebugPrint(2, "CLuaInterface::GetStack %s\n", what);
-	// ToDo
 
-	return 0;
+	return lua_getinfo(state, what, dbg);
 }
 
 const char* CLuaInterface::GetLocal(lua_Debug* dbg, int n)
 {
 	::DebugPrint(2, "CLuaInterface::GetLocal %i\n", n);
-	// ToDo
 
-	return "";
+	return lua_getlocal(state, dbg, n);
 }
 
 const char* CLuaInterface::GetUpvalue(int funcIndex, int n)
 {
 	::DebugPrint(2, "CLuaInterface::GetUpvalue %i %i\n", funcIndex, n);
-	// ToDo
 
-	return "";
+	return lua_getupvalue(state, funcIndex, n);
 }
 
 bool CLuaInterface::RunStringEx(const char *filename, const char *path, const char *stringToRun, bool run, bool printErrors, bool dontPushErrors, bool noReturns)
@@ -1492,7 +1475,7 @@ std::string CLuaInterface::RunMacros(std::string code)
 	code = std::regex_replace(code, std::regex("\\*/"), "]]");
 	code = std::regex_replace(code, std::regex("//"), "--");
 
-	// ToDo do Baseclass macro
+	code = std::regex_replace(code, std::regex("DEFINE_BASECLASS"), "local BaseClass = baseclass.Get");
 
 	return code;
 }

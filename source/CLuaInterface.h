@@ -204,7 +204,7 @@ public:
 protected:
 #endif
 	// Deprecated: Use the UserType functions instead of this
-	virtual void* NewUserdata(unsigned int iSize) = 0;
+	virtual ILuaBase::UserData* NewUserdata(unsigned int iSize) = 0;
 
 public:
 	// Throws an error and ceases execution of the function
@@ -256,7 +256,7 @@ public:
 protected:
 #endif
 	// Deprecated: You should probably be using the UserType functions instead of this
-	virtual void* GetUserdata(int iStackPos = -1) = 0;
+	virtual ILuaBase::UserData* GetUserdata(int iStackPos = -1) = 0;
 
 public:
 	// Pushes a nil value on to the stack
@@ -284,7 +284,7 @@ public:
 protected:
 #endif
 	// Deprecated: Don't use light userdata in GMod
-	virtual void        PushUserdata(void*) = 0;
+	virtual void        PushUserdata(ILuaBase::UserData*) = 0;
 
 public:
 	// Allows for values to be stored by reference for later use
@@ -516,6 +516,8 @@ public:
     virtual bool Execute() = 0;
 };
 
+#define LUA_MAX_TEMP_OBJECTS 32
+
 class ILuaInterface : public ILuaBase
 {
 public:
@@ -613,7 +615,7 @@ public:
 	virtual void Insert(int iStackPos);
 	virtual void Remove(int iStackPos);
 	virtual int Next(int iStackPos);
-	virtual void* NewUserdata(unsigned int iSize);
+	virtual ILuaBase::UserData* NewUserdata(unsigned int iSize);
 	[[noreturn]]
 	virtual void ThrowError(const char* strError);
 	virtual void CheckType(int iStackPos, int iType);
@@ -625,14 +627,14 @@ public:
 	virtual double GetNumber(int iStackPos = -1);
 	virtual bool GetBool(int iStackPos = -1);
 	virtual CFunc GetCFunction(int iStackPos = -1);
-	virtual void* GetUserdata(int iStackPos = -1);
+	virtual ILuaBase::UserData* GetUserdata(int iStackPos = -1);
 	virtual void PushNil();
 	virtual void PushString(const char* val, unsigned int iLen = 0);
 	virtual void PushNumber(double val);
 	virtual void PushBool(bool val);
 	virtual void PushCFunction(CFunc val);
 	virtual void PushCClosure(CFunc val, int iVars);
-	virtual void PushUserdata(void*);
+	virtual void PushUserdata(ILuaBase::UserData*);
 	virtual int ReferenceCreate();
 	virtual void ReferenceFree(int i);
 	virtual void ReferencePush(int i);
@@ -770,6 +772,9 @@ private:
 	GarrysMod::Lua::ILuaObject* pGlobal = nullptr;
 	const char* pPathID = "LuaMenu"; // lsv, lsc or LuaMenu
 	unsigned char pRealm = -1; // CLIENT = 0, SERVER = 1, MENU = 2
+	GarrysMod::Lua::ILuaObject* m_TempObjects[LUA_MAX_TEMP_OBJECTS];
+	uint8 m_iCurrentTempObject = 0;
+	GarrysMod::Lua::ILuaObject* m_ProtectedFunctionReturns[4];
 };
 
 // Some functions declared inside CLuaInterface_cpp
