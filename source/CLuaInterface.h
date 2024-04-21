@@ -775,6 +775,7 @@ private:
 	GarrysMod::Lua::ILuaObject* m_TempObjects[LUA_MAX_TEMP_OBJECTS];
 	uint8 m_iCurrentTempObject = 0;
 	GarrysMod::Lua::ILuaObject* m_ProtectedFunctionReturns[4];
+	const char* m_pPath = "includes";
 };
 
 // Some functions declared inside CLuaInterface_cpp
