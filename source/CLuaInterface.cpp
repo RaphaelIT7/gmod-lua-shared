@@ -5,6 +5,7 @@
 #include "lua/lauxlib.h"
 #include "lua_shared.h"
 #include "lua/lj_obj.h"
+#include "CLuaObject.h"
 #include <regex>
 
 #ifdef ARCHITECTURE_X86
@@ -12,6 +13,7 @@
 #else
 #include "color.h"
 #endif
+
 
 int g_iTypeNum = 0;
 
@@ -383,6 +385,7 @@ void CLuaInterface::PushUserdata(ILuaBase::UserData* val)
 int CLuaInterface::ReferenceCreate()
 {
 	::DebugPrint(4, "CLuaInterface::ReferenceCreate\n");
+
 	return luaL_ref(state, LUA_REGISTRYINDEX);
 }
 
@@ -396,6 +399,7 @@ void CLuaInterface::ReferencePush(int i)
 {
 	::DebugPrint(4, "CLuaInterface::ReferencePush\n");
 	lua_rawgeti(state, LUA_REGISTRYINDEX, i);
+	::DebugPrint(5, "Reference Type: %i\n", GetType(-1));
 }
 
 void CLuaInterface::PushSpecial(int iType)
@@ -674,6 +678,8 @@ int func_print(lua_State* L)
 					break;
 			}
 		}
+
+		ss << "\t";
 	}
 
 	ss<<"\n";
@@ -722,26 +728,55 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	SetField(-2, "print"); // Workaround until I get LuaJIT to call GMOD_Print
 	Pop(1);
 
-    lua_pushinteger(state, 1);
-    lua_setglobal(state, "AcceptInput");
+	DoStackCheck();
 
-    lua_pushinteger(state, 2);
-    lua_setglobal(state, "AdjustMouseSensitivity");
+	lua_createtable(state, 0, 0);
 
-    lua_pushinteger(state, 3);
-    lua_setglobal(state, "AllowPlayerPickup");
+	lua_pushinteger(state, 1);
+	lua_pushstring(state, "AcceptInput");
+	lua_settable(state, -3);
 
-    lua_pushinteger(state, 4);
-    lua_setglobal(state, "CalcMainActivity");
+	lua_pushinteger(state, 2);
+	lua_pushstring(state, "AdjustMouseSensitivity");
+	lua_settable(state, -3);
 
-    lua_pushinteger(state, 5);
-    lua_setglobal(state, "CalcView");
+	lua_pushinteger(state, 3);
+	lua_pushstring(state, "AllowPlayerPickup");
+	lua_settable(state, -3);
 
-    lua_pushinteger(state, 6);
-    lua_setglobal(state, "CalcViewModelView");
+	lua_pushinteger(state, 4);
+	lua_pushstring(state, "CalcMainActivity");
+	lua_settable(state, -3);
 
-    lua_pushinteger(state, 7);
-    lua_setglobal(state, "CanExitVehicle");
+	lua_pushinteger(state, 5);
+	lua_pushstring(state, "CalcView");
+	lua_settable(state, -3);
+
+	lua_pushinteger(state, 6);
+	lua_pushstring(state, "CalcViewModelView");
+	lua_settable(state, -3);
+
+	lua_pushinteger(state, 7);
+	lua_pushstring(state, "CanExitVehicle");
+	lua_settable(state, -3);
+
+	DoStackCheck();
+
+	// lua_getfield(state, "debug");
+
+	// lua_pushnil(state);
+	// lua_setfield(state, -2, "setlocal");
+
+	// lua_pushnil(state);
+	// lua_setfield(state, -2, "setupvalue");
+
+	// lua_pushnil(state);
+	// lua_setfield(state, -2, "upvalueid");
+
+	// lua_pushnil(state);
+	// lua_setfield(state, -2, "upvaluejoin");
+
+	// lua_pop(state, 1);
 
 	return true;
 }
@@ -906,7 +941,7 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::NewTemporaryObject()
 
 bool CLuaInterface::isUserData(int iStackPos)
 {
-	::DebugPrint(4, "CLuaInterface::isUserData\n");
+	::DebugPrint(4, "CLuaInterface::isUserData %s\n", lua_type(state, iStackPos) == Type::UserData ? "Yes" : "No");
 
 	return lua_type(state, iStackPos) == Type::UserData;
 }
@@ -987,29 +1022,34 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::CreateObject()
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, GarrysMod::Lua::ILuaObject* key, GarrysMod::Lua::ILuaObject* value)
 {
+	::Msg("Top: %i\n", Top());
 	::DebugPrint(3, "CLuaInterface::SetMember 1\n");
-	if (obj->isTable())
+	if (obj->GetType() == Type::Table)
 	{
-		obj->Push();
-		key->Push();
-		value->Push();
+		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
+		ReferencePush(((GarrysMod::Lua::CLuaObject*)key)->m_reference);
+		ReferencePush(((GarrysMod::Lua::CLuaObject*)value)->m_reference);
 		SetTable(-3);
-		Pop(1);
+		Pop(2);
 	}
 }
 
 void CLuaInterface::GetNewTable()
 {
+	::Msg("Top: %i\n", Top());
 	::DebugPrint(2, "CLuaInterface::GetNewTable\n");
-	// ToDo
+	
+	CreateTable();
+
 }
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key)
 {
+	::Msg("Top: %i\n", Top());
 	::DebugPrint(3, "CLuaInterface::SetMember 2\n");
-	if (obj->isTable())
+	if (obj->GetType() == Type::Table)
 	{
-		obj->Push();
+		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
 		PushNumber(key);
 		Push(-3);
 		SetTable(-3);
@@ -1019,23 +1059,27 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key)
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key, GarrysMod::Lua::ILuaObject* value)
 {
+	::Msg("Top: %i\n", Top());
 	::DebugPrint(3, "CLuaInterface::SetMember 3\n");
-	if (obj->isTable())
+	if (obj->GetType() == Type::Table)
 	{
-		obj->Push();
+		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
 		PushNumber(key);
 		value->Push();
 		SetTable(-3);
-		Pop(1);
+		Pop(2);
 	}
 }
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 {
+	::Msg("Top: %i\n", Top());
 	::DebugPrint(3, "CLuaInterface::SetMember 4 %s %i %s\n", key, obj->GetType(), obj->isTable() ? "Yes" : "no");
-	if (obj->isTable())
+	if (obj->GetType() == Type::Table)
 	{
-		obj->Push();
+		::Msg("Top1: %i\n", Top());
+		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
+		::Msg("Top2: %i\n", Top());
 		PushString(key);
 		Push(-3);
 		SetTable(-3);
@@ -1045,14 +1089,15 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, GarrysMod::Lua::ILuaObject* value)
 {
+	::Msg("Top: %i\n", Top());
 	::DebugPrint(3, "CLuaInterface::SetMember 5\n");
-	if (obj->isTable())
+	if (obj->GetType() == Type::Table)
 	{
-		obj->Push();
+		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
 		PushString(key);
-		value->Push();
+		ReferencePush(((GarrysMod::Lua::CLuaObject*)value)->m_reference);
 		SetTable(-3);
-		Pop(1);
+		Pop(2);
 	}
 }
 
