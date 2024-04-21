@@ -53,6 +53,17 @@ void hook_lua_init_stack_gmod(lua_State* L1, lua_State* L)
 	}
 }
 
+void lua_init_stack_gmod(lua_State* L1, lua_State* L)
+{
+	Msg("lua_init_stack_gmod called!\n");
+	hook_lua_init_stack_gmod(L1, L);
+}
+
+void GMOD_LuaPrint(const char* str)
+{
+	Msg("GMOD_LuaPrint: %s", str);
+}
+
 void hook_GMOD_LuaPrint(const char* str)
 {
 	Msg("%s", str);
