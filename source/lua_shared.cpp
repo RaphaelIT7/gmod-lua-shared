@@ -120,6 +120,10 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		g_pFullFileSystem->Close(fh);
 	} else {
 		delete file;
+		if (!path._Starts_with("gamemodes/"))
+		{
+			LoadFile("gamemodes/" +  path, pathId, fromDatatable, fromFile); // Try the gamemodes folder
+		}
 	}
 
 	return file;

@@ -95,7 +95,9 @@ CLuaError* ReadStackIntoError(lua_State* L)
 		++level;
 	}
 
-	lua_error->message = lua_tolstring(L, -1, NULL);
+	const char* str = lua_tolstring(L, -1, NULL);
+	if (str != NULL) // Setting a std::string to NULL causes a crash
+		lua_error->message = str;
 
 	return lua_error;
 }
@@ -399,7 +401,6 @@ void CLuaInterface::ReferencePush(int i)
 {
 	::DebugPrint(4, "CLuaInterface::ReferencePush\n");
 	lua_rawgeti(state, LUA_REGISTRYINDEX, i);
-	::DebugPrint(5, "Reference Type: %i\n", GetType(-1));
 }
 
 void CLuaInterface::PushSpecial(int iType)
@@ -456,8 +457,6 @@ int CLuaInterface::GetType(int iStackPos)
 			type = udata->type;
 		}
 	}
-
-	::DebugPrint(3, "Return Type: %i\n", type);
 
 	return type;
 }
@@ -578,7 +577,7 @@ bool CLuaInterface::PushMetaTable(int iType)
 	
 	int ref = -1;
 	const char* type = GetActualTypeName(iType);
-	PushSpecial(SPECIAL_ENV);
+	PushSpecial(SPECIAL_REG);
 		GetField(-1, type);
 		if (IsType(-1, Type::Table))
 		{
@@ -700,6 +699,7 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	state->luabase = this;
 	SetState(state);
 
+	::Msg("Top: %i\n", Top());
 	for (int i=0; i<LUA_MAX_TEMP_OBJECTS;++i)
 	{
 		m_TempObjects[i] = CreateObject();
@@ -717,6 +717,7 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 		// Warning("Lua detected bad FPU precision! Prepare for weirdness!");
 	}
 
+	::Msg("Top: %i\n", Top());
 	DoStackCheck();
 
 	NewGlobalTable("");
@@ -729,6 +730,7 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	Pop(1);
 
 	DoStackCheck();
+	::Msg("Top: %i\n", Top());
 
 	lua_createtable(state, 0, 0);
 
@@ -760,7 +762,10 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	lua_pushstring(state, "CanExitVehicle");
 	lua_settable(state, -3);
 
+	Pop(1);
+
 	DoStackCheck();
+	::Msg("Top: %i\n", Top());
 
 	// lua_getfield(state, "debug");
 
@@ -858,8 +863,8 @@ void CLuaInterface::LuaError(const char* str, int iStackPos)
 
 void CLuaInterface::TypeError(const char* str, int iStackPos)
 {
-	::DebugPrint(2, "CLuaInterface::LuaError %s %i\n", str, iStackPos);
-	luaL_typerror(state, iStackPos, str);
+	::DebugPrint(2, "CLuaInterface::TypeError %s %i\n", str, iStackPos);
+	//luaL_typerror(state, iStackPos, str);
 }
 
 void CLuaInterface::CallInternal(int args, int rets)
@@ -868,26 +873,41 @@ void CLuaInterface::CallInternal(int args, int rets)
 	if (!ThreadInMainThread())
 		Error("Calling Lua function in a thread other than main!");
 
+	if (rets > 4)
+		Error("[CLuaInterface::Call] Expecting more returns than possible\n");
+
+	for (int i=0; i<3; ++i)
+	{
+		m_ProtectedFunctionReturns[i] = nullptr;
+	}
+
 	if (IsType(-(args + 1), Type::Function))
 	{
-		CallFunctionProtected(args, rets, true);
+		if (CallFunctionProtected(args, rets, true))
+		{
+			for (int i=1; i<=rets; ++i)
+			{
+				GarrysMod::Lua::ILuaObject* obj = NewTemporaryObject();
+				obj->SetFromStack(-i);
+				m_ProtectedFunctionReturns[i] = obj;
+			}
+		}
 	} else {
-		//Error("Lua tried to call non functions");
+		Error("Lua tried to call non functions");
 	}
 }
 
 void CLuaInterface::CallInternalNoReturns(int args)
 {
 	::DebugPrint(2, "CLuaInterface::CallInternalNoReturns %i\n", args);
-	CallInternal(args, 0);
-	// ToDo
+	
+	CallFunctionProtected(args, 0, true);
 }
 
 bool CLuaInterface::CallInternalGetBool(int args)
 {
 	::DebugPrint(2, "CLuaInterface::CallInternalGetBool %i\n", args);
 	CallInternal(args, 1);
-	// ToDo
 
 	return GetBool(1);
 }
@@ -904,7 +924,11 @@ const char* CLuaInterface::CallInternalGetString(int args)
 bool CLuaInterface::CallInternalGet(int args, GarrysMod::Lua::ILuaObject* obj)
 {
 	::DebugPrint(2, "CLuaInterface::CallInternalGet %i\n", args);
-	// ToDo
+	if (CallFunctionProtected(args, 1, 0)) {
+		obj->SetFromStack(-1);
+		Pop(1);
+		return true;
+	}
 
 	return false;
 }
@@ -913,10 +937,12 @@ void CLuaInterface::NewGlobalTable(const char* name)
 {
 	::DebugPrint(1, "CLuaInterface::NewGlobalTable %s\n", name);
 
-	CreateTable();
+	//CreateTable();
+	PushSpecial(SPECIAL_GLOB);
 	pGlobal = CreateObject();
 	pGlobal->SetFromStack(-1);
-	SetField(LUA_GLOBALSINDEX, name);
+	Pop(1);
+	//SetField(LUA_GLOBALSINDEX, name);
 }
 
 GarrysMod::Lua::ILuaObject* CLuaInterface::NewTemporaryObject()
@@ -1077,9 +1103,7 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 	::DebugPrint(3, "CLuaInterface::SetMember 4 %s %i %s\n", key, obj->GetType(), obj->isTable() ? "Yes" : "no");
 	if (obj->GetType() == Type::Table)
 	{
-		::Msg("Top1: %i\n", Top());
 		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
-		::Msg("Top2: %i\n", Top());
 		PushString(key);
 		Push(-3);
 		SetTable(-3);
@@ -1095,7 +1119,12 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, 
 	{
 		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
 		PushString(key);
-		ReferencePush(((GarrysMod::Lua::CLuaObject*)value)->m_reference);
+		if (value)
+		{
+			ReferencePush(((GarrysMod::Lua::CLuaObject*)value)->m_reference);
+		} else {
+			PushNil();
+		}
 		SetTable(-3);
 		Pop(2);
 	}
@@ -1177,8 +1206,13 @@ bool CLuaInterface::RunString(const char* filename, const char* path, const char
 bool CLuaInterface::IsEqual(GarrysMod::Lua::ILuaObject* objA, GarrysMod::Lua::ILuaObject* objB)
 {
 	::DebugPrint(2, "CLuaInterface::IsEqual\n");
-	// Still ToDo
-	return objA == objB;
+	
+	ReferencePush(((GarrysMod::Lua::CLuaObject*)objA)->m_reference);
+	ReferencePush(((GarrysMod::Lua::CLuaObject*)objB)->m_reference);
+	bool ret = Equal(-1, -2);
+	Pop(2);
+
+	return ret;
 }
 
 void CLuaInterface::Error(const char* err)
@@ -1409,7 +1443,23 @@ const char* CLuaInterface::GetCurrentLocation()
 void CLuaInterface::MsgColour(const Color& col, const char* fmt, ...)
 {
 	::DebugPrint(2, "CLuaInterface::MsgColour\n");
-	// ToDo
+
+	va_list args;
+	va_start(args, fmt);
+
+	int size = vsnprintf(NULL, 0, fmt, args);
+	if (size < 0) {
+		va_end(args);
+		return;
+	}
+
+	char* buffer = new char[size + 1];
+	vsnprintf(buffer, size + 1, fmt, args);
+
+	gamecallback->MsgColour(buffer, col);
+
+	delete[] buffer;
+	va_end(args);
 }
 
 void CLuaInterface::GetCurrentFile(std::string &outStr)
@@ -1431,7 +1481,18 @@ void CLuaInterface::CompileString(Bootil::Buffer& dumper, const std::string& str
 
 bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 {
-	::DebugPrint(2, "CLuaInterface::CallFunctionProtected\n");
+	::DebugPrint(2, "CLuaInterface::CallFunctionProtected %i %i %s\n", iArgs, iRets, showError ? "Yes" : "no");
+
+	for (int i=1;i <= Top(); ++i)
+	{
+		::DebugPrint(4, "Stack: %i, Type: %i\n", i, GetType(i));
+	}
+
+	if (GetType(-(iArgs + 1)) != Type::Function)
+	{
+		Warning("[CLuaInterface::CallFunctionProtected] You betraid me. This is not a function :<\n");
+		return false;
+	}
 
 	int ret = PCall(iArgs, iRets, 0);
 	if (ret != 0)
