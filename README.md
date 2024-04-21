@@ -17,7 +17,12 @@ Maybe if I finish this I also try to get Lua 5.4 to work :D
 - [x] CLuaInterface::FindAndRunScript needs to be implemented.
 - [x] CLuaInterface::PushUserType needs to be implemented?
 - [x] Random Crashes on Windows? (Seems to be solved???)
-- [ ] ILuaObjects are broken? (obj->isTable() = false, (obj->GetType() == Type::Table) = true?, obj->Push() = nothing???) Best example is Global();
+- [x] ILuaObjects are broken? (obj->isTable() = false, (obj->GetType() == Type::Table) = true?, obj->Push() = nothing???) Best example is Global();
+NOTE: Added a workaround to fix it.  
+- [ ] Type Errors cause engine errors.
+
+## Linux DS issues
+
 
 ## ILuaBase
 
