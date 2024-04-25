@@ -204,6 +204,12 @@ typedef struct GCRef {
 
 typedef uint32_t MSize;
 
+typedef union{
+GCObject*gc;
+void*p;
+lua_Number n;
+int b;
+}Value;
 typedef struct lua_TValue{
 Value value;int tt;
 }TValue;
