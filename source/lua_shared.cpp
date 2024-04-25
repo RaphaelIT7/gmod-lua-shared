@@ -1,7 +1,6 @@
 #include "lua_shared.h"
 #include "CLuaConVars.h"
 #include "tier3/tier3.h"
-#include "detour.h"
 #include <Platform.hpp>
 
 CLuaShared g_CLuaShared;
@@ -33,28 +32,11 @@ void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext
 
 	LuaConVars();
 
-	Detouring::Hook detour_lua_init_stack_gmod;
-	SourceSDK::ModuleLoader lua_shared_loader("lua_shared");
-	void* func_lua_init_stack_gmod = FindFunction(lua_shared_loader.GetModule(), lua_init_stack_gmodSym);
-	CheckFunction(func_lua_init_stack_gmod, "lua_init_stack_gmod");
-	CreateDetour(&detour_lua_init_stack_gmod, "lua_init_stack_gmod", reinterpret_cast<void*>(func_lua_init_stack_gmod), reinterpret_cast<void*>(&hook_lua_init_stack_gmod));
-
-	Detouring::Hook detour_GMOD_LuaPrint;
-	void* func_GMOD_LuaPrint = FindFunction(lua_shared_loader.GetModule(), GMOD_LuaPrintSym);
-	CheckFunction(func_GMOD_LuaPrint, "GMOD_LuaPrint");
-	CreateDetour(&detour_GMOD_LuaPrint, "GMOD_LuaPrint", reinterpret_cast<void*>(func_GMOD_LuaPrint), reinterpret_cast<void*>(&hook_GMOD_LuaPrint));
-
-
 	pGet = get;
 }
 
 void CLuaShared::Shutdown()
 {
-	for (Detouring::Hook* hook : detours) {
-		hook->Disable();
-		hook->Destroy();
-	}
-
 	ConVar_Unregister();
 
 #ifdef ARCHITECTURE_X86
