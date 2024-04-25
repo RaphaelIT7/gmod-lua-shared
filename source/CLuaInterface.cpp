@@ -733,7 +733,7 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 
 	NewGlobalTable("");
 
-	::DebugPrint(3, "Table? %s\n", pGlobal->isTable() ? "Yes" : "No");
+	::DebugPrint(3, "Table? %s\n", m_pGlobal->isTable() ? "Yes" : "No");
 	::Msg("Top: %i\n", Top());
 
 	PushSpecial(SPECIAL_GLOB);
@@ -835,7 +835,7 @@ void* CLuaInterface::AddThreadedCall(ILuaThreadedCall* call)
 GarrysMod::Lua::ILuaObject* CLuaInterface::Global()
 {
 	::DebugPrint(4, "CLuaInterface::Global\n");
-	return pGlobal;
+	return m_pGlobal;
 }
 
 GarrysMod::Lua::ILuaObject* CLuaInterface::GetObject(int index)
@@ -951,8 +951,8 @@ void CLuaInterface::NewGlobalTable(const char* name)
 
 	//CreateTable();
 	PushSpecial(SPECIAL_GLOB);
-	pGlobal = CreateObject();
-	pGlobal->SetFromStack(-1);
+	m_pGlobal = CreateObject();
+	m_pGlobal->SetFromStack(-1);
 	Pop(1);
 	//SetField(LUA_GLOBALSINDEX, name);
 }
@@ -1552,6 +1552,8 @@ void CLuaInterface::Require(const char* name)
 const char* CLuaInterface::GetActualTypeName(int type)
 {
 	::DebugPrint(4, "CLuaInterface::GetActualTypeName\n");
+
+	//lua_typename(state, lua_type(state, type));
 
 	return Type::Name[type];
 }
