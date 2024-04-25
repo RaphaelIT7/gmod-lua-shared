@@ -4,7 +4,9 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'libs/**'
+      - 'libs/lua51*'
+      - 'libs/luajit*'
+      - 'libs/libluajit*'
       - 'source/**'
       - 'premake5.lua'
 
