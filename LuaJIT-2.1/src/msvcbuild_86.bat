@@ -47,12 +47,6 @@ if exist minilua.exe.manifest^
 @set LJCOMPILE=%LJCOMPILE% /arch:SSE2
 @goto :DA
 :NO32
-@if "%VSCMD_ARG_TGT_ARCH%" neq "arm64" goto :X64
-@set DASC=vm_arm64.dasc
-@set DASMTARGET=-D LUAJIT_TARGET=LUAJIT_ARCH_ARM64
-@set LJARCH=arm64
-@goto :DA
-:X64
 @if "%1" neq "nogc64" goto :DA
 @shift
 @set DASC=vm_x86.dasc
