@@ -96,6 +96,8 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		file->time = g_pFullFileSystem->GetFileTime(path.c_str(), pathId.c_str());
 		file->timesloadedclient = 0;
 		file->timesloadedserver = 0;
+		file->source = path.c_str();
+		file->compressed = nullptr; // ToDo: Get Bootil to work and Change this to use Bootil::AutoBuffer
 
 		pCache[path] = file;
 
