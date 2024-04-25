@@ -80,7 +80,7 @@ jobs:
       - name: Generate libs
         run: |
           cd LuaJIT-2.1/src/
-          make CC='$(DEFAULT_CC) -fPIC' LIBS='-L../../libs/ -llua_shared_lib_64'
+          make CC='$(DEFAULT_CC) -fPIC' LIBS='-L../../libs/ -llua_shared_lib_64.so'
           mv libluajit.a libluajit_64.a
 
       - uses: actions/upload-artifact@v4
@@ -107,7 +107,7 @@ jobs:
       - name: Generate libs
         run: |
           cd LuaJIT-2.1/src/
-          make CC='$(DEFAULT_CC) -m32' LIBS='-L../../libs/ -llua_shared_lib_32'
+          make CC='$(DEFAULT_CC) -m32' LIBS='-L../../libs/ -llua_shared_lib_32.so'
           mv libluajit.a libluajit_32.a
 
       - uses: actions/upload-artifact@v4
