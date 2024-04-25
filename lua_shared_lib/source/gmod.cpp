@@ -1,6 +1,7 @@
 #include "gmod.h"
 #include <string>
 #include <tier1/convar.h>
+#include "../../lua/lj_def.h"
 
 class Vector;
 class QAngle;
