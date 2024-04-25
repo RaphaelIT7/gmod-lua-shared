@@ -47,9 +47,5 @@ CreateWorkspace({name = "lua_shared_lib", abi_compatible = false})
             targetextension(".lib")
 
 		filter("system:linux or macosx")
-			files({ -- Fix for Linux 64x
-				[[garrysmod_common\sourcesdk-minimal\tier1\convar.cpp]],
-			})
-
 			files({"source/posix/*.cpp", "source/posix/*.hpp"})
 			targetextension(".a")

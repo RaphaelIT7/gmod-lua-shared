@@ -1,12 +1,16 @@
 #include "gmod.h"
 #include <string>
-#include <tier1/convar.h>
 #include "../../lua/lj_obj.h"
+
+#define COMMAND_COMPLETION_MAXITEMS		128
+#define COMMAND_COMPLETION_ITEM_LENGTH	128
+typedef int  ( *FnCommandCompletionCallback )( const char *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] );
 
 class Vector;
 class QAngle;
 class Color;
 class lua_Debug;
+class CCommand;
 namespace Bootil
 {
 	class Buffer;
@@ -174,7 +178,7 @@ namespace GarrysMod
 			virtual void *AddThreadedCall( ILuaThreadedCall * ) = 0;
 			virtual void AppendStackTrace( char *, unsigned long ) = 0;
 			virtual void *CreateConVar( const char *, const char *, const char *, int ) = 0;
-			virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) ) = 0;
+			virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), FnCommandCompletionCallback ) = 0;
 		};
     }
 }
