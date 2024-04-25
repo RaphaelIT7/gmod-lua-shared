@@ -19,7 +19,7 @@ Maybe if I finish this I also try to get Lua 5.4 to work :D
 - [x] Random Crashes on Windows? (Seems to be solved???)
 - [x] ILuaObjects are broken? (obj->isTable() = false, (obj->GetType() == Type::Table) = true?, obj->Push() = nothing???) Best example is Global();
 NOTE: Added a workaround to fix it.  
-- [ ] Type Errors cause engine errors.
+- [ ] Type Errors cause engine errors. (Check of we maybe break the stack?)
 
 ## Linux DS issues
 - [ ] Crashes while loading.
@@ -50,8 +50,10 @@ Most of it.
 This is not even used in Gmod :|  
 But the code to use it exists `AddThreadedCall` and `RunThreadedCalls`
 
-## Collection of random Engine Errors
+## Collection of random Engine Errors and Warnings
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/aa4143fc-75f2-4311-b23b-d2de1394d59b)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/85631077-ec8d-4831-8fe1-5789f8090493)
+![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/de603ca9-d70c-4aca-96b7-f7ff39cf529e)
+
 
 > NOTE for myself: Go thru these [commits](https://github.com/mingodad/ljsjit) and learn how to add gmod's syntax to lua
