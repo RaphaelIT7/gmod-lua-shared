@@ -1,7 +1,7 @@
 #include "gmod.h"
 #include <string>
 #include <tier1/convar.h>
-#include "../../lua/lj_def.h"
+#include "../../lua/lj_obj.h"
 
 class Vector;
 class QAngle;
@@ -178,101 +178,6 @@ namespace GarrysMod
 		};
     }
 }
-
-#define GCHeader	GCRef nextgc; uint8_t marked; uint8_t gct
-typedef double lua_Number;
-typedef union GCObject GCObject;
-typedef unsigned char lu_byte;
-typedef struct GCheader{
-	GCObject*next;lu_byte tt;lu_byte marked;
-}GCheader;
-
-typedef struct MRef {
-#if LJ_GC64
-  uint64_t ptr64;	/* True 64 bit pointer. */
-#else
-  uint32_t ptr32;	/* Pseudo 32 bit pointer. */
-#endif
-} MRef;
-
-typedef struct GCRef {
-#if LJ_GC64
-  uint64_t gcptr64;	/* True 64 bit pointer. */
-#else
-  uint32_t gcptr32;	/* Pseudo 32 bit pointer. */
-#endif
-} GCRef;
-
-typedef uint32_t MSize;
-
-typedef union{
-GCObject*gc;
-void*p;
-lua_Number n;
-int b;
-}Value;
-typedef struct lua_TValue{
-Value value;int tt;
-}TValue;
-
-typedef LJ_ALIGN(8) union TValue {
-  uint64_t u64;		/* 64 bit pattern overlaps number. */
-  lua_Number n;		/* Number object overlaps split tag/value object. */
-#if LJ_GC64
-  GCRef gcr;		/* GCobj reference with tag. */
-  int64_t it64;
-  struct {
-    LJ_ENDIAN_LOHI(
-      int32_t i;	/* Integer value. */
-    , uint32_t it;	/* Internal object tag. Must overlap MSW of number. */
-    )
-  };
-#else
-  struct {
-    LJ_ENDIAN_LOHI(
-      union {
-	GCRef gcr;	/* GCobj reference (if any). */
-	int32_t i;	/* Integer value. */
-      };
-    , uint32_t it;	/* Internal object tag. Must overlap MSW of number. */
-    )
-  };
-#endif
-#if LJ_FR2
-  int64_t ftsz;		/* Frame type and size of previous frame, or PC. */
-#else
-  struct {
-    LJ_ENDIAN_LOHI(
-      GCRef func;	/* Function for next frame (or dummy L). */
-    , FrameLink tp;	/* Link to previous frame. */
-    )
-  } fr;
-#endif
-  struct {
-    LJ_ENDIAN_LOHI(
-      uint32_t lo;	/* Lower 32 bits of number. */
-    , uint32_t hi;	/* Upper 32 bits of number. */
-    )
-  } u32;
-} TValue;
-
-struct lua_State {
-  GCHeader;
-  uint8_t dummy_ffid;	/* Fake FF_C for curr_funcisL() on dummy frames. */
-  uint8_t status;	/* Thread status. */
-  MRef glref;		/* Link to global state. */
-  GCRef gclist;		/* GC chain. */
-  TValue *base;		/* Base of currently executing function. */
-  TValue *top;		/* First free slot in the stack. */
-  MRef maxstack;	/* Last free slot in the stack. */
-  MRef stack;		/* Stack base. */
-  GCRef openupval;	/* List of open upvalues in the stack. */
-  GCRef env;		/* Thread environment (table of globals). */
-  void *cframe;		/* End of C stack frame chain. */
-  MSize stacksize;	/* True stack size (incl. LJ_STACK_EXTRA). */
-  char _GARRY_VARS[0x18];	/* GMOD FIELD */
-  void *luabase;			/* GMOD FIELD */
-};
 
 DDLL_EXPORT void lua_init_stack_gmod(lua_State* L1, lua_State* L)
 {

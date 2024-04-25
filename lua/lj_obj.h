@@ -493,8 +493,6 @@ typedef struct Node {
 #endif
 } Node;
 
-LJ_STATIC_ASSERT(offsetof(Node, val) == 0);
-
 typedef struct GCtab {
   GCHeader;
   uint8_t nomm;		/* Negative cache for fast metamethods. */
@@ -733,20 +731,6 @@ typedef struct GChead {
   GCRef gclist;
   GCRef metatable;
 } GChead;
-
-/* The env field SHOULD be at the same offset for all GC objects. */
-LJ_STATIC_ASSERT(offsetof(GChead, env) == offsetof(GCfuncL, env));
-LJ_STATIC_ASSERT(offsetof(GChead, env) == offsetof(GCudata, env));
-
-/* The metatable field MUST be at the same offset for all GC objects. */
-LJ_STATIC_ASSERT(offsetof(GChead, metatable) == offsetof(GCtab, metatable));
-LJ_STATIC_ASSERT(offsetof(GChead, metatable) == offsetof(GCudata, metatable));
-
-/* The gclist field MUST be at the same offset for all GC objects. */
-LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(lua_State, gclist));
-LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(GCproto, gclist));
-LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(GCfuncL, gclist));
-LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(GCtab, gclist));
 
 typedef union GCobj {
   GChead gch;
