@@ -5,6 +5,7 @@
 class Vector;
 class QAngle;
 class Color;
+class lua_Debug;
 namespace Bootil
 {
 	class Buffer;
@@ -177,6 +178,9 @@ namespace GarrysMod
     }
 }
 
+typedef double lua_Number;
+typedef union GCObject GCObject;
+typedef unsigned char lu_byte;
 typedef struct GCheader{
 	GCObject*next;lu_byte tt;lu_byte marked;
 }GCheader;
