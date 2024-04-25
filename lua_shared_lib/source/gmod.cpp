@@ -1,5 +1,5 @@
 #include "gmod.h"
-#include "../lua/lj_obj.h"
+#include "../../lua/lj_obj.h"
 #include <string>
 #include <tier1/convar.h>
 
