@@ -1,5 +1,4 @@
 #include "gmod.h"
-#include "../../lua/lj_obj.h"
 #include <string>
 #include <tier1/convar.h>
 
@@ -177,6 +176,24 @@ namespace GarrysMod
 		};
     }
 }
+
+struct lua_State {
+  GCHeader;
+  uint8_t dummy_ffid;	/* Fake FF_C for curr_funcisL() on dummy frames. */
+  uint8_t status;	/* Thread status. */
+  MRef glref;		/* Link to global state. */
+  GCRef gclist;		/* GC chain. */
+  TValue *base;		/* Base of currently executing function. */
+  TValue *top;		/* First free slot in the stack. */
+  MRef maxstack;	/* Last free slot in the stack. */
+  MRef stack;		/* Stack base. */
+  GCRef openupval;	/* List of open upvalues in the stack. */
+  GCRef env;		/* Thread environment (table of globals). */
+  void *cframe;		/* End of C stack frame chain. */
+  MSize stacksize;	/* True stack size (incl. LJ_STACK_EXTRA). */
+  char _GARRY_VARS[0x18];	/* GMOD FIELD */
+  void *luabase;			/* GMOD FIELD */
+};
 
 DDLL_EXPORT void lua_init_stack_gmod(lua_State* L1, lua_State* L)
 {
