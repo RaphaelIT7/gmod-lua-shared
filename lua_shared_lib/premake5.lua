@@ -44,6 +44,7 @@ CreateWorkspace({name = "lua_shared_lib", abi_compatible = false})
         targetsuffix("")
         filter("system:windows")
             files({"source/win32/*.cpp", "source/win32/*.hpp"})
+            targetextension(".lib")
 
 		filter("system:linux or macosx")
 			files({"source/posix/*.cpp", "source/posix/*.hpp"})

@@ -12,7 +12,7 @@ jobs:
     with:
       PROJECT_NAME: "lua_shared_lib"
       BUILD_64x: "true"
-      LINUX_FILEEXTENTION: "a"
+      LINUX_FILEEXTENTION: "so"
       WINDOWS_FILEEXTENTION: "lib"
       BUILD_WINDOWS: "true"
       ARTIFACT_EXPIRE: "1"
