@@ -1,4 +1,4 @@
-#include <GarrysMod/Lua/LuaObject.h>
+#include "ILuaObject.h"
 class ILuaInterface;
 
 struct CLuaError

@@ -5,7 +5,6 @@
 #include "../lua/lauxlib.h"
 #include "lua_shared.h"
 #include "../lua/lj_obj.h"
-#include "CLuaObject.h"
 #include <regex>
 
 #ifdef ARCHITECTURE_X86
@@ -703,7 +702,7 @@ int func_print(lua_State* L)
 bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 {
 	::DebugPrint(1, "CLuaInterface::Init Server: %s\n", bIsServer ? "Yes" : "No");
-	gamecallback = callback;
+	m_pGameCallback = callback;
 
 	state = luaL_newstate();
 	luaL_openlibs(state);
@@ -954,7 +953,6 @@ void CLuaInterface::NewGlobalTable(const char* name)
 	PushSpecial(SPECIAL_GLOB);
 	pGlobal = CreateObject();
 	pGlobal->SetFromStack(-1);
-	((GarrysMod::Lua::CLuaObject*)pGlobal)->m_iLUA_TYPE = Type::Table;
 	Pop(1);
 	//SetField(LUA_GLOBALSINDEX, name);
 }
@@ -1031,33 +1029,33 @@ bool CLuaInterface::IsServer()
 {
 	::DebugPrint(3, "CLuaInterface::IsServer\n");
 
-	return pRealm == State::SERVER;
+	return m_iRealm == State::SERVER;
 }
 
 bool CLuaInterface::IsClient()
 {
 	::DebugPrint(3, "CLuaInterface::IsClient\n");
 
-	return pRealm == State::CLIENT;
+	return m_iRealm == State::CLIENT;
 }
 
 bool CLuaInterface::IsMenu()
 {
 	::DebugPrint(3, "CLuaInterface::IsMenu\n");
 
-	return pRealm == State::MENU;
+	return m_iRealm == State::MENU;
 }
 
 void CLuaInterface::DestroyObject(GarrysMod::Lua::ILuaObject* obj)
 {
 	::DebugPrint(4, "CLuaInterface::DestroyObject\n");
-	gamecallback->DestroyLuaObject(obj);
+	m_pGameCallback->DestroyLuaObject(obj);
 }
 
 GarrysMod::Lua::ILuaObject* CLuaInterface::CreateObject()
 {
 	::DebugPrint(4, "CLuaInterface::CreateObject\n");
-	return gamecallback->CreateLuaObject();
+	return m_pGameCallback->CreateLuaObject();
 }
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, GarrysMod::Lua::ILuaObject* key, GarrysMod::Lua::ILuaObject* value)
@@ -1066,9 +1064,9 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, GarrysMod::Lua::I
 	::DebugPrint(3, "CLuaInterface::SetMember 1\n");
 	if (obj->GetType() == Type::Table)
 	{
-		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
-		ReferencePush(((GarrysMod::Lua::CLuaObject*)key)->m_reference);
-		ReferencePush(((GarrysMod::Lua::CLuaObject*)value)->m_reference);
+		ReferencePush(obj->m_reference);
+		ReferencePush(key->m_reference);
+		ReferencePush(value->m_reference);
 		SetTable(-3);
 		Pop(1);
 	}
@@ -1089,7 +1087,7 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key)
 	::DebugPrint(3, "CLuaInterface::SetMember 2\n");
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
-		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
+		ReferencePush(obj->m_reference);
 		PushNumber(key);
 		Push(-3);
 		SetTable(-3);
@@ -1103,7 +1101,7 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key, Garrys
 	::DebugPrint(3, "CLuaInterface::SetMember 3\n");
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
-		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
+		ReferencePush(obj->m_reference);
 		PushNumber(key);
 		value->Push();
 		SetTable(-3);
@@ -1117,7 +1115,7 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 	::DebugPrint(3, "CLuaInterface::SetMember 4 %s %i %s\n", key, obj->GetType(), obj->isTable() ? "Yes" : "no");
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
-		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
+		ReferencePush(obj->m_reference);
 		PushString(key);
 		Push(-3);
 		SetTable(-3);
@@ -1131,11 +1129,11 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, 
 	::DebugPrint(3, "CLuaInterface::SetMember 5\n");
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
-		ReferencePush(((GarrysMod::Lua::CLuaObject*)obj)->m_reference);
+		ReferencePush(obj->m_reference);
 		PushString(key);
 		if (value)
 		{
-			ReferencePush(((GarrysMod::Lua::CLuaObject*)value)->m_reference);
+			ReferencePush(value->m_reference);
 		} else {
 			PushNil();
 		}
@@ -1147,7 +1145,7 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, 
 void CLuaInterface::SetType(unsigned char realm)
 {
 	::DebugPrint(1, "CLuaInterface::SetType %u\n", realm);
-	pRealm = realm;
+	m_iRealm = realm;
 }
 
 void CLuaInterface::PushLong(long number)
@@ -1221,8 +1219,8 @@ bool CLuaInterface::IsEqual(GarrysMod::Lua::ILuaObject* objA, GarrysMod::Lua::IL
 {
 	::DebugPrint(2, "CLuaInterface::IsEqual\n");
 	
-	ReferencePush(((GarrysMod::Lua::CLuaObject*)objA)->m_reference);
-	ReferencePush(((GarrysMod::Lua::CLuaObject*)objB)->m_reference);
+	ReferencePush(objA->m_reference);
+	ReferencePush(objB->m_reference);
 	bool ret = Equal(-1, -2);
 	Pop(2);
 
@@ -1278,14 +1276,14 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	::DebugPrint(2, "CLuaInterface::FindAndRunScript %s, %s, %s, %s, %s\n", filename, run ? "Yes" : "No", showErrors ? "Yes" : "No", stringToRun, noReturns ? "Yes" : "No");
 
 	ILuaShared* shared = LuaShared();
-	File* file = shared->LoadFile(filename, pPathID, true, true);
+	File* file = shared->LoadFile(filename, m_sPathID, true, true);
 	if (file)
 	{
 		return RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 	} else {
 		if (strcmp(stringToRun, "") != 0)
 		{
-			File* file2 = shared->LoadFile(ToPath(stringToRun) + filename, pPathID, true, true);
+			File* file2 = shared->LoadFile(ToPath(stringToRun) + filename, m_sPathID, true, true);
 			if (file2)
 				return RunStringEx(file2->name.c_str(), file2->source.c_str(), file2->contents.c_str(), true, showErrors, true, noReturns);
 		}
@@ -1297,14 +1295,14 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 void CLuaInterface::SetPathID(const char* pathID)
 {
 	::DebugPrint(1, "CLuaInterface::SetPathID %s\n", pathID);
-	pPathID = pathID;
+	V_strncpy(m_sPathID, pathID, sizeof(m_sPathID));
 }
 
 const char* CLuaInterface::GetPathID()
 {
 	::DebugPrint(2, "CLuaInterface::GetPathID\n");
 
-	return pPathID;
+	return m_sPathID;
 }
 
 void CLuaInterface::ErrorNoHalt( const char* fmt, ... )
@@ -1401,7 +1399,7 @@ bool CLuaInterface::RunStringEx(const char *filename, const char *path, const ch
 			Pop(1);
 
 		if (printErrors)
-			gamecallback->LuaError(err);
+			m_pGameCallback->LuaError(err);
 
 		delete err;
 
@@ -1443,7 +1441,7 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 	va_end(args);
 	
 	std::string realm;
-	switch(pRealm)
+	switch(m_iRealm)
 	{
 		case 0:
 			realm = "client";
@@ -1460,7 +1458,7 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 	}
 	error->side = realm;
 
-	gamecallback->LuaError(error);
+	m_pGameCallback->LuaError(error);
 
 	delete error;
 }
@@ -1489,7 +1487,7 @@ void CLuaInterface::MsgColour(const Color& col, const char* fmt, ...)
 	char* buffer = new char[size + 1];
 	vsnprintf(buffer, size + 1, fmt, args);
 
-	gamecallback->MsgColour(buffer, col);
+	m_pGameCallback->MsgColour(buffer, col);
 
 	delete[] buffer;
 	va_end(args);
@@ -1533,7 +1531,7 @@ bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 		CLuaError* err = ReadStackIntoError(state);
 		if (showError)
 		{
-			gamecallback->LuaError(err);
+			m_pGameCallback->LuaError(err);
 		}
 		delete err;
 		Pop(1);

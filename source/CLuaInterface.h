@@ -7,7 +7,7 @@
 #include <Bootil/Bootil.h>
 #endif
 #include "CLuaGameCallback.h"
-#include <GarrysMod/Lua/LuaObject.h>
+#include "ILuaObject.h"
 
 #include <lua.hpp>
 #define GARRYSMOD_LUA_LUABASE_H 1
@@ -738,12 +738,12 @@ public:
 public:
 	inline ILuaGameCallback *GetLuaGameCallback() const
 	{
-		return gamecallback;
+		return m_pGameCallback;
 	}
 
 	inline void SetLuaGameCallback( ILuaGameCallback *callback )
 	{
-		gamecallback = callback;
+		m_pGameCallback = callback;
 	}
 private:
 	// vtable: 1 * sizeof(void **) = 4 (x86) or 8 (x86-64) bytes
@@ -751,8 +751,7 @@ private:
 
 	// These members represent nothing in particular
 	// They've been selected to fill the required space between the vtable and the callback object
-	uint64_t _1; // 8 bytes
-	size_t _2[43]; // 43 * sizeof(size_t) = 172 (x86) or 344 (x86-64) bytes
+	size_t _2[39]; // 43 * sizeof(size_t) = 172 (x86) or 344 (x86-64) bytes
 
 #ifdef __APPLE__
 
@@ -763,7 +762,11 @@ private:
 	// x86: offset of 188 bytes
 	// x86-64: offset of 368 bytes
 	// macOS adds an offset of 4 bytes (total 192) on x86 and 8 bytes (total 376) on x86-64
-	ILuaGameCallback* gamecallback = nullptr;
+	GarrysMod::Lua::ILuaObject* m_TempObjects[LUA_MAX_TEMP_OBJECTS];
+	unsigned char m_iRealm; // CLIENT = 0, SERVER = 1, MENU = 2
+	ILuaGameCallback* m_pGameCallback = nullptr;
+	char m_sPathID[32] = "LuaMenu"; // This is exacly where Gmod stores. lsv, lsc or LuaMenu
+	int m_iCurrentTempObject = 0;
 public:
 	void RunThreadedCalls();
 	inline void DoStackCheck() {
@@ -772,10 +775,6 @@ public:
 private:
 	std::list<ILuaThreadedCall*> pThreadedcalls;
 	GarrysMod::Lua::ILuaObject* pGlobal = nullptr;
-	const char* pPathID = "LuaMenu"; // lsv, lsc or LuaMenu
-	unsigned char pRealm = -1; // CLIENT = 0, SERVER = 1, MENU = 2
-	GarrysMod::Lua::ILuaObject* m_TempObjects[LUA_MAX_TEMP_OBJECTS];
-	uint8 m_iCurrentTempObject = 0;
 	GarrysMod::Lua::ILuaObject* m_ProtectedFunctionReturns[4];
 	const char* m_pPath = "includes";
 };
