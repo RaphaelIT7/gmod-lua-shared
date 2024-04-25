@@ -1,7 +1,2 @@
-void lua_init_stack_gmod(lua_State* L1, lua_State* L)
-{
-	if (L && L != L1)
-	{
-		L1->luabase = L->luabase;
-	}
-}
+extern void lua_init_stack_gmod(lua_State* L1, lua_State* L);
+extern void GMOD_LuaPrint(const char* str, lua_State*);

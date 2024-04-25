@@ -2,8 +2,10 @@
 
 #define GMOD_CLUAINTERFACE
 #include <cstdarg>
+#ifndef LUA_SHARED_LIB
 #include <convar.h>
 #include <Bootil/Bootil.h>
+#endif
 #include "CLuaGameCallback.h"
 #include <GarrysMod/Lua/LuaObject.h>
 

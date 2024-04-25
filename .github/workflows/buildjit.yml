@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - 'libs/lua_shared_lib_*'
       - 'LuaJIT-2.1/**'
 
 jobs:

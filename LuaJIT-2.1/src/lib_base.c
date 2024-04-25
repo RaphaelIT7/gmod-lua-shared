@@ -36,7 +36,7 @@
 #include "lj_strscan.h"
 #include "lj_strfmt.h"
 #include "lj_lib.h"
-#include "gmod2.h"
+#include "gmod.h"
 
 /* -- Base library: checks ------------------------------------------------ */
 
@@ -548,7 +548,7 @@ LJLIB_CF(print)
 
     if (buffer_pos + size >= sizeof(buffer)) {
       buffer[buffer_pos] = '\0';
-      GMOD_LuaPrint(buffer);
+      GMOD_LuaPrint(buffer, L);
       buffer_pos = 0;
     }
 
@@ -558,7 +558,7 @@ LJLIB_CF(print)
   //putchar('\n');
 
   buffer[buffer_pos] = '\0';
-  GMOD_LuaPrint(buffer);
+  GMOD_LuaPrint(buffer, L);
 
   return 0;
 }

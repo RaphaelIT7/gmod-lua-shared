@@ -1,10 +1,10 @@
 #include "CLuaInterface.h"
 #include "CLuaConVars.h"
-#include "lua/lj_obj.h"
-#include "lua/luajit_rolling.h"
-#include "lua/lauxlib.h"
+#include "../lua/lj_obj.h"
+#include "../lua/luajit_rolling.h"
+#include "../lua/lauxlib.h"
 #include "lua_shared.h"
-#include "lua/lj_obj.h"
+#include "../lua/lj_obj.h"
 #include "CLuaObject.h"
 #include <regex>
 

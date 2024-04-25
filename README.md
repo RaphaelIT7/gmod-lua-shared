@@ -22,7 +22,7 @@ NOTE: Added a workaround to fix it.
 - [ ] Type Errors cause engine errors.
 
 ## Linux DS issues
-
+- [ ] Crashes while loading.
 
 ## ILuaBase
 
