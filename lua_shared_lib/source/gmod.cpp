@@ -178,6 +178,7 @@ namespace GarrysMod
     }
 }
 
+#define GCHeader	GCRef nextgc; uint8_t marked; uint8_t gct
 typedef double lua_Number;
 typedef union GCObject GCObject;
 typedef unsigned char lu_byte;
@@ -202,6 +203,10 @@ typedef struct GCRef {
 } GCRef;
 
 typedef uint32_t MSize;
+
+typedef struct lua_TValue{
+Value value;int tt;
+}TValue;
 
 typedef LJ_ALIGN(8) union TValue {
   uint64_t u64;		/* 64 bit pattern overlaps number. */
