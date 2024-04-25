@@ -44,9 +44,10 @@ jobs:
         name: Checkout
 
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Generate libs
         with:
           arch: amd64_x86
+
+      - name: Generate libs
         run: |
           cd LuaJIT-2.1/src/
           .\msvcbuild_86.bat
