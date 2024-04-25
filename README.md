@@ -19,7 +19,11 @@ Maybe if I finish this I also try to get Lua 5.4 to work :D
 - [x] Random Crashes on Windows? (Seems to be solved???)
 - [x] ILuaObjects are broken? (obj->isTable() = false, (obj->GetType() == Type::Table) = true?, obj->Push() = nothing???) Best example is Global();
 NOTE: Added a workaround to fix it.  
-- [ ] Type Errors cause engine errors. (Check of we maybe break the stack?)
+- [x] Fixed the Stack
+- [ ] Update the ILuaObject. It's different in the MenuSystem.dll
+- [ ] Fix SetMember functions causing `[MENU ERROR] attempt to index a string value`
+- [ ] Find out why `Material` causes a crash
+- [ ] Type Errors cause engine errors.
 
 ## Linux DS issues
 - [ ] Crashes while loading.
