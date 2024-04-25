@@ -6,6 +6,7 @@
 #include "lua_shared.h"
 #include "../lua/lj_obj.h"
 #include <regex>
+#include "PooledStrings.h"
 
 #ifdef ARCHITECTURE_X86
 #include "Color.h"
@@ -745,35 +746,18 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	::Msg("Top: %i\n", Top());
 
 	lua_createtable(state, 0, 0);
+	
+	int idx = 0;
+	for(const char* str : g_PooledStrings)
+	{
+		++idx;
+		PushNumber(idx);
+		PushString(str);
+		SetTable(-3);
+	}
 
-	lua_pushinteger(state, 1);
-	lua_pushstring(state, "AcceptInput");
-	lua_settable(state, -3);
-
-	lua_pushinteger(state, 2);
-	lua_pushstring(state, "AdjustMouseSensitivity");
-	lua_settable(state, -3);
-
-	lua_pushinteger(state, 3);
-	lua_pushstring(state, "AllowPlayerPickup");
-	lua_settable(state, -3);
-
-	lua_pushinteger(state, 4);
-	lua_pushstring(state, "CalcMainActivity");
-	lua_settable(state, -3);
-
-	lua_pushinteger(state, 5);
-	lua_pushstring(state, "CalcView");
-	lua_settable(state, -3);
-
-	lua_pushinteger(state, 6);
-	lua_pushstring(state, "CalcViewModelView");
-	lua_settable(state, -3);
-
-	lua_pushinteger(state, 7);
-	lua_pushstring(state, "CanExitVehicle");
-	lua_settable(state, -3);
-
+	m_pStringPool = CreateObject();
+	m_pStringPool->SetFromStack(-1);
 	Pop(1);
 
 	DoStackCheck();
@@ -1567,15 +1551,18 @@ void CLuaInterface::PreCreateTable(int arrelems, int nonarrelems)
 void CLuaInterface::PushPooledString(int index)
 {
 	::DebugPrint(2, "CLuaInterface::PushPooledString\n");
-	// ToDo
+	
+	ReferencePush(m_pStringPool->m_reference);
+	PushNumber(index);
+	GetTable(-2);
+	Remove(-2);
 }
 
 const char* CLuaInterface::GetPooledString(int index)
 {
 	::DebugPrint(2, "CLuaInterface::GetPooledString\n");
-	// ToDo
 
-	return "Nope";
+	return g_PooledStrings[index];
 }
 
 void CLuaInterface::AppendStackTrace(char *, unsigned long)

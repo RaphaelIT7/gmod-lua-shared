@@ -59,6 +59,7 @@ But the code to use it exists `AddThreadedCall` and `RunThreadedCalls`
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/85631077-ec8d-4831-8fe1-5789f8090493)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/de603ca9-d70c-4aca-96b7-f7ff39cf529e)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/f0df946c-fe5c-4b40-9482-099e32b5b827)
+![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/f3b58551-76f5-4d12-80ea-315d613654eb)
 
 
 
