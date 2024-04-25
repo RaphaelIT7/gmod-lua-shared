@@ -104,6 +104,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		g_pFullFileSystem->Close(fh);
 	} else {
 		delete file;
+		return nullptr;
 	}
 
 	return file;
