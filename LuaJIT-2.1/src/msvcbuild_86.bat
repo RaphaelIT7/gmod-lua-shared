@@ -126,7 +126,7 @@ if exist luajit.exe.manifest^
 @goto :END
 :SETHOSTVARS
 @if "%VSCMD_ARG_HOST_ARCH%_%VSCMD_ARG_TGT_ARCH%" equ "x64_arm64" (
-  call "%VSINSTALLDIR%Common7\Tools\VsDevCmd.bat" -arch=%VSCMD_ARG_HOST_ARCH% -no_logo
+  call "%VSINSTALLDIR%Common7\Tools\VsDevCmd.bat" -arch=x86 -no_logo
   echo on
 )
 @goto :END
