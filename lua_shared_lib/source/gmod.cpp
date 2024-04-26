@@ -1,7 +1,6 @@
 #include "gmod.h"
 #include <string>
 #include "../../lua/lj_obj.h"
-#include "../../source/Types.h"
 
 #define COMMAND_COMPLETION_MAXITEMS		128
 #define COMMAND_COMPLETION_ITEM_LENGTH	128
@@ -204,7 +203,7 @@ DDLL_EXPORT void* GMOD_LuaCreateEmptyUserdata(lua_State* L)
 {
 	ILuaBase::UserData* udata = (ILuaBase::UserData*)((ILuaBase*)L->luabase)->NewUserdata(sizeof(ILuaBase::UserData));
 	udata->data = nullptr;
-	udata->type = Type::UserData;
+	udata->type = 7; // 7 = Userdata
 	return udata;
 }
 
