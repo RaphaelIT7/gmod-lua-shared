@@ -483,7 +483,7 @@ LJLIB_PUSH(top-2)  /* Upvalue holds weak table. */
 LJLIB_CF(newproxy)
 {
   lua_settop(L, 1);
-  lua_newuserdata(L, 0);
+  GMOD_LuaCreateEmptyUserdata(L);
   if (lua_toboolean(L, 1) == 0) {  /* newproxy(): without metatable. */
     return 1;
   } else if (lua_isboolean(L, 1)) {  /* newproxy(true): with metatable. */

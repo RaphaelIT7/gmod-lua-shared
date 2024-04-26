@@ -256,8 +256,9 @@ LUALIB_API void luaL_checkany(lua_State *L, int idx)
 
 LUA_API const char *lua_typename(lua_State *L, int t)
 {
-  UNUSED(L);
-  return lj_obj_typename[t+1];
+  return GMODLUA_GetUserType(L, t);
+
+  //return lj_obj_typename[t+1];
 }
 
 LUA_API int lua_iscfunction(lua_State *L, int idx)
