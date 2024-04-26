@@ -1,6 +1,7 @@
 #include "gmod.h"
 #include <string>
 #include "../../lua/lj_obj.h"
+#include "../../source/Types.h"
 
 #define COMMAND_COMPLETION_MAXITEMS		128
 #define COMMAND_COMPLETION_ITEM_LENGTH	128
@@ -183,17 +184,39 @@ namespace GarrysMod
     }
 }
 
+using namespace GarrysMod::Lua;
 DDLL_EXPORT void lua_init_stack_gmod(lua_State* L1, lua_State* L)
 {
     if (L && L != L1)
 	{
 		L1->luabase = L->luabase;
 		if (L->luabase)
-			((GarrysMod::Lua::ILuaBase*)L->luabase)->SetState(L);
+			((ILuaBase*)L->luabase)->SetState(L);
 	}
 }
 
 DDLL_EXPORT void GMOD_LuaPrint(const char* str, lua_State* L) // Idk how gmod does it
 {
-	((GarrysMod::Lua::ILuaInterface*)L->luabase)->Msg("%s", str);
+	((ILuaInterface*)L->luabase)->Msg("%s", str);
+}
+
+DDLL_EXPORT void* GMOD_LuaCreateEmptyUserdata(lua_State* L)
+{
+	ILuaBase::UserData* udata = (ILuaBase::UserData*)((ILuaBase*)L->luabase)->NewUserdata(sizeof(ILuaBase::UserData));
+	udata->data = nullptr;
+	udata->type = Type::UserData;
+	return udata;
+}
+
+DDLL_EXPORT const char* GMODLUA_GetUserType(lua_State* L, int iType)
+{
+	// lua_getmetatable()
+	// What does it do with "UserData"?
+	// lua_pushstring(L, "MetaName")
+	// lua_gettable(L)
+	// lua_isstring
+	// lua_tolstring
+
+	ILuaBase* LUA = (ILuaBase*)L->luabase;
+	return LUA->GetTypeName(iType);
 }

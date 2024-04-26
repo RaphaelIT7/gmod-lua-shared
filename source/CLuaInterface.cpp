@@ -449,7 +449,7 @@ int CLuaInterface::GetType(int iStackPos)
 
 const char* CLuaInterface::GetTypeName(int iType)
 {
-	::DebugPrint(4, "CLuaInterface::GetTypeName\n");
+	::DebugPrint(1, "CLuaInterface::GetTypeName %i\n", iType);
 	if (iType < 0) {
 		return "none";
 	} else {
