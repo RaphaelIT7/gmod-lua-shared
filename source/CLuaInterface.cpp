@@ -43,32 +43,6 @@ void DebugPrint(int level, const char* fmt, ...) {
 // =================================
 // First functions
 // =================================
-void hook_lua_init_stack_gmod(lua_State* L1, lua_State* L)
-{
-    if (L && L != L1)
-	{
-		L1->luabase = L->luabase;
-		if (L->luabase)
-			((ILuaBase*)L->luabase)->SetState(L);
-	}
-}
-
-void lua_init_stack_gmod(lua_State* L1, lua_State* L)
-{
-	Msg("lua_init_stack_gmod called!\n");
-	hook_lua_init_stack_gmod(L1, L);
-}
-
-void GMOD_LuaPrint(const char* str)
-{
-	Msg("GMOD_LuaPrint: %s", str);
-}
-
-void hook_GMOD_LuaPrint(const char* str)
-{
-	Msg("%s", str);
-}
-
 void lua_run_menu_f( const CCommand &args )
 {
 	if ( args.ArgC() < 1 || args.Arg(1) == "" )

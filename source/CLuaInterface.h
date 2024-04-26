@@ -37,8 +37,6 @@ namespace State
 
 
 struct lua_Debug;
-extern void hook_lua_init_stack_gmod(lua_State*, lua_State*);
-extern void hook_GMOD_LuaPrint(const char*);
 
 // ToDo: Verify and Add GMODLUA_GetUserType and edit lua_typename to call this function.
 /*
