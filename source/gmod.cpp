@@ -54,6 +54,7 @@ void GMOD_LoadBinaryModule(lua_State* L, const char* name)
 	if (!gmod13_open) {
 		lua_pushliteral(L, "Failed to get gmod13_open!");
 		lua_error(L);
+		dlclose(handle);
 		return;
 	}
 
@@ -80,7 +81,7 @@ void GMOD_UnloadBinaryModule(lua_State* L, const char* module, ILuaBase::UserDat
 	#else
 		if (udata->data)
 		{
-			CFunc gmod13_close = (CFunc)dlsym(handle, "gmod13_close");
+			CFunc gmod13_close = (CFunc)dlsym(udata->data, "gmod13_close");
 			if (gmod13_close) {
 				lua_pushcclosure(L, gmod13_close, 0);
 				lua_call(L, 0, 0);
