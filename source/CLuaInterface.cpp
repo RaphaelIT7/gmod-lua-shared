@@ -107,8 +107,6 @@ int AdvancedLuaErrorReporter(lua_State *L)
 ILuaInterface* CreateLuaInterface(bool bIsServer)
 {
 	::DebugPrint(1, "CreateLuaInterface\n");
-	// ToDo: Create ILuaGameCallback and pass it to interface->Init as the first argument!
-
 	CLuaInterface* LuaInterface = new CLuaInterface;
 
 	return LuaInterface;
@@ -760,7 +758,7 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 void CLuaInterface::Shutdown()
 {
 	::DebugPrint(1, "CLuaInterface::Shutdown\n");
-	// ToDo: Do the magic
+	GMOD_UnloadBinaryModules(state);
 
 	lua_close(state);
 }
@@ -1047,6 +1045,7 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key)
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
+		::DebugPrint(3, "Type: %i\n", GetType(-1));
 		PushNumber(key);
 		Push(-3);
 		SetTable(-3);
@@ -1538,7 +1537,7 @@ void CLuaInterface::Require(const char* cname)
 		char dllpath[512];
 		get->FileSystem()->RelativePathToFullPath(path.c_str(), "MOD", dllpath, sizeof(dllpath));
 		GMOD_LoadBinaryModule(state, dllpath);
-		delete[] dllpath;
+		//delete[] dllpath; //NOTE: Delete this and it will cause a critical error? probably because the value is still in use by Lua
 	} else {
 		RunLuaModule(cname);
 	}
@@ -1594,6 +1593,20 @@ void* CLuaInterface::CreateConCommand(const char* name, const char* helpString, 
 	::DebugPrint(2, "CLuaInterface::CreateConCommand\n");
 
 	return LuaConVars()->CreateConCommand(name, helpString, flags, callback, completionFunc);
+}
+
+const char* CLuaInterface::CheckStringOpt( int iStackPos, const char* def )
+{
+	::DebugPrint(4, "CLuaInterface::CheckStringOpt %i %s\n", iStackPos, def);
+
+	return luaL_optlstring(state, iStackPos, def, NULL);
+}
+
+double CLuaInterface::CheckNumberOpt( int iStackPos, double def )
+{
+	::DebugPrint(4, "CLuaInterface::CheckNumberOpt %i %f\n", iStackPos, def);
+
+	return luaL_optnumber(state, iStackPos, def);
 }
 
 std::string CLuaInterface::RunMacros(std::string code)
