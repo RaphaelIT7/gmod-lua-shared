@@ -37,6 +37,7 @@ namespace State
 
 
 struct lua_Debug;
+extern void GMOD_LoadBinaryModule(lua_State* L, const char*);
 
 // ToDo: Verify and Add GMODLUA_GetUserType and edit lua_typename to call this function.
 /*

@@ -8,6 +8,12 @@
 #include <regex>
 #include "PooledStrings.h"
 
+#ifdef WIN32
+#include <Windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
 #ifdef ARCHITECTURE_X86
 #include "Color.h"
 #else
@@ -43,6 +49,62 @@ void DebugPrint(int level, const char* fmt, ...) {
 // =================================
 // First functions
 // =================================
+void GMOD_LoadBinaryModule(lua_State* L, const char* name)
+{
+	lua_pushfstring(L, "LOADLIB: %s", name);
+	ILuaBase::UserData* udata = (ILuaBase::UserData*)lua_newuserdata(L, sizeof(ILuaBase::UserData));
+	udata->data = nullptr;
+	udata->type = Type::UserData;
+
+	lua_pushvalue(L, LUA_REGISTRYINDEX);
+	lua_getfield(L, -1, "_LOADLIB");
+	lua_setmetatable(L, -3);
+
+	lua_pushvalue(L, -3);
+	lua_pushvalue(L, -3);
+	lua_settable(L, -3);
+
+#ifdef WIN32
+	HMODULE hDll = LoadLibrary(name);
+	if (hDll == NULL) {
+		lua_pushliteral(L, "Failed to load dll!");
+		lua_error(L);
+		return;
+	}
+
+	CFunc gmod13_open = (CFunc)GetProcAddress(hDll, "gmod13_open");
+	if (gmod13_open == NULL) {
+		lua_pushliteral(L, "Failed to get gmod13_open!");
+		lua_error(L);
+		return;
+	}
+
+	lua_pushcclosure(L, gmod13_open, 0);
+	lua_call(L, 0, 0);
+
+	FreeLibrary(hDll);
+#else
+	void* handle = dlopen(name, RTLD_LAZY);
+	if (!handle) {
+		lua_pushliteral(L, "Failed to load dll!");
+		lua_error(L);
+		return;
+	}
+
+	CFunc gmod13_open = (CFunc)dlsym(handle, "gmod13_open");
+	if (!gmod13_open) {
+		lua_pushliteral(L, "Failed to get gmod13_open!");
+		lua_error(L);
+		return;
+	}
+
+	lua_pushcclosure(L, gmod13_open, 0);
+	lua_call(L, 0, 0);
+
+	dlclose(handle);
+#endif
+}
+
 void lua_run_menu_f( const CCommand &args )
 {
 	if ( args.ArgC() < 1 || args.Arg(1) == "" )
@@ -92,14 +154,14 @@ int AdvancedLuaErrorReporter(lua_State *L)
 	// VPROF AdvancedLuaErrorReporter GLua
 
 	if (lua_isstring(L, 0)) {
-        const char* str = lua_tostring(L, 0);
+		const char* str = lua_tostring(L, 0);
 
-        g_LastError.assign(str);
+		g_LastError.assign(str);
 
-        ReadStackIntoError(L);
+		ReadStackIntoError(L);
 
-        lua_pushstring(L, g_LastError.c_str());
-    }
+		lua_pushstring(L, g_LastError.c_str());
+	}
 
 	return 0;
 }
@@ -1220,13 +1282,13 @@ bool CLuaInterface::RunLuaModule(const char* name)
 
 std::string ToPath(std::string path)
 {
-    size_t lastSeparatorPos = path.find_last_of("/\\");
+	size_t lastSeparatorPos = path.find_last_of("/\\");
 
-    if (lastSeparatorPos != std::string::npos) {
-        return path.substr(0, lastSeparatorPos + 1);
-    }
+	if (lastSeparatorPos != std::string::npos) {
+		return path.substr(0, lastSeparatorPos + 1);
+	}
 
-    return path;
+	return path;
 }
 
 bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showErrors, const char *stringToRun, bool noReturns)
@@ -1499,12 +1561,45 @@ bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 	return ret != 0;
 }
 
-void CLuaInterface::Require(const char* name)
+void CLuaInterface::Require(const char* cname)
 {
-	::DebugPrint(2, "CLuaInterface::Require %s\n", name);
-	// ToDo
+	::DebugPrint(2, "CLuaInterface::Require %s\n", cname);
+	
 
-	RunLuaModule(name);
+	std::string name = cname;
+	name = (IsClient() ? "gmcl_" : "gmsv_") + name;
+
+#ifdef SYSTEM_MACOSX
+	name = name + "osx";
+#else
+	#ifdef SYSTEM_WINDOWS
+		name = name + "win";
+	#else
+		name = name + "linux";
+	#endif
+
+	#ifdef ARCHITECTURE_X86_64
+		name = name + "64";
+	#else
+		#ifdef SYSTEM_WINDOWS
+			name = name + "32";
+		#endif
+	#endif
+#endif
+	name = name + ".dll";
+
+
+	std::string path = (std::string)"lua/bin/" + name;
+	IGet* get = ((CLuaShared*)LuaShared())->GetIGet();
+	if (get->FileSystem()->FileExists(path.c_str(), "MOD"))
+	{
+		char dllpath[512];
+		get->FileSystem()->RelativePathToFullPath(path.c_str(), "MOD", dllpath, sizeof(dllpath));
+		GMOD_LoadBinaryModule(state, dllpath);
+		delete[] dllpath;
+	} else {
+		RunLuaModule(cname);
+	}
 }
 
 const char* CLuaInterface::GetActualTypeName(int type)
