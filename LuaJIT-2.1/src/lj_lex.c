@@ -357,6 +357,42 @@ static LexToken lex_scan(LexState *ls, TValue *tv)
     case '>':
       lex_next(ls);
       if (ls->c != '=') return '>'; else { lex_next(ls); return TK_ge; }
+    // GMOD Syntax start
+    case '!':
+      lex_next(ls)
+      if (ls->c != '=') return TK_not; else { lex_next(ls); return TK_ne; }
+    case '&':
+      lex_next(ls)
+      if (ls->c != '&') return '&'; else { lex_next(ls); return TX_and; }
+    case '|':
+      lex_next(ls)
+      if (ls->c != '|') return '|'; else { lex_next(ls); return TX_or; }
+    case '/':
+      lex_next(ls);
+      if (ls->c == '/')
+      {
+        while (!lex_iseol(ls) && ls->c != LEX_EOF)
+		  lex_next(ls);
+      	continue;
+      } else if (ls->c == "*")
+      {
+         lex_next(ls);
+         for(;;) {
+         	if (ls->c == '*') {
+              lex_next(ls);
+              if (ls->c == '/') {
+                lex_next(ls);
+                break;
+              }
+            } else if (ls->c == LEX_EOF) {
+              lj_lex_error(ls, TK_string, LJ_ERR_XLDELIM);
+              break;
+            } else {
+              lex_next(ls);
+            }
+         }
+      }
+    // GMOD Syntax end
     case '~':
       lex_next(ls);
       if (ls->c != '=') return '~'; else { lex_next(ls); return TK_ne; }

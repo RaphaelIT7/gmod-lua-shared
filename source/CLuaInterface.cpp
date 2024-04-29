@@ -980,7 +980,13 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::GetMetaTableObject(int iStackPos)
 GarrysMod::Lua::ILuaObject* CLuaInterface::GetReturn(int iStackPos)
 {
 	::DebugPrint(2, "CLuaInterface::GetReturn\n");
-	// ToDo
+	
+	int idx = -iStackPos;
+	if (idx > 0 && idx <= 4)
+	{
+		::DebugPrint(1, "CLuaInterface::GetReturn EXPERIMENTAL RETURN! %i\n", idx);
+		return m_ProtectedFunctionReturns[idx];
+	}
 
 	return nullptr;
 }
@@ -1235,9 +1241,6 @@ std::string ToPath(std::string path)
 bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showErrors, const char *stringToRun, bool noReturns)
 {
 	::DebugPrint(2, "CLuaInterface::FindAndRunScript %s, %s, %s, %s, %s\n", filename, run ? "Yes" : "No", showErrors ? "Yes" : "No", stringToRun, noReturns ? "Yes" : "No");
-
-	if (true)
-		return false;
 
 	ILuaShared* shared = LuaShared();
 	File* file = shared->LoadFile(filename, m_sPathID, true, true);
@@ -1617,16 +1620,6 @@ std::string CLuaInterface::RunMacros(std::string code)
 	::Msg("Top: %i\n", Top());
 
 	::DebugPrint(2, "CLuaInterface::RunMacros\n");
-	
-	// ToDo Move syntax to LuaJIT
-
-	code = std::regex_replace(code, std::regex("&&"), "and");
-	code = std::regex_replace(code, std::regex("\\|\\|"), "or");
-	code = std::regex_replace(code, std::regex("!="), "~=");
-	code = std::regex_replace(code, std::regex("!"), "not ");
-	code = std::regex_replace(code, std::regex("/\\*"), "--[[");
-	code = std::regex_replace(code, std::regex("\\*/"), "]]");
-	code = std::regex_replace(code, std::regex("//"), "--");
 
 	code = std::regex_replace(code, std::regex("DEFINE_BASECLASS"), "local BaseClass = baseclass.Get");
 
