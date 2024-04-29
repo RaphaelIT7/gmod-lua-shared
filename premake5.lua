@@ -56,20 +56,17 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
 		filter("system:windows", "platforms:x86_64")
 			links({
 				"lua51_64.lib",
-				"luajit_64.lib",
 				"lua_shared_lib_64.lib",
 	        })
 
 		filter("system:windows", "platforms:x86")
 			links({
 				"lua51_32.lib",
-				"luajit_32.lib",
 				"lua_shared_lib_32.lib",
 	        })
 
 		filter({"system:linux", "platforms:x86_64"})
 			links("luajit_64")
-            linkoptions(current_dir .. "/libs/libluajit_64.a")
             links("lua_shared_lib_64")
             linkoptions(current_dir .. "/libs/liblua_shared_lib_64.a")
 

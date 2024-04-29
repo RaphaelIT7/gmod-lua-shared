@@ -42,25 +42,25 @@ public:
 class CLuaShared : public ILuaShared
 {
 public:
-	~CLuaShared();
-	void Init(CreateInterfaceFn, bool, CSteamAPIContext*, IGet*);
-	void Shutdown();
-	void DumpStats();
-	ILuaInterface* CreateLuaInterface(unsigned char, bool);
-	void CloseLuaInterface(ILuaInterface*);
-	ILuaInterface* GetLuaInterface(unsigned char);
-	File* LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile);
-	File* GetCache(const std::string&);
-	void MountLua(const char*);
-	void MountLuaAdd(const char*, const char*);
-	void UnMountLua(const char*);
-	void SetFileContents(const char*, const char*);
-	void SetLuaFindHook(LuaClientDatatableHook*);
-	void FindScripts(const std::string&, const std::string&, std::vector<std::string>&);
-	const char* GetStackTraces();
-	void InvalidateCache(const std::string&);
-	void EmptyCache();
-
+	virtual ~CLuaShared();
+	virtual void Init(CreateInterfaceFn, bool, CSteamAPIContext*, IGet*);
+	virtual void Shutdown();
+	virtual void DumpStats();
+	virtual ILuaInterface* CreateLuaInterface(unsigned char, bool);
+	virtual void CloseLuaInterface(ILuaInterface*);
+	virtual ILuaInterface* GetLuaInterface(unsigned char);
+	virtual File* LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile);
+	virtual File* GetCache(const std::string&);
+	virtual void MountLua(const char*);
+	virtual void MountLuaAdd(const char*, const char*);
+	virtual void UnMountLua(const char*);
+	virtual void SetFileContents(const char*, const char*);
+	virtual void SetLuaFindHook(LuaClientDatatableHook*);
+	virtual void FindScripts(const std::string&, const std::string&, std::vector<std::string>&);
+	virtual const char* GetStackTraces();
+	virtual void InvalidateCache(const std::string&);
+	virtual void EmptyCache();
+public:
 	IGet* GetIGet() { return pGet; };
 	void AddSearchPath(const char*, const char*);
 private:
