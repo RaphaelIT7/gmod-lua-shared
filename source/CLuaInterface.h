@@ -749,8 +749,14 @@ private:
 
 	// These members represent nothing in particular
 	// They've been selected to fill the required space between the vtable and the callback object
-	char _1[2];
-	size_t _2[7]; // 43 * sizeof(size_t) = 172 (x86) or 344 (x86-64) bytes
+	int _1 = 1; // Always 1?
+	void* _2 = nullptr;
+	int _3 = 0;
+	int _4 = 0;
+	int _5 = 0;
+	void* _6 = nullptr;
+	void* _7 = nullptr;
+	char _8[3];
 
 #ifdef __APPLE__
 
