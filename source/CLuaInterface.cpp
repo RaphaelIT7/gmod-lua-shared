@@ -1242,6 +1242,9 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 {
 	::DebugPrint(2, "CLuaInterface::FindAndRunScript %s, %s, %s, %s, %s\n", filename, run ? "Yes" : "No", showErrors ? "Yes" : "No", stringToRun, noReturns ? "Yes" : "No");
 
+	if (true)
+		return false;
+
 	ILuaShared* shared = LuaShared();
 	File* file = shared->LoadFile(filename, m_sPathID, true, true);
 	if (file)
