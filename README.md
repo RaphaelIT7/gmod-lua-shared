@@ -21,10 +21,12 @@ Maybe if I finish this I also try to get Lua 5.4 to work :D
 NOTE: Added a workaround to fix it.  
 - [x] Fixed the Stack
 - [x] (IMPORTANT) Find out why functions like Material crash. Are we missing something?  
-- [ ] Implement continue
+- [x] Implement continue
+- [ ] What makes this call? What is broken? `CLuaInterface::CheckString 1068146288`
 - [ ] Update the ILuaObject. It's different in the MenuSystem.dll
 - [ ] Fix SetMember functions causing `[MENU ERROR] attempt to index a string value`
 - [ ] Type Errors cause engine errors.
+- [ ] Fix `/* */` in LuaJIT and remove the Workaround from `CLuaInterface::RunMacros`
 
 ## Linux DS issues
 - [ ] Crashes while loading.

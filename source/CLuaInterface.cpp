@@ -1624,6 +1624,10 @@ std::string CLuaInterface::RunMacros(std::string code)
 
 	::DebugPrint(2, "CLuaInterface::RunMacros\n");
 
+	// ToDo: Fix this in LuaJIT and remove it here
+	code = std::regex_replace(code, std::regex("/\\*"), "--[[");
+	code = std::regex_replace(code, std::regex("\\*/"), "]]");
+
 	code = std::regex_replace(code, std::regex("DEFINE_BASECLASS"), "local BaseClass = baseclass.Get");
 
 	return code;
