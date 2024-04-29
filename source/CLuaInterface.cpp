@@ -41,7 +41,7 @@ void DebugPrint(int level, const char* fmt, ...) {
 }
 
 // =================================
-// First functions
+// Helper functions
 // =================================
 void lua_run_menu_f( const CCommand &args )
 {
@@ -57,6 +57,9 @@ void lua_run_menu_f( const CCommand &args )
  
 ConCommand lua_run_menu( "lua_run_menu", lua_run_menu_f , "lua_run_menu", 0);
 
+// =================================
+// First gmod function
+// =================================
 std::string g_LastError;
 std::vector<lua_Debug*> stackErrors;
 CLuaError* ReadStackIntoError(lua_State* L)
@@ -144,7 +147,7 @@ void luaL_newmetatable_type(lua_State* L, const char* strName, int iType)
 }
 
 // =================================
-// ILuaBase implementation
+// ILuaBase / CBaseLuaInterface implementation
 // =================================
 
 int CLuaInterface::Top()
