@@ -474,7 +474,8 @@ void CLuaInterface::CreateMetaTableType(const char* strName, int iType)
 
 const char* CLuaInterface::CheckString(int iStackPos)
 {
-	::DebugPrint(4, "CLuaInterface::CheckString\n");
+	::DebugPrint(4, "CLuaInterface::CheckString %i\n");
+
 	return luaL_checklstring(state, iStackPos, NULL);
 }
 
@@ -1233,6 +1234,9 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 {
 	::DebugPrint(2, "CLuaInterface::FindAndRunScript %s, %s, %s, %s, %s\n", filename, run ? "Yes" : "No", showErrors ? "Yes" : "No", stringToRun, noReturns ? "Yes" : "No");
 
+	if (true)
+		return false;
+
 	ILuaShared* shared = LuaShared();
 	File* file = shared->LoadFile(filename, m_sPathID, true, true);
 	if (file)
@@ -1505,7 +1509,7 @@ void CLuaInterface::Require(const char* cname)
 	
 
 	std::string name = cname;
-	name = (IsClient() ? "gmcl_" : "gmsv_") + name;
+	name = (IsClient() ? "gmcl_" : "gmsv_") + name + "_";
 
 #ifdef SYSTEM_MACOSX
 	name = name + "osx";
