@@ -17,7 +17,7 @@
 
 int g_iTypeNum = 0;
 
-ConVar lua_debugmode("lua_debugmode", "0", 0);
+ConVar lua_debugmode("lua_debugmode", "5", 0);
 void DebugPrint(int level, const char* fmt, ...) {
 	if (lua_debugmode.GetInt() < level)
 		return;
@@ -875,8 +875,9 @@ void CLuaInterface::CallInternal(int args, int rets)
 			for (int i=1; i<=rets; ++i)
 			{
 				GarrysMod::Lua::ILuaObject* obj = NewTemporaryObject();
-				obj->SetFromStack(-i);
+				obj->SetFromStack(-1);
 				m_ProtectedFunctionReturns[i] = obj;
+				Pop(1);
 			}
 		}
 	} else {
@@ -894,10 +895,12 @@ void CLuaInterface::CallInternalNoReturns(int args)
 bool CLuaInterface::CallInternalGetBool(int args)
 {
 	::DebugPrint(2, "CLuaInterface::CallInternalGetBool %i\n", args);
-	CallInternal(args, 1);
-
-	bool ret = GetBool(-1);
-	Pop(1);
+	
+	bool ret = false;
+	if (CallFunctionProtected(args, 1, 0)) {
+		ret = GetBool(-1);
+		Pop(1);
+	}
 
 	return ret;
 }
@@ -905,10 +908,12 @@ bool CLuaInterface::CallInternalGetBool(int args)
 const char* CLuaInterface::CallInternalGetString(int args)
 {
 	::DebugPrint(2, "CLuaInterface::CallInternalGetString %i\n", args);
-	CallInternal(args, 1);
 
-	const char* ret = GetString(-1);
-	Pop(1);
+	const char* ret = NULL;
+	if (CallFunctionProtected(args, 1, 0)) {
+		ret = GetString(-1);
+		Pop(1);
+	}
 
 	return ret;
 }

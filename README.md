@@ -27,6 +27,7 @@ NOTE: I should actual give Msg the Value to ACTUALLY print the REAL value and no
 - [x] What causes a stack leak? A bunch of nil values end up on the stack.  
 - [x] Fix SetMember functions causing `[MENU ERROR] attempt to index a string value`
 - [ ] Find another stack leak.  
+- [ ] Fix the random crash when loading into a game  
 - [ ] Type Errors cause engine errors.
 - [ ] Fix `/* */` and `//` in LuaJIT and remove the Workarounds from `CLuaInterface::RunMacros`  
 BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
