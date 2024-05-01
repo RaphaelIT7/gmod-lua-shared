@@ -320,7 +320,7 @@ CFunc CLuaInterface::GetCFunction(int iStackPos)
 
 ILuaBase::UserData* CLuaInterface::GetUserdata(int iStackPos)
 {
-	::DebugPrint(4, "CLuaInterface::GetUserdata\n");
+	::DebugPrint(4, "CLuaInterface::GetUserdata %i\n", iStackPos);
 	return (ILuaBase::UserData*)lua_touserdata(state, iStackPos);
 }
 
@@ -411,7 +411,7 @@ void CLuaInterface::PushSpecial(int iType)
 
 bool CLuaInterface::IsType(int iStackPos, int iType)
 {
-	::DebugPrint(4, "CLuaInterface::IsType\n");
+	::DebugPrint(4, "CLuaInterface::IsType %i %i\n", iStackPos, iType);
 	int actualType = lua_type(state, iStackPos);
 	bool isType = false;
 
@@ -421,6 +421,11 @@ bool CLuaInterface::IsType(int iStackPos, int iType)
 
 	if (iType > 8)
 	{
+		for (int i=1;i <= Top(); ++i)
+		{
+			::DebugPrint(4, "Stack: %i, Type: %i\n", i, GetType(i));
+		}
+
 		ILuaBase::UserData* udata = GetUserdata(iStackPos);
 		if (udata && udata->type == iType)
 		{
@@ -542,7 +547,7 @@ void CLuaInterface::PushVector(const Vector& val)
 
 void CLuaInterface::SetState(lua_State* L)
 {
-	::DebugPrint(1, "CLuaInterface::SetState\n");
+	::DebugPrint(3, "CLuaInterface::SetState\n");
 	state = L;
 }
 
@@ -561,8 +566,8 @@ int CLuaInterface::CreateMetaTable(const char* strName)
 
 bool CLuaInterface::PushMetaTable(int iType)
 {
-	::DebugPrint(2, "CLuaInterface::PushMetaTable\n");
-	
+	::DebugPrint(2, "CLuaInterface::PushMetaTable %i\n", iType);
+
 	int ref = -1;
 	const char* type = GetActualTypeName(iType);
 	PushSpecial(SPECIAL_REG);
@@ -570,8 +575,10 @@ bool CLuaInterface::PushMetaTable(int iType)
 		if (IsType(-1, Type::Table))
 		{
 			ref = ReferenceCreate();
+		} else {
+			Pop(1);
 		}
-	Pop(2);
+	Pop(1);
 
 	if (ref != -1)
 	{
@@ -1141,9 +1148,11 @@ bool CLuaInterface::FindOnObjectsMetaTable(int iStackPos, int keyIndex)
 		if (lua_type(state, -1) != Type::Nil)
 		{
 			ref = ReferenceCreate();
+		} else {
+			Pop(1);
 		}
 
-		Pop(2);
+		Pop(1);
 		if (ref != -1)
 		{
 			ReferencePush(ref);
