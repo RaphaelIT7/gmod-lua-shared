@@ -597,7 +597,11 @@ void CLuaInterface::PushUserType(void* data, int iType)
 	udata->type = iType;
 
 	if (PushMetaTable(iType))
+	{
 		SetMetaTable(-2);
+	} else {
+		::Msg("Failed to find Metatable for %i!\n", iType);
+	}
 }
 
 void CLuaInterface::SetUserType(int iStackPos, void* data)
