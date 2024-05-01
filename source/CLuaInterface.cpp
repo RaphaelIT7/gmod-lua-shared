@@ -1182,27 +1182,21 @@ int CLuaInterface::GetFlags(int iStackPos) // What da hell, this seems important
 
 bool CLuaInterface::FindOnObjectsMetaTable(int iStackPos, int keyIndex)
 {
-	::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable\n");
+	::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable %i %i %s\n", iStackPos, keyIndex, lua_tolstring(state, keyIndex, NULL));
 	// ToDo
 	if (lua_getmetatable(state, iStackPos) == 1)
 	{
 		lua_pushvalue(state, keyIndex);
 		GetTable(-2);
 		int ref = -1;
-		if (lua_type(state, -1) != Type::Nil)
+		if (lua_type(state, -1) == Type::Nil)
 		{
-			ref = ReferenceCreate();
-		} else {
-			Pop(1);
+			Pop(2);
+			return false;
 		}
 
-		Pop(1);
-		if (ref != -1)
-		{
-			ReferencePush(ref);
-			ReferenceFree(ref);
-			return true;
-		}
+		Remove(-2);
+		return true;
 	}
 
 	return false;
