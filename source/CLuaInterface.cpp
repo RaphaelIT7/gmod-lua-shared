@@ -1342,7 +1342,7 @@ void CLuaInterface::Msg( const char* fmt, ... )
 
 	va_end(args);
 
-	Msg("%s", buffer);
+	::Msg("%s", buffer);
 	delete[] buffer;
 }
 
