@@ -17,7 +17,7 @@
 
 int g_iTypeNum = 0;
 
-ConVar lua_debugmode("lua_debugmode", "1", 0);
+ConVar lua_debugmode("lua_debugmode", "5", 0);
 void DebugPrint(int level, const char* fmt, ...) {
 	if (lua_debugmode.GetInt() < level)
 		return;
@@ -479,7 +479,7 @@ void CLuaInterface::CreateMetaTableType(const char* strName, int iType)
 
 const char* CLuaInterface::CheckString(int iStackPos)
 {
-	::DebugPrint(4, "CLuaInterface::CheckString %i\n");
+	::DebugPrint(4, "CLuaInterface::CheckString %i\n", iStackPos);
 
 	return luaL_checklstring(state, iStackPos, NULL);
 }

@@ -22,7 +22,8 @@ NOTE: Added a workaround to fix it.
 - [x] Fixed the Stack
 - [x] (IMPORTANT) Find out why functions like Material crash. Are we missing something?  
 - [x] Implement continue  
-- [ ] What makes this call? What is broken? `CLuaInterface::CheckString 1068146288`  
+- [x] What makes this call? What is broken? `CLuaInterface::CheckString 1068146288`  
+NOTE: I should actual give Msg the Value to ACTUALLY print the REAL value and not some memory.
 - [ ] What causes a stack leak? A bunch of nil values end up on the stack.  
 - [x] Fix SetMember functions causing `[MENU ERROR] attempt to index a string value`
 - [ ] Type Errors cause engine errors.
