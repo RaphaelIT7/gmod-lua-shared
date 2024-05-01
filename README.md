@@ -21,9 +21,9 @@ Maybe if I finish this I also try to get Lua 5.4 to work :D
 NOTE: Added a workaround to fix it.  
 - [x] Fixed the Stack
 - [x] (IMPORTANT) Find out why functions like Material crash. Are we missing something?  
-- [x] Implement continue
-- [ ] What makes this call? What is broken? `CLuaInterface::CheckString 1068146288`
-- [ ] Update the ILuaObject. It's different in the MenuSystem.dll
+- [x] Implement continue  
+- [ ] What makes this call? What is broken? `CLuaInterface::CheckString 1068146288`  
+- [ ] What causes a stack leak? A bunch of nil values end up on the stack.  
 - [x] Fix SetMember functions causing `[MENU ERROR] attempt to index a string value`
 - [ ] Type Errors cause engine errors.
 - [ ] Fix `/* */` and `//` in LuaJIT and remove the Workarounds from `CLuaInterface::RunMacros`  
@@ -66,6 +66,7 @@ But the code to use it exists `AddThreadedCall` and `RunThreadedCalls`
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/f3b58551-76f5-4d12-80ea-315d613654eb)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/6a1f8287-c7c5-41dc-868c-3a5bfbc1fa17)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/a35a26bf-5dab-4809-b572-fc56ae2f1bea)
+![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/e86fea60-73d4-412a-af30-f3c1f53ddb9c)
 
 
 > NOTE for myself: Go thru these [commits](https://github.com/mingodad/ljsjit) and learn how to add gmod's syntax to lua
