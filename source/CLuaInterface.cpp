@@ -889,16 +889,21 @@ bool CLuaInterface::CallInternalGetBool(int args)
 	::DebugPrint(2, "CLuaInterface::CallInternalGetBool %i\n", args);
 	CallInternal(args, 1);
 
-	return GetBool(1);
+	bool ret = GetBool(-1);
+	Pop(1);
+
+	return ret;
 }
 
 const char* CLuaInterface::CallInternalGetString(int args)
 {
 	::DebugPrint(2, "CLuaInterface::CallInternalGetString %i\n", args);
 	CallInternal(args, 1);
-	// ToDo
 
-	return GetString(1);
+	const char* ret = GetString(-1);
+	Pop(1);
+
+	return ret;
 }
 
 bool CLuaInterface::CallInternalGet(int args, GarrysMod::Lua::ILuaObject* obj)
