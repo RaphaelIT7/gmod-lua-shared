@@ -665,7 +665,18 @@ int func_print(lua_State* L)
 					LUA->Pop(1);
 
 					if (!meta)
-						ss << "<Something Unknown. Scary>";
+					{
+						LUA->PushSpecial(SPECIAL_GLOB);
+							LUA->GetField(-1, "tostring");
+							if (LUA->IsType(-1, Type::Function))
+							{
+								LUA->Push(i);
+								LUA->PCall(1, 1, 0);
+								ss << LUA->GetString(-1);
+								LUA->Pop(1);
+							}
+						LUA->Pop(2);
+					}
 
 					break;
 			}
@@ -1188,7 +1199,6 @@ bool CLuaInterface::FindOnObjectsMetaTable(int iStackPos, int keyIndex)
 	{
 		lua_pushvalue(state, keyIndex);
 		GetTable(-2);
-		int ref = -1;
 		if (lua_type(state, -1) == Type::Nil)
 		{
 			Pop(2);
@@ -1212,12 +1222,12 @@ bool CLuaInterface::FindObjectOnTable(int iStackPos, int keyIndex)
 
 void CLuaInterface::SetMemberFast(GarrysMod::Lua::ILuaObject* obj, int keyIndex, int valueIndex)
 {
-	::DebugPrint(3, "CLuaInterface::SetMemberFast\n");
-	if (obj->isTable())
+	::DebugPrint(3, "CLuaInterface::SetMemberFast %i %i\n", keyIndex, valueIndex);
+	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
-		obj->Push();
-		Push(keyIndex + 1);
-		Push(valueIndex + 2);
+		ReferencePush(obj->m_reference);
+		Push(keyIndex);
+		Push(valueIndex);
 		SetTable(-3);
 		Pop(1);
 	}
