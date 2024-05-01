@@ -828,7 +828,7 @@ void CLuaInterface::PushLuaObject(GarrysMod::Lua::ILuaObject* obj)
 	::DebugPrint(4, "CLuaInterface::PushLuaObject\n");
 	if (obj)
 	{
-		obj->Push();
+		ReferencePush(obj->m_reference);
 	} else {
 		PushNil();
 	}
