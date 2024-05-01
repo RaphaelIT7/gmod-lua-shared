@@ -17,7 +17,7 @@
 
 int g_iTypeNum = 0;
 
-ConVar lua_debugmode("lua_debugmode", "5", 0);
+ConVar lua_debugmode("lua_debugmode", "1", 0);
 void DebugPrint(int level, const char* fmt, ...) {
 	if (lua_debugmode.GetInt() < level)
 		return;
@@ -65,7 +65,6 @@ std::vector<lua_Debug*> stackErrors;
 CLuaError* ReadStackIntoError(lua_State* L)
 {
 	// VPROF ReadStackIntoError GLua
-	lua_Debug* stack = new lua_Debug;
 
 	int level = 0;
 	lua_Debug ar;
