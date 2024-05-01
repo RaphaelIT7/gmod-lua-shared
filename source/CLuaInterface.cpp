@@ -437,7 +437,7 @@ bool CLuaInterface::IsType(int iStackPos, int iType)
 
 int CLuaInterface::GetType(int iStackPos)
 {
-	::DebugPrint(4, "CLuaInterface::GetType\n");
+	::DebugPrint(4, "CLuaInterface::GetType %i %i\n", iStackPos, lua_type(state, iStackPos));
 	int type = lua_type(state, iStackPos);
 
 	if (type == GarrysMod::Lua::Type::UserData)
@@ -449,7 +449,7 @@ int CLuaInterface::GetType(int iStackPos)
 		}
 	}
 
-	return type;
+	return type == -1 ? Type::Nil : type;
 }
 
 const char* CLuaInterface::GetTypeName(int iType)
@@ -1183,32 +1183,34 @@ void CLuaInterface::PushLong(long number)
 	lua_pushnumber(state, number);
 }
 
-int CLuaInterface::GetFlags(int iStackPos) // What da hell, this seems important :<
+int CLuaInterface::GetFlags(int iStackPos)
 {
 	::DebugPrint(1, "CLuaInterface::GetFlags %i %i\n", iStackPos, GetType(iStackPos));
-	// ToDo
 
-	return 0;
+	return (int)GetNumber(iStackPos); // ToDo: Verify this
 }
 
 bool CLuaInterface::FindOnObjectsMetaTable(int iStackPos, int keyIndex)
 {
 	::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable %i %i %s\n", iStackPos, keyIndex, lua_tolstring(state, keyIndex, NULL));
-	// ToDo
+
 	if (lua_getmetatable(state, iStackPos) == 1)
 	{
 		lua_pushvalue(state, keyIndex);
-		GetTable(-2);
+		lua_gettable(state, -2);
 		if (lua_type(state, -1) == Type::Nil)
 		{
 			Pop(2);
+			::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable NOT SO GOOD\n");
 			return false;
 		}
 
 		Remove(-2);
+		::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable GOOD\n");
 		return true;
 	}
 
+	::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable BAD\n");
 	return false;
 }
 
