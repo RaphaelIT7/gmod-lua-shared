@@ -24,6 +24,9 @@ void CLuaConVars::Init()
 
 char* AAllocString( const char *pStr, int nMaxChars = -1 )
 {
+	if (pStr == NULL)
+		return NULL;
+
 	int allocLen;
 	if ( nMaxChars == -1 )
 		allocLen = strlen( pStr ) + 1;

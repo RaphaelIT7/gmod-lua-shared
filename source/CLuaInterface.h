@@ -549,7 +549,7 @@ public:
 	virtual void DestroyObject( GarrysMod::Lua::ILuaObject *obj ) = 0;
 	virtual GarrysMod::Lua::ILuaObject *CreateObject( ) = 0;
 	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, GarrysMod::Lua::ILuaObject *key, GarrysMod::Lua::ILuaObject *value ) = 0;
-	virtual void GetNewTable( ) = 0;
+	virtual GarrysMod::Lua::ILuaObject* GetNewTable( ) = 0;
 	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, float key ) = 0;
 	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, float key, GarrysMod::Lua::ILuaObject *value ) = 0;
 	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, const char *key ) = 0;
@@ -688,7 +688,7 @@ public:
 	virtual void DestroyObject( GarrysMod::Lua::ILuaObject *obj );
 	virtual GarrysMod::Lua::ILuaObject *CreateObject( );
 	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, GarrysMod::Lua::ILuaObject *key, GarrysMod::Lua::ILuaObject *value );
-	virtual void GetNewTable( );
+	virtual GarrysMod::Lua::ILuaObject* GetNewTable( );
 	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, float key );
 	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, float key, GarrysMod::Lua::ILuaObject *value );
 	virtual void SetMember( GarrysMod::Lua::ILuaObject *table, const char *key );

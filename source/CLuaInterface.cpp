@@ -567,7 +567,6 @@ int CLuaInterface::CreateMetaTable(const char* strName)
 bool CLuaInterface::PushMetaTable(int iType)
 {
 	::DebugPrint(2, "CLuaInterface::PushMetaTable %i\n", iType);
-
 	int ref = -1;
 	const char* type = GetActualTypeName(iType);
 	PushSpecial(SPECIAL_REG);
@@ -808,7 +807,10 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::Global()
 GarrysMod::Lua::ILuaObject* CLuaInterface::GetObject(int index)
 {
 	::DebugPrint(4, "CLuaInterface::GetObject\n");
-	return (GarrysMod::Lua::ILuaObject*)GetUserdata(index);
+	GarrysMod::Lua::ILuaObject* obj = CreateObject();
+	obj->SetFromStack(index);
+
+	return obj;
 }
 
 void CLuaInterface::PushLuaObject(GarrysMod::Lua::ILuaObject* obj)
@@ -1035,9 +1037,17 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, GarrysMod::Lua::I
 {
 	::Msg("Top: %i\n", Top());
 	::DebugPrint(3, "CLuaInterface::SetMember 1\n");
+
 	if (obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
+		if (!IsType(-1, Type::Table))
+		{
+			Msg("CLuaInterface::SetMember1 Stopped an error! %s\n", key);
+			Pop(1);
+			return;
+		}
+
 		ReferencePush(key->m_reference);
 		ReferencePush(value->m_reference);
 		SetTable(-3);
@@ -1045,13 +1055,15 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, GarrysMod::Lua::I
 	}
 }
 
-void CLuaInterface::GetNewTable()
+GarrysMod::Lua::ILuaObject* CLuaInterface::GetNewTable()
 {
 	::Msg("Top: %i\n", Top());
 	::DebugPrint(2, "CLuaInterface::GetNewTable\n");
 	
 	CreateTable();
-
+	GarrysMod::Lua::ILuaObject* obj = CreateObject();
+	obj->SetFromStack(-1);
+	return obj;
 }
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key)
@@ -1061,6 +1073,13 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key)
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
+		if (!IsType(-1, Type::Table))
+		{
+			Msg("CLuaInterface::SetMember2 Stopped an error! %s\n", key);
+			Pop(1);
+			return;
+		}
+
 		::DebugPrint(3, "Type: %i\n", GetType(-1));
 		PushNumber(key);
 		Push(-3);
@@ -1076,8 +1095,15 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key, Garrys
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
+		if (!IsType(-1, Type::Table))
+		{
+			Msg("CLuaInterface::SetMember3 Stopped an error! %s\n", key);
+			Pop(1);
+			return;
+		}
+
 		PushNumber(key);
-		value->Push();
+		ReferencePush(value->m_reference);
 		SetTable(-3);
 		Pop(1);
 	}
@@ -1090,6 +1116,13 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
+		if (!IsType(-1, Type::Table))
+		{
+			Msg("CLuaInterface::SetMember4 Stopped an error! %s\n", key);
+			Pop(1);
+			return;
+		}
+
 		PushString(key);
 		Push(-3);
 		SetTable(-3);
@@ -1104,6 +1137,13 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, 
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
+		if (!IsType(-1, Type::Table))
+		{
+			Msg("CLuaInterface::SetMember5 Stopped an error! %s\n", key);
+			Pop(1);
+			return;
+		}
+
 		PushString(key);
 		if (value)
 		{
@@ -1128,9 +1168,9 @@ void CLuaInterface::PushLong(long number)
 	lua_pushnumber(state, number);
 }
 
-int CLuaInterface::GetFlags(int iStackPos) // What da hell
+int CLuaInterface::GetFlags(int iStackPos) // What da hell, this seems important :<
 {
-	::DebugPrint(1, "CLuaInterface::GetFlags\n");
+	::DebugPrint(1, "CLuaInterface::GetFlags %i %i\n", iStackPos, GetType(iStackPos));
 	// ToDo
 
 	return 0;
@@ -1251,8 +1291,8 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 {
 	::DebugPrint(2, "CLuaInterface::FindAndRunScript %s, %s, %s, %s, %s\n", filename, run ? "Yes" : "No", showErrors ? "Yes" : "No", stringToRun, noReturns ? "Yes" : "No");
 
-	if (true)
-		return false;
+	//if (true)
+	//	return false;
 
 	ILuaShared* shared = LuaShared();
 	File* file = shared->LoadFile(filename, m_sPathID, true, true);
@@ -1632,10 +1672,13 @@ std::string CLuaInterface::RunMacros(std::string code)
 	::Msg("Top: %i\n", Top());
 
 	::DebugPrint(2, "CLuaInterface::RunMacros\n");
+	
+	// ToDo Move syntax to LuaJIT
 
 	// ToDo: Fix this in LuaJIT and remove it here
 	code = std::regex_replace(code, std::regex("/\\*"), "--[[");
 	code = std::regex_replace(code, std::regex("\\*/"), "]]");
+	code = std::regex_replace(code, std::regex("//"), "--");
 
 	code = std::regex_replace(code, std::regex("DEFINE_BASECLASS"), "local BaseClass = baseclass.Get");
 

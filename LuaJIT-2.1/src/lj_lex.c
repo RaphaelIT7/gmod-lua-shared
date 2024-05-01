@@ -367,7 +367,7 @@ static LexToken lex_scan(LexState *ls, TValue *tv)
     case '|':
       lex_next(ls);
       if (ls->c != '|') return '|'; else { lex_next(ls); return TK_or; }
-    case '/':
+    /*case '/':
       lex_next(ls);
       if (ls->c == '/')
       {
@@ -391,7 +391,7 @@ static LexToken lex_scan(LexState *ls, TValue *tv)
               lex_next(ls);
             }
          }
-      }
+      }*/
     // GMOD Syntax end
     case '~':
       lex_next(ls);
