@@ -17,7 +17,7 @@
 
 int g_iTypeNum = 0;
 
-ConVar lua_debugmode("lua_debugmode", "5", 0);
+ConVar lua_debugmode("lua_debugmode", "0", 0);
 void DebugPrint(int level, const char* fmt, ...) {
 	if (lua_debugmode.GetInt() < level)
 		return;
@@ -420,11 +420,6 @@ bool CLuaInterface::IsType(int iStackPos, int iType)
 
 	if (iType > 8)
 	{
-		for (int i=1;i <= Top(); ++i)
-		{
-			::DebugPrint(4, "Stack: %i, Type: %i\n", i, GetType(i));
-		}
-
 		ILuaBase::UserData* udata = GetUserdata(iStackPos);
 		if (udata && udata->type == iType)
 		{
@@ -560,7 +555,7 @@ int CLuaInterface::CreateMetaTable(const char* strName)
 	lua_pushinteger(state, 1);
 	lua_settable(state, -3);
 
-	return 0; // ToDo: What should I return? :<
+	return 1; // ToDo: What should I return? :<
 }
 
 bool CLuaInterface::PushMetaTable(int iType)
@@ -584,6 +579,8 @@ bool CLuaInterface::PushMetaTable(int iType)
 		ReferenceFree(ref);
 		return true;
 	}
+
+	::Msg("I failed u :< %i\n", iType);
 
 	return false;
 }
@@ -707,7 +704,6 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	state->luabase = this;
 	SetState(state);
 
-	::Msg("Top: %i\n", Top());
 	for (int i=0; i<LUA_MAX_TEMP_OBJECTS;++i)
 	{
 		m_TempObjects[i] = CreateObject();
@@ -725,13 +721,11 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 		// Warning("Lua detected bad FPU precision! Prepare for weirdness!");
 	}
 
-	::Msg("Top: %i\n", Top());
 	DoStackCheck();
 
 	NewGlobalTable("");
 
 	::DebugPrint(3, "Table? %s\n", m_pGlobal->isTable() ? "Yes" : "No");
-	::Msg("Top: %i\n", Top());
 
 	PushSpecial(SPECIAL_GLOB);
 	PushCFunction(func_print);
@@ -739,7 +733,6 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	Pop(1);
 
 	DoStackCheck();
-	::Msg("Top: %i\n", Top());
 
 	lua_createtable(state, 0, 0);
 	
@@ -757,7 +750,6 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 	Pop(1);
 
 	DoStackCheck();
-	::Msg("Top: %i\n", Top());
 
 	// lua_getfield(state, "debug");
 
@@ -1054,7 +1046,6 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::CreateObject()
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, GarrysMod::Lua::ILuaObject* key, GarrysMod::Lua::ILuaObject* value)
 {
-	::Msg("Top: %i\n", Top());
 	::DebugPrint(3, "CLuaInterface::SetMember 1\n");
 
 	if (obj->GetType() == Type::Table)
@@ -1076,7 +1067,6 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, GarrysMod::Lua::I
 
 GarrysMod::Lua::ILuaObject* CLuaInterface::GetNewTable()
 {
-	::Msg("Top: %i\n", Top());
 	::DebugPrint(2, "CLuaInterface::GetNewTable\n");
 	
 	CreateTable();
@@ -1087,7 +1077,6 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::GetNewTable()
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key)
 {
-	::Msg("Top: %i\n", Top());
 	::DebugPrint(3, "CLuaInterface::SetMember 2\n");
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
@@ -1109,7 +1098,6 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key)
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key, GarrysMod::Lua::ILuaObject* value)
 {
-	::Msg("Top: %i\n", Top());
 	::DebugPrint(3, "CLuaInterface::SetMember 3\n");
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
@@ -1130,7 +1118,6 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key, Garrys
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 {
-	::Msg("Top: %i\n", Top());
 	::DebugPrint(3, "CLuaInterface::SetMember 4 %s %i %s\n", key, obj->GetType(), obj->isTable() ? "Yes" : "no");
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
@@ -1151,7 +1138,6 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, GarrysMod::Lua::ILuaObject* value)
 {
-	::Msg("Top: %i\n", Top());
 	::DebugPrint(3, "CLuaInterface::SetMember 5\n");
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
@@ -1547,10 +1533,10 @@ bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 {
 	::DebugPrint(2, "CLuaInterface::CallFunctionProtected %i %i %s\n", iArgs, iRets, showError ? "Yes" : "no");
 
-	for (int i=1;i <= Top(); ++i)
+	/*for (int i=1;i <= Top(); ++i)
 	{
 		::DebugPrint(4, "Stack: %i, Type: %i\n", i, GetType(i));
-	}
+	}*/
 
 	if (GetType(-(iArgs + 1)) != Type::Function)
 	{
@@ -1568,7 +1554,6 @@ bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 		}
 		delete err;
 		Pop(1);
-		::Msg("Top: %i\n", Top());
 	}
 
 	return ret != 0;
@@ -1683,8 +1668,6 @@ double CLuaInterface::CheckNumberOpt( int iStackPos, double def )
 
 std::string CLuaInterface::RunMacros(std::string code)
 {
-	::Msg("Top: %i\n", Top());
-
 	::DebugPrint(2, "CLuaInterface::RunMacros\n");
 	
 	// ToDo Move syntax to LuaJIT

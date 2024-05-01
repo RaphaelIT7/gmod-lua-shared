@@ -785,7 +785,7 @@ private:
 public:
 	void RunThreadedCalls();
 	inline void DoStackCheck() {
-		
+		//::Msg("Top: %i\n", Top());
 	}
 private:
 	std::list<ILuaThreadedCall*> pThreadedcalls;
