@@ -767,7 +767,7 @@ private:
 
 #ifdef __APPLE__
 
-	size_t _3; // 1 * sizeof(size_t) = 4 (x86) or 8 (x86-64) bytes
+	size_t _9; // 1 * sizeof(size_t) = 4 (x86) or 8 (x86-64) bytes
 
 #endif
 
@@ -778,10 +778,24 @@ private:
 	GarrysMod::Lua::ILuaObject* m_TempObjects[LUA_MAX_TEMP_OBJECTS];
 	unsigned char m_iRealm = -1; // CLIENT = 0, SERVER = 1, MENU = 2
 	ILuaGameCallback* m_pGameCallback = nullptr;
-	char m_sPathID[32] = "LuaMenu"; // This is exacly where Gmod stores. lsv, lsc or LuaMenu
+	char m_sPathID[32] = "LuaMenu"; // lsv, lsc or LuaMenu
 	int m_iCurrentTempObject = 0;
 	GarrysMod::Lua::ILuaObject* m_pGlobal = nullptr;
 	GarrysMod::Lua::ILuaObject* m_pStringPool = nullptr;
+	// But wait, theres more. In the next fields the metatables objects are saved but idk if it just has a field for each metatable or if it uses a map.
+	/*char _9[44];
+	GarrysMod::Lua::ILuaObject* m_pVectorMeta;
+	GarrysMod::Lua::ILuaObject* m_pAngleMeta;
+	char _10[36];
+	GarrysMod::Lua::ILuaObject* m_pIMaterialMeta;
+	GarrysMod::Lua::ILuaObject* m_pPanelMeta;
+	char _11[7];
+	GarrysMod::Lua::ILuaObject* m_pITextureMeta;
+	char _12[4];
+	GarrysMod::Lua::ILuaObject* m_pConVarMeta;
+	char _13[20];
+	GarrysMod::Lua::ILuaObject* m_pIVideoWriterMeta;
+	GarrysMod::Lua::ILuaObject* m_pFileMeta;*/
 public:
 	void RunThreadedCalls();
 	inline void DoStackCheck() {
