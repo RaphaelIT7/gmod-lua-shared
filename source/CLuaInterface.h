@@ -760,7 +760,7 @@ private:
 	void* _2 = nullptr;
 	int _3 = 0;
 	int _4 = 0;
-	int _5 = 0;
+	int m_iPushedPaths = 0;
 	void* _6 = nullptr;
 	void* _7 = nullptr;
 	char _8[3];
@@ -783,19 +783,43 @@ private:
 	GarrysMod::Lua::ILuaObject* m_pGlobal = nullptr;
 	GarrysMod::Lua::ILuaObject* m_pStringPool = nullptr;
 	// But wait, theres more. In the next fields the metatables objects are saved but idk if it just has a field for each metatable or if it uses a map.
-	/*char _9[44];
+	char _10[1];
+	char _11[39];
+	GarrysMod::Lua::ILuaObject* m_pWeaponMeta;
 	GarrysMod::Lua::ILuaObject* m_pVectorMeta;
 	GarrysMod::Lua::ILuaObject* m_pAngleMeta;
-	char _10[36];
+	GarrysMod::Lua::ILuaObject* m_pPhysObjMeta;
+	GarrysMod::Lua::ILuaObject* m_pISaveMeta;
+	GarrysMod::Lua::ILuaObject* m_pIRestoreMeta;
+	GarrysMod::Lua::ILuaObject* m_pCTakeDamageInfoMeta;
+	GarrysMod::Lua::ILuaObject* m_pCEffectDataMeta;
+	GarrysMod::Lua::ILuaObject* m_pCMoveDataMeta;
+	GarrysMod::Lua::ILuaObject* m_pCRecipientFilterMeta;
+	GarrysMod::Lua::ILuaObject* m_pCUserCmd;
+	GarrysMod::Lua::ILuaObject* m_unknown1; // Probably only Menu state
 	GarrysMod::Lua::ILuaObject* m_pIMaterialMeta;
 	GarrysMod::Lua::ILuaObject* m_pPanelMeta;
-	char _11[7];
+	GarrysMod::Lua::ILuaObject* m_pCLuaParticleMeta;
+	char _12[3];
 	GarrysMod::Lua::ILuaObject* m_pITextureMeta;
-	char _12[4];
+	GarrysMod::Lua::ILuaObject* m_pBf_readMeta;
 	GarrysMod::Lua::ILuaObject* m_pConVarMeta;
-	char _13[20];
+	GarrysMod::Lua::ILuaObject* m_pIMeshMeta;
+	GarrysMod::Lua::ILuaObject* m_pVMatrixMeta;
+	GarrysMod::Lua::ILuaObject* m_pCSoundPatchMeta;
+	GarrysMod::Lua::ILuaObject* m_pPixelvis_handle_tMeta;
+	GarrysMod::Lua::ILuaObject* m_pDlight_tMeta;
 	GarrysMod::Lua::ILuaObject* m_pIVideoWriterMeta;
-	GarrysMod::Lua::ILuaObject* m_pFileMeta;*/
+	GarrysMod::Lua::ILuaObject* m_pFileMeta;
+	GarrysMod::Lua::ILuaObject* m_pCLuaLocomotionMeta;
+	GarrysMod::Lua::ILuaObject* m_pPathFollowerMeta;
+	GarrysMod::Lua::ILuaObject* m_pCNavAreaMeta;
+	GarrysMod::Lua::ILuaObject* m_pIGModAudioChannelMeta;
+	GarrysMod::Lua::ILuaObject* m_pCNavLadderMeta;
+	GarrysMod::Lua::ILuaObject* m_pCNewParticleEffectMeta;
+	GarrysMod::Lua::ILuaObject* m_pProjectedTextureMeta;
+	GarrysMod::Lua::ILuaObject* m_pPhysCollideMeta;
+	GarrysMod::Lua::ILuaObject* m_pSurfaceInfoMeta;
 public:
 	void RunThreadedCalls();
 	inline void DoStackCheck() {
