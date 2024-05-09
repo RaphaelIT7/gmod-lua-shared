@@ -1354,20 +1354,23 @@ void CLuaInterface::Msg( const char* fmt, ... )
 void CLuaInterface::PushPath( const char* path )
 {
 	::DebugPrint(2, "CLuaInterface::PushPath %s\n", path);
-	m_pPath = path;
+	m_sLastPath = m_sCurrentPath;
+	m_sCurrentPath = path;
+	++m_iPushedPaths;
 }
 
 void CLuaInterface::PopPath()
 {
 	::DebugPrint(2, "CLuaInterface::PopPath\n");
-	m_pPath = NULL;
+	//m_sCurrentPath = NULL;
+	--m_iPushedPaths;
 }
 
 const char* CLuaInterface::GetPath()
 {
 	::DebugPrint(2, "CLuaInterface::GetPath\n");
 
-	return m_pPath;
+	return m_sCurrentPath;
 }
 
 int CLuaInterface::GetColor(int iStackPos) // Probably returns the StackPos

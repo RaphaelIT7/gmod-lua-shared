@@ -757,11 +757,11 @@ private:
 	// These members represent nothing in particular
 	// They've been selected to fill the required space between the vtable and the callback object
 	int _1 = 1; // Always 1?
-	void* _2 = nullptr;
+	const char* m_sCurrentPath;
 	int _3 = 0;
 	int _4 = 0;
 	int m_iPushedPaths = 0;
-	void* _6 = nullptr;
+	const char* m_sLastPath;
 	void* _7 = nullptr;
 	char _8[3];
 
@@ -827,7 +827,6 @@ public:
 	}
 private:
 	std::list<ILuaThreadedCall*> pThreadedcalls;
-	const char* m_pPath = "includes";
 };
 
 // Some functions declared inside CLuaInterface_cpp
