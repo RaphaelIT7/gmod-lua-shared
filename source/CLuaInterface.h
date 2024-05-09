@@ -757,17 +757,17 @@ private:
 	// These members represent nothing in particular
 	// They've been selected to fill the required space between the vtable and the callback object
 	int _1 = 1; // Always 1?
-	const char* m_sCurrentPath;
+	const char* m_sCurrentPath = NULL;
 	int _3 = 0;
 	int _4 = 0;
 	int m_iPushedPaths = 0;
-	const char* m_sLastPath;
-	void* _7 = nullptr;
-	char _8[3];
+	const char* m_sLastPath = NULL;
+	void* _5 = nullptr;
+	char _6[3];
 
 #ifdef __APPLE__
 
-	size_t _9; // 1 * sizeof(size_t) = 4 (x86) or 8 (x86-64) bytes
+	size_t _7; // 1 * sizeof(size_t) = 4 (x86) or 8 (x86-64) bytes
 
 #endif
 
@@ -783,8 +783,8 @@ private:
 	GarrysMod::Lua::ILuaObject* m_pGlobal = nullptr;
 	GarrysMod::Lua::ILuaObject* m_pStringPool = nullptr;
 	// But wait, theres more. In the next fields the metatables objects are saved but idk if it just has a field for each metatable or if it uses a map.
-	char _10[1];
-	char _11[39];
+	char _8[1];
+	char _9[39];
 	GarrysMod::Lua::ILuaObject* m_pWeaponMeta;
 	GarrysMod::Lua::ILuaObject* m_pVectorMeta;
 	GarrysMod::Lua::ILuaObject* m_pAngleMeta;
@@ -800,7 +800,7 @@ private:
 	GarrysMod::Lua::ILuaObject* m_pIMaterialMeta;
 	GarrysMod::Lua::ILuaObject* m_pPanelMeta;
 	GarrysMod::Lua::ILuaObject* m_pCLuaParticleMeta;
-	char _12[3];
+	char _10[3];
 	GarrysMod::Lua::ILuaObject* m_pITextureMeta;
 	GarrysMod::Lua::ILuaObject* m_pBf_readMeta;
 	GarrysMod::Lua::ILuaObject* m_pConVarMeta;
