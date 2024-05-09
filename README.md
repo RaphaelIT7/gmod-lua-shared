@@ -57,10 +57,6 @@ Everything.
 
 Most of it.
 
-## ILuaThreadedCall
-This is not even used in Gmod :|  
-But the code to use it exists `AddThreadedCall` and `RunThreadedCalls`
-
 ## Collection of random Engine Errors and Warnings or other things
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/aa4143fc-75f2-4311-b23b-d2de1394d59b)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/85631077-ec8d-4831-8fe1-5789f8090493)

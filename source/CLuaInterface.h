@@ -512,10 +512,11 @@ private:
 };
 
 // NOTE: This is a custom class that somewhat works works with Gmod? (Gmod's real class is currently unknown) soonTM
+// Update: This class now works 100% with Gmod :D
 class ILuaThreadedCall {
 public:
-    virtual void Unknown(void*) {}
-    virtual bool Execute(void*, bool, unsigned long long) = 0;
+    virtual void Init() = 0;
+    virtual void Run(ILuaBase*) = 0;
 };
 
 #define LUA_MAX_TEMP_OBJECTS 32
@@ -592,7 +593,7 @@ public:
 	virtual void PreCreateTable( int arrelems, int nonarrelems ) = 0;
 	virtual void PushPooledString( int index ) = 0;
 	virtual const char *GetPooledString( int index ) = 0;
-	virtual void *AddThreadedCall( ILuaThreadedCall * ) = 0;
+	virtual int AddThreadedCall( ILuaThreadedCall * ) = 0;
 	virtual void AppendStackTrace( char *, unsigned long ) = 0;
 	virtual void *CreateConVar( const char *, const char *, const char *, int ) = 0;
 	virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) ) = 0;
@@ -731,7 +732,7 @@ public:
 	virtual void PreCreateTable( int arrelems, int nonarrelems );
 	virtual void PushPooledString( int index );
 	virtual const char *GetPooledString( int index );
-	virtual void *AddThreadedCall( ILuaThreadedCall * );
+	virtual int AddThreadedCall( ILuaThreadedCall * );
 	virtual void AppendStackTrace( char *, unsigned long );
 	virtual void *CreateConVar( const char *, const char *, const char *, int );
 	virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) );

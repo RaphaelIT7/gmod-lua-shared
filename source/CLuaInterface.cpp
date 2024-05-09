@@ -791,17 +791,26 @@ void CLuaInterface::Cycle()
 void CLuaInterface::RunThreadedCalls()
 {
 	::DebugPrint(3, "CLuaInterface::RunThreadedCalls\n");
-	m_pThreadedCalls.remove_if([] (ILuaThreadedCall* call) {
-		return call->Execute(nullptr, false, 0);
-	});
+	for (ILuaThreadedCall* call : m_pThreadedCalls)
+	{
+		call->Init();
+	}
+
+	for (ILuaThreadedCall* call : m_pThreadedCalls)
+	{
+		call->Run(this);
+	}
+
+	m_pThreadedCalls.clear();
 }
 
-void* CLuaInterface::AddThreadedCall(ILuaThreadedCall* call)
+int CLuaInterface::AddThreadedCall(ILuaThreadedCall* call)
 {
 	::DebugPrint(1, "CLuaInterface::AddThreadedCall What called this?\n");
-	Error("Tell me. What called this?");
+
 	m_pThreadedCalls.push_back(call);
-	return nullptr;
+
+	return m_pThreadedCalls.size();
 }
 
 GarrysMod::Lua::ILuaObject* CLuaInterface::Global()
