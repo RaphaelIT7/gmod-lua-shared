@@ -17,7 +17,7 @@
 
 int g_iTypeNum = 0;
 
-ConVar lua_debugmode("lua_debugmode", "5", 0);
+ConVar lua_debugmode("lua_debugmode", "0", 0);
 void DebugPrint(int level, const char* fmt, ...) {
 	if (lua_debugmode.GetInt() < level)
 		return;
@@ -791,8 +791,8 @@ void CLuaInterface::Cycle()
 void CLuaInterface::RunThreadedCalls()
 {
 	::DebugPrint(3, "CLuaInterface::RunThreadedCalls\n");
-	pThreadedcalls.remove_if([] (ILuaThreadedCall* call) {
-		return call->Execute();
+	m_pThreadedCalls.remove_if([] (ILuaThreadedCall* call) {
+		return call->Execute(nullptr, false, 0);
 	});
 }
 
@@ -800,7 +800,7 @@ void* CLuaInterface::AddThreadedCall(ILuaThreadedCall* call)
 {
 	::DebugPrint(1, "CLuaInterface::AddThreadedCall What called this?\n");
 	Error("Tell me. What called this?");
-	pThreadedcalls.push_back(call);
+	m_pThreadedCalls.push_back(call);
 	return nullptr;
 }
 

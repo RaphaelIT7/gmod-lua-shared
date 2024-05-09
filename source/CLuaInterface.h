@@ -511,11 +511,11 @@ private:
 	lua_State* state;
 };
 
-// NOTE: This is a custom class! (Gmod's real class is unknown)
+// NOTE: This is a custom class that somewhat works works with Gmod? (Gmod's real class is currently unknown) soonTM
 class ILuaThreadedCall {
 public:
-    virtual ~ILuaThreadedCall() {}
-    virtual bool Execute() = 0;
+    virtual void Unknown(void*) {}
+    virtual bool Execute(void*, bool, unsigned long long) = 0;
 };
 
 #define LUA_MAX_TEMP_OBJECTS 32
@@ -762,8 +762,7 @@ private:
 	int _4 = 0;
 	int m_iPushedPaths = 0;
 	const char* m_sLastPath = NULL;
-	void* _5 = nullptr;
-	char _6[3];
+	std::list<ILuaThreadedCall*> m_pThreadedCalls;
 
 #ifdef __APPLE__
 
@@ -825,8 +824,6 @@ public:
 	inline void DoStackCheck() {
 		//::Msg("Top: %i\n", Top());
 	}
-private:
-	std::list<ILuaThreadedCall*> pThreadedcalls;
 };
 
 // Some functions declared inside CLuaInterface_cpp
