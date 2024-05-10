@@ -1321,7 +1321,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	} else {
 		std::string out;
 		GetCurrentFile(out);
-		if (out.length() != 0) // ToDo: Fix this mess. This will probably kill performance / loading times.
+		if (out != "!UNKNOWN") // ToDo: Fix this mess. This will probably kill performance / loading times.
 		{
 			File* file2 = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
 			if (file2)
@@ -1333,7 +1333,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 				lua_getinfo(state, "S", &ar);
 
 				out = ar.source ? ar.source : "!UNKNOWN";
-				if (out.length() != 0)
+				if (out != "!UNKNOWN")
 				{
 					File* file2 = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
 					if (file2)
