@@ -17,7 +17,7 @@
 
 int g_iTypeNum = 0;
 
-ConVar lua_debugmode("lua_debugmode", "0", 0);
+ConVar lua_debugmode("lua_debugmode", "5", 0);
 void DebugPrint(int level, const char* fmt, ...) {
 	if (lua_debugmode.GetInt() < level)
 		return;
@@ -481,7 +481,7 @@ const char* CLuaInterface::CheckString(int iStackPos)
 
 double CLuaInterface::CheckNumber(int iStackPos)
 {
-	::DebugPrint(4, "CLuaInterface::CheckNumber\n");
+	::DebugPrint(4, "CLuaInterface::CheckNumber %i\n", iStackPos);
 	return luaL_checknumber(state, iStackPos);
 }
 
@@ -1152,17 +1152,10 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, GarrysMod::Lua::ILuaObject* value)
 {
-	::DebugPrint(3, "CLuaInterface::SetMember 5\n");
+	::DebugPrint(3, "CLuaInterface::SetMember 5 %s\n", key);
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
-		if (!IsType(-1, Type::Table))
-		{
-			Msg("CLuaInterface::SetMember5 Stopped an error! %s\n", key);
-			Pop(1);
-			return;
-		}
-
 		PushString(key);
 		if (value)
 		{
@@ -1205,13 +1198,11 @@ bool CLuaInterface::FindOnObjectsMetaTable(int iStackPos, int keyIndex)
 		if (lua_type(state, -1) == Type::Nil)
 		{
 			Pop(2);
-			::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable NOT SO GOOD\n");
-			return false;
+		} else {
+			Remove(-2);
+			::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable GOOD\n");
+			return true;
 		}
-
-		Remove(-2);
-		::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable GOOD\n");
-		return true;
 	}
 
 	::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable BAD\n");
@@ -1221,14 +1212,28 @@ bool CLuaInterface::FindOnObjectsMetaTable(int iStackPos, int keyIndex)
 bool CLuaInterface::FindObjectOnTable(int iStackPos, int keyIndex)
 {
 	::DebugPrint(2, "CLuaInterface::FindObjectOnTable\n");
-	// ToDo
+	if (IsType(iStackPos, GarrysMod::Lua::Type::Table))
+	{
+		lua_pushvalue(state, iStackPos);
+		lua_pushvalue(state, keyIndex);
+		lua_gettable(state, -2);
+		lua_remove(state, -2);
+		if (GetType(-1) != GarrysMod::Lua::Type::Nil)
+		{
+			return true;
+		} else {
+			lua_remove(state, -1);
+		}
+	} else {
+		::DebugPrint(2, "CLuaInterface::FindObjectOnTable NOT A TABLE!\n");
+	}
 
 	return false;
 }
 
 void CLuaInterface::SetMemberFast(GarrysMod::Lua::ILuaObject* obj, int keyIndex, int valueIndex)
 {
-	::DebugPrint(3, "CLuaInterface::SetMemberFast %i %i\n", keyIndex, valueIndex);
+	::DebugPrint(3, "CLuaInterface::SetMemberFast %i %i %s\n", keyIndex, valueIndex, GetType(keyIndex) == Type::String ? GetString(keyIndex) : "");
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
@@ -1314,11 +1319,36 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	{
 		return RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 	} else {
-		if (strcmp(stringToRun, "") != 0)
+		std::string out;
+		GetCurrentFile(out);
+		if (out.length() != 0) // ToDo: Fix this mess. This will probably kill performance / loading times.
 		{
-			File* file2 = shared->LoadFile(ToPath(stringToRun) + filename, m_sPathID, true, true);
+			File* file2 = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
 			if (file2)
+			{
 				return RunStringEx(file2->name.c_str(), file2->source.c_str(), file2->contents.c_str(), true, showErrors, true, noReturns);
+			} else {
+				lua_Debug ar;
+				lua_getstack(state, 2, &ar); // Going deeper.
+				lua_getinfo(state, "S", &ar);
+
+				out = ar.source ? ar.source : "!UNKNOWN";
+				if (out.length() != 0)
+				{
+					File* file2 = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
+					if (file2)
+					{
+						return RunStringEx(file2->name.c_str(), file2->source.c_str(), file2->contents.c_str(), true, showErrors, true, noReturns);
+					} else {
+						if (strcmp(stringToRun, "") != 0)
+						{
+							File* file2 = shared->LoadFile(ToPath(stringToRun) + filename, m_sPathID, true, true);
+							if (file2)
+								return RunStringEx(file2->name.c_str(), file2->source.c_str(), file2->contents.c_str(), true, showErrors, true, noReturns);
+						}
+					}
+				}
+			}
 		}
 	}
 
