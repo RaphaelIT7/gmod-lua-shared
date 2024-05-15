@@ -423,9 +423,12 @@ bool CLuaInterface::IsType(int iStackPos, int iType)
 		ILuaBase::UserData* udata = GetUserdata(iStackPos);
 		if (udata && udata->type == iType)
 		{
+			::DebugPrint(4, "CLuaInterface::IsType %i %i (%i)\n", iStackPos, iType, udata->type);
 			return true;
 		}
 	}
+
+	::DebugPrint(4, "CLuaInterface::IsType %i %i (%i)\n", iStackPos, iType, actualType);
 
 	return false;
 }
@@ -443,6 +446,8 @@ int CLuaInterface::GetType(int iStackPos)
 			type = udata->type;
 		}
 	}
+
+	::DebugPrint(4, "CLuaInterface::GetType %i %i (%i)\n", iStackPos, lua_type(state, iStackPos), type);
 
 	return type == -1 ? Type::Nil : type;
 }
@@ -474,7 +479,7 @@ void CLuaInterface::CreateMetaTableType(const char* strName, int iType)
 
 const char* CLuaInterface::CheckString(int iStackPos)
 {
-	::DebugPrint(4, "CLuaInterface::CheckString %i\n", iStackPos);
+	::DebugPrint(4, "CLuaInterface::CheckString %i %s\n", iStackPos, luaL_checklstring(state, iStackPos, NULL));
 
 	return luaL_checklstring(state, iStackPos, NULL);
 }
@@ -1732,13 +1737,6 @@ double CLuaInterface::CheckNumberOpt( int iStackPos, double def )
 std::string CLuaInterface::RunMacros(std::string code)
 {
 	::DebugPrint(2, "CLuaInterface::RunMacros\n");
-	
-	// ToDo Move syntax to LuaJIT
-
-	// ToDo: Fix this in LuaJIT and remove it here
-	code = std::regex_replace(code, std::regex("/\\*"), "--[[");
-	code = std::regex_replace(code, std::regex("\\*/"), "]]");
-	code = std::regex_replace(code, std::regex("//"), "--");
 
 	code = std::regex_replace(code, std::regex("DEFINE_BASECLASS"), "local BaseClass = baseclass.Get");
 
