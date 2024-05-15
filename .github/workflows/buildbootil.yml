@@ -23,11 +23,19 @@ jobs:
           curl -L https://github.com/danielga/garrysmod_common/releases/download/premake-build%2F5.0.0-beta2/premake-5.0.0-beta2-windows.zip -o premake.zip
           tar -xf premake.zip
 
-      - name: Generate libs
+      - name: Generate Project
         run: |
           cd ${{env.PROJECT_PATH}}
           ./premake5.exe vs2019
+
+     - name: Build 32x
+        run: |
+          cd ${{env.PROJECT_PATH}}
           "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\msbuild.exe" /p:Configuration=Release /p:Platform=Win32 Bootil.sln
+
+     - name: Build 64x
+        run: |
+          cd ${{env.PROJECT_PATH}}
           "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\msbuild.exe" /p:Configuration=Release /p:Platform=x64 Bootil.sln
 
       - uses: actions/upload-artifact@v4
@@ -57,6 +65,7 @@ jobs:
     steps:
       - name: Install Dependencies
         run: |
+          dpkg --add-architecture i386
           apt update
           apt install -y build-essential git libstdc++6:i386 gcc-multilib g++-multilib wget
 
