@@ -111,9 +111,6 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 {
 	DebugPrint("CLuaShared::LoadFile: %s\n", path.c_str());
 
-	if (path.size() == 0) // Linux crash?
-		return nullptr;
-
 	File* file = new File;
 	FileHandle_t fh = g_pFullFileSystem->Open(path.c_str(), "rb", pathId.c_str());
 	if(fh)
@@ -135,7 +132,9 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);
 		file->compressed = buffer;
 
+#ifdef SYSTEM_WINDOWS
 		pCache[path] = file;
+#endif
 
 		g_pFullFileSystem->Close(fh);
 	} else {
