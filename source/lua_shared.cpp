@@ -107,7 +107,7 @@ ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
 	return pInterfaces[realm];
 }
 
-File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile)
+File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
 {
 	DebugPrint("CLuaShared::LoadFile: %s\n", path.c_str());
 
@@ -132,9 +132,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);
 		file->compressed = buffer;
 
-#ifdef SYSTEM_WINDOWS
 		pCache[path] = file;
-#endif
 
 		g_pFullFileSystem->Close(fh);
 	} else {
