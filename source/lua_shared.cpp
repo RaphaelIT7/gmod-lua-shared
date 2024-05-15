@@ -10,13 +10,38 @@ ILuaShared* LuaShared()
 	return &g_CLuaShared;
 }
 
+ConVar lua_debugmode("lua_debugmode_shared", "1", 0);
+void DebugPrint(const char* fmt, ...) {
+	if (!lua_debugmode.GetBool())
+		return;
+
+	va_list args;
+	va_start(args, fmt);
+
+	int size = vsnprintf(NULL, 0, fmt, args);
+	if (size < 0) {
+		va_end(args);
+		return;
+	}
+
+	char* buffer = new char[size + 1];
+	vsnprintf(buffer, size + 1, fmt, args);
+
+	Msg("%s", buffer);
+
+	delete[] buffer;
+	va_end(args);
+}
+
 CLuaShared::~CLuaShared()
 {
-
+	DebugPrint("CLuaShared::~CLuaShared\n");
 }
 
 void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext*, IGet* get)
 {
+	DebugPrint("CLuaShared::Init\n");
+
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);
 #ifdef ARCHITECTURE_X86
@@ -32,6 +57,8 @@ void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext
 
 void CLuaShared::Shutdown()
 {
+	DebugPrint("CLuaShared::Shutdown\n");
+
 	ConVar_Unregister();
 
 #ifdef ARCHITECTURE_X86
@@ -43,6 +70,8 @@ void CLuaShared::Shutdown()
 
 void CLuaShared::DumpStats()
 {
+	DebugPrint("CLuaShared::DumpStats\n");
+
 	Msg("Lua File Stats ------\n");
 	Msg("Files In Cache: %i\n", 0);
 	Msg("m_iCacheHints: %i\n", 0);
@@ -56,6 +85,8 @@ void CLuaShared::DumpStats()
 
 ILuaInterface* CLuaShared::CreateLuaInterface(unsigned char realm, bool unknown)
 {
+	DebugPrint("CLuaShared::CreateLuaInterface\n");
+
 	ILuaInterface* iFace = ::CreateLuaInterface(unknown);
 	pInterfaces[realm] = iFace;
 
@@ -64,17 +95,21 @@ ILuaInterface* CLuaShared::CreateLuaInterface(unsigned char realm, bool unknown)
 
 void CLuaShared::CloseLuaInterface(ILuaInterface* LuaInterface)
 {
+	DebugPrint("CLuaShared::CloseLuaInterface\n");
+
 	::CloseLuaInterface(LuaInterface);
 }
 
 ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
 {
+	DebugPrint("CLuaShared::GetLuaInterface\n");
+
 	return pInterfaces[realm];
 }
 
 File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile)
 {
-	Msg("CLuaShared::LoadFile: %s\n", path.c_str());
+	DebugPrint("CLuaShared::LoadFile: %s\n", path.c_str());
 
 	File* file = new File;
 	FileHandle_t fh = g_pFullFileSystem->Open(path.c_str(), "rb", pathId.c_str());
@@ -110,7 +145,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 
 File* CLuaShared::GetCache(const std::string& unknown)
 {
-	Msg("CLuaShared::GetCache %s", unknown.c_str());
+	DebugPrint("CLuaShared::GetCache %s", unknown.c_str());
 
 	auto it = pCache.find(unknown);
 	if (it != pCache.end())
@@ -129,7 +164,7 @@ File* CLuaShared::GetCache(const std::string& unknown)
 
 void CLuaShared::MountLua(const char* pathID)
 {
-	Msg("CLuaShared::MountLua %s\n", pathID);
+	DebugPrint("CLuaShared::MountLua %s\n", pathID);
 
 	std::string gamepath = pGet->GameDir();
 	gamepath = gamepath + '\\';
@@ -149,7 +184,7 @@ void CLuaShared::MountLua(const char* pathID)
 
 void CLuaShared::MountLuaAdd(const char* file, const char* path)
 {
-	Msg("CLuaShared::UnMountLua %s %s\n", file, path);
+	DebugPrint("CLuaShared::UnMountLua %s %s\n", file, path);
 	// Fancy code
 
 	// AddSearchPath(file, path)
@@ -159,28 +194,30 @@ void CLuaShared::MountLuaAdd(const char* file, const char* path)
 
 void CLuaShared::UnMountLua(const char* realm)
 {
-	Msg("CLuaShared::UnMountLua %s\n", realm);
+	DebugPrint("CLuaShared::UnMountLua %s\n", realm);
 	// ToDo
 }
 
 void CLuaShared::SetFileContents(const char* a, const char* b)
 {
-	Msg("CLuaShared::SetFileContents %s, %s\n", a, b);
+	DebugPrint("CLuaShared::SetFileContents %s, %s\n", a, b);
 	// Does nothing.
 }
 
 void CLuaShared::SetLuaFindHook(LuaClientDatatableHook* hook)
 {
-	Msg("CLuaShared::SetLuaFindHook\n");
+	DebugPrint("CLuaShared::SetLuaFindHook\n");
 }
 
 void CLuaShared::FindScripts(const std::string& a, const std::string& b, std::vector<std::string>& out)
 {
-	Msg("CLuaShared::FindScripts %s, %s\n", a.c_str(), b.c_str());
+	DebugPrint("CLuaShared::FindScripts %s, %s\n", a.c_str(), b.c_str());
 }
 
 const char* CLuaShared::GetStackTraces()
 {
+	DebugPrint("CLuaShared::GetStackTraces\n");
+
 	char* buffer = new char[1000];
 
 	V_strncat(buffer, "	Client\n", 1000, -1);
@@ -212,16 +249,17 @@ const char* CLuaShared::GetStackTraces()
 
 void CLuaShared::InvalidateCache(const std::string&)
 {
-
+	DebugPrint("CLuaShared::InvalidateCache\n");
 }
 
 void CLuaShared::EmptyCache()
 {
-
+	DebugPrint("CLuaShared::EmptyCache\n");
 }
 
 void CLuaShared::AddSearchPath(const char* path, const char* pathID)
 {
+	DebugPrint("CLuaShared::AddSearchPath %s %s\n", path, pathID);
 	g_pFullFileSystem->AddSearchPath(path, pathID);
 }
 

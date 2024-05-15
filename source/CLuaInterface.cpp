@@ -17,7 +17,7 @@
 
 int g_iTypeNum = 0;
 
-ConVar lua_debugmode("lua_debugmode", "5", 0);
+ConVar lua_debugmode("lua_debugmode_interface", "5", 0);
 void DebugPrint(int level, const char* fmt, ...) {
 	if (lua_debugmode.GetInt() < level)
 		return;
