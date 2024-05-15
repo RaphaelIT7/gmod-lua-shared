@@ -84,5 +84,6 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
 			files({"source/posix/*.cpp", "source/posix/*.hpp"})
 			targetextension(".so")
 			links({
-				"dl"
+				"dl",
+				"pthread"
 			})
