@@ -26,7 +26,9 @@ NOTE: Added a workaround to fix it.
 NOTE: I should actual give Msg the Value to ACTUALLY print the REAL value and not some memory.
 - [x] What causes a stack leak? A bunch of nil values end up on the stack.  
 - [x] Fix SetMember functions causing `[MENU ERROR] attempt to index a string value`
-- [ ] Find another stack leak.  
+- [x] Find another stack leak.  
+NOTE: The leak was cased by `CallFunctionProtected` returning false instead of true.  
+- [ ] Fix some random error (`the file "(null)"" couldn't be opened`)
 - [ ] Fix the random crash when loading into a game  
 - [ ] Type Errors cause engine errors.
 - [ ] Fix `/* */` and `//` in LuaJIT and remove the Workarounds from `CLuaInterface::RunMacros`  
@@ -67,7 +69,3 @@ Most of it.
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/a35a26bf-5dab-4809-b572-fc56ae2f1bea)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/e86fea60-73d4-412a-af30-f3c1f53ddb9c)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/34406eed-5e6c-4d01-94c9-1ab1075416c8)
-
-
-
-> NOTE for myself: Go thru these [commits](https://github.com/mingodad/ljsjit) and learn how to add gmod's syntax to lua

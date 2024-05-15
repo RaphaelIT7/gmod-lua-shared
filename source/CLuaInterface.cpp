@@ -906,7 +906,7 @@ bool CLuaInterface::CallInternalGetBool(int args)
 	::DebugPrint(2, "CLuaInterface::CallInternalGetBool %i\n", args);
 	
 	bool ret = false;
-	if (CallFunctionProtected(args, 1, 0)) {
+	if (CallFunctionProtected(args, 1, 1)) {
 		ret = GetBool(-1);
 		Pop(1);
 	}
@@ -919,7 +919,7 @@ const char* CLuaInterface::CallInternalGetString(int args)
 	::DebugPrint(2, "CLuaInterface::CallInternalGetString %i\n", args);
 
 	const char* ret = NULL;
-	if (CallFunctionProtected(args, 1, 0)) {
+	if (CallFunctionProtected(args, 1, 1)) {
 		ret = GetString(-1);
 		Pop(1);
 	}
@@ -930,7 +930,7 @@ const char* CLuaInterface::CallInternalGetString(int args)
 bool CLuaInterface::CallInternalGet(int args, GarrysMod::Lua::ILuaObject* obj)
 {
 	::DebugPrint(2, "CLuaInterface::CallInternalGet %i\n", args);
-	if (CallFunctionProtected(args, 1, 0)) {
+	if (CallFunctionProtected(args, 1, 1)) {
 		obj->SetFromStack(-1);
 		Pop(1);
 		return true;
@@ -1061,13 +1061,12 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::CreateObject()
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, GarrysMod::Lua::ILuaObject* key, GarrysMod::Lua::ILuaObject* value)
 {
 	::DebugPrint(3, "CLuaInterface::SetMember 1\n");
-
-	if (obj->GetType() == Type::Table)
+	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
 		if (!IsType(-1, Type::Table))
 		{
-			Msg("CLuaInterface::SetMember1 Stopped an error! %s\n", key);
+			Warning("CLuaInterface::SetMember1 Stopped an error!\n");
 			Pop(1);
 			return;
 		}
@@ -1097,28 +1096,27 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key)
 		ReferencePush(obj->m_reference);
 		if (!IsType(-1, Type::Table))
 		{
-			Msg("CLuaInterface::SetMember2 Stopped an error! %s\n", key);
+			Warning("CLuaInterface::SetMember2 Stopped an error! %f\n", key);
 			Pop(1);
 			return;
 		}
 
-		::DebugPrint(3, "Type: %i\n", GetType(-1));
 		PushNumber(key);
 		Push(-3);
 		SetTable(-3);
-		Pop(1);
+		Pop(2);
 	}
 }
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key, GarrysMod::Lua::ILuaObject* value)
 {
-	::DebugPrint(3, "CLuaInterface::SetMember 3\n");
+	::DebugPrint(3, "CLuaInterface::SetMember 3 %f\n", key);
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
 		if (!IsType(-1, Type::Table))
 		{
-			Msg("CLuaInterface::SetMember3 Stopped an error! %s\n", key);
+			Warning("CLuaInterface::SetMember3 Stopped an error! %f\n", key);
 			Pop(1);
 			return;
 		}
@@ -1132,13 +1130,13 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, float key, Garrys
 
 void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key)
 {
-	::DebugPrint(3, "CLuaInterface::SetMember 4 %s %i %s\n", key, obj->GetType(), obj->isTable() ? "Yes" : "no");
+	::DebugPrint(3, "CLuaInterface::SetMember 4 %s\n", key);
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
 		if (!IsType(-1, Type::Table))
 		{
-			Msg("CLuaInterface::SetMember4 Stopped an error! %s\n", key);
+			Warning("CLuaInterface::SetMember4 Stopped an error! %s\n", key);
 			Pop(1);
 			return;
 		}
@@ -1156,6 +1154,13 @@ void CLuaInterface::SetMember(GarrysMod::Lua::ILuaObject* obj, const char* key, 
 	if (obj->isTable() || obj->GetType() == Type::Table)
 	{
 		ReferencePush(obj->m_reference);
+		if (!IsType(-1, Type::Table))
+		{
+			Warning("CLuaInterface::SetMember5 Stopped an error! %s\n", key);
+			Pop(1);
+			return;
+		}
+
 		PushString(key);
 		if (value)
 		{
@@ -1578,6 +1583,7 @@ void CLuaInterface::GetCurrentFile(std::string &outStr)
 	}
 
 	outStr = "!UNKNOWN";
+	::DebugPrint(2, "CLuaInterface::GetCurrentFile %s\n", "!UNKNOWN (How dare you)");
 }
 
 void CLuaInterface::CompileString(Bootil::Buffer& dumper, const std::string& stringToCompile)
@@ -1613,7 +1619,7 @@ bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 		Pop(1);
 	}
 
-	return ret != 0;
+	return ret == 0;
 }
 
 void CLuaInterface::Require(const char* cname)
