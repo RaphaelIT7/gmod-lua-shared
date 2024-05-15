@@ -4,7 +4,7 @@
 #include <cstdarg>
 #ifndef LUA_SHARED_LIB
 #include <convar.h>
-#include <bootil/Bootil.h>
+#include <Bootil/Bootil.h>
 #endif
 #include "CLuaGameCallback.h"
 #include "ILuaObject.h"
