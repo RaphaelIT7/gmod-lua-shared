@@ -2,6 +2,7 @@
 #include <filesystem.h>
 #include <GarrysMod/IGet.h>
 #include <unordered_map>
+#include <bootil/Bootil.h>
 
 struct File
 {
@@ -9,7 +10,7 @@ struct File
 	std::string name;
 	std::string source;
 	std::string contents;
-	void* compressed; // Bootil::Autobuffer
+	Bootil::AutoBuffer compressed;
 	unsigned int timesloadedserver;
 	unsigned int timesloadedclient;
 };

@@ -13,8 +13,16 @@ project "bootil_static"
 	vectorextensions "SSE"
 	staticruntime "On"
 	editandcontinue "Off"
+	runtime "Release"
+
+	filter { "platforms:x32" }
+        targetname "bootil_static_32"
+
+    filter { "platforms:x64" }
+        targetname "bootil_static_64"
 
 	if os.is( "linux" ) or os.is( "macosx" ) then
+		targetextension(".a")
 		buildoptions { "-fPIC" }
 	end
 

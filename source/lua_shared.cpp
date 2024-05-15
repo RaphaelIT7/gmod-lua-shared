@@ -92,7 +92,10 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		file->timesloadedclient = 0;
 		file->timesloadedserver = 0;
 		file->source = path.c_str();
-		file->compressed = nullptr; // ToDo: Get Bootil to work and Change this to use Bootil::AutoBuffer. This probably crashes dedicated servers currently
+
+		Bootil::AutoBuffer buffer;
+		Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);
+		file->compressed = buffer;
 
 		pCache[path] = file;
 

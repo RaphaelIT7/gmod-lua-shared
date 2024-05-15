@@ -28,6 +28,8 @@ jobs:
         run: |
           cd ${{env.PROJECT_PATH}}
           ./premake5.exe vs2019
+          "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\msbuild.exe" /p:Configuration=Release /p:Platform=Win32 Bootil.sln
+          "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\msbuild.exe" /p:Configuration=Release /p:Platform=x64 Bootil.sln
 
       - uses: actions/upload-artifact@v4
         name: Upload lua51.lib
@@ -37,13 +39,20 @@ jobs:
           retention-days: 1
 
       - uses: actions/upload-artifact@v4
-        name: Upload luajit.lib
+        name: Upload bootil_static_32.lib
         with:
-          name: luajit.lib
-          path: LuaJIT-2.1/src/luajit.lib
+          name: bootil_static_32.lib
+          path: Bootil/projects/release_x32_windows/bootil_static_32.lib
           retention-days: 1
 
-  build-linux-64:
+      - uses: actions/upload-artifact@v4
+        name: Upload bootil_static_64.lib
+        with:
+          name: bootil_static_64.lib
+          path: Bootil/projects/release_x64_windows/bootil_static_64.lib
+          retention-days: 1
+
+  build-linux:
     runs-on: ubuntu-latest
     container: debian:bullseye
     steps:
@@ -67,59 +76,20 @@ jobs:
         run: |
           cd ${{env.PROJECT_PATH}}
           premake5 gmake
-          make
+          make config=release_x32
+          make config=release_x64
+          ls
 
       - uses: actions/upload-artifact@v4
-        name: Upload libluajit.a (64x)
+        name: Upload libbootil_static_32.a
         with:
-          name: libluajit_64.a
-          path: LuaJIT-2.1/src/libluajit.a
+          name: libbootil_static_32.a
+          path: Bootil/projects/release_x32_linux/libbootil_static_32.a
           retention-days: 1
 
       - uses: actions/upload-artifact@v4
-        name: Upload libluajit.so (64x)
+        name: Upload libbootil_static_64.a
         with:
-          name: libluajit_64.so
-          path: LuaJIT-2.1/src/libluajit.so
-          retention-days: 1
-
-  build-linux-32:
-    runs-on: ubuntu-latest
-    container: debian:bullseye
-    steps:
-      - name: Install Dependencies
-        run: |
-          dpkg --add-architecture i386
-          apt update
-          apt install -y build-essential gcc-multilib g++-multilib
-
-      - uses: actions/checkout@v4
-        name: Checkout
-
-      - name: Install Premake
-        run: |
-          cd ${{env.PROJECT_PATH}}
-          wget https://github.com/danielga/garrysmod_common/releases/download/premake-build%2F5.0.0-beta2/premake-5.0.0-beta2-linux.tar.gz -O premake.tar.gz
-          tar -xvf premake.tar.gz --directory=/usr/bin
-          gcc --version
-
-      - uses: ilammy/msvc-dev-cmd@v1
-      - name: Generate libs
-        run: |
-          cd ${{env.PROJECT_PATH}}
-          premake5 gmake
-          make
-
-      - uses: actions/upload-artifact@v4
-        name: Upload libluajit.a (32x)
-        with:
-          name: libluajit_32.a
-          path: LuaJIT-2.1/src/libluajit.a
-          retention-days: 1
-
-      - uses: actions/upload-artifact@v4
-        name: Upload libluajit.so (32x)
-        with:
-          name: libluajit_32.so
-          path: LuaJIT-2.1/src/libluajit.so
+          name: libbootil_static_64.a
+          path: Bootil/projects/release_x64_linux/libbootil_static_64.a
           retention-days: 1

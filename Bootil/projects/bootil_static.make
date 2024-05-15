@@ -12,8 +12,8 @@ endif
 
 ifeq ($(config),debug_x32)
   RESCOMP = windres
-  TARGETDIR = debug_x32_windows
-  TARGET = $(TARGETDIR)/bootil_static.lib
+  TARGETDIR = debug_x32_linux
+  TARGET = $(TARGETDIR)/libbootil_static_32.a
   OBJDIR = obj/x32/Debug
   DEFINES += -DBOOTIL_COMPILE_STATIC -DBOOST_ALL_NO_LIB
   INCLUDES += -I../include -I../src/3rdParty
@@ -39,15 +39,15 @@ endif
 
 ifeq ($(config),debug_x64)
   RESCOMP = windres
-  TARGETDIR = debug_x64_windows
-  TARGET = $(TARGETDIR)/bootil_static.lib
+  TARGETDIR = debug_x64_linux
+  TARGET = $(TARGETDIR)/libbootil_static_64.a
   OBJDIR = obj/x64/Debug
   DEFINES += -DBOOTIL_COMPILE_STATIC -DBOOST_ALL_NO_LIB
   INCLUDES += -I../include -I../src/3rdParty
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g -msse
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -msse
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g -msse -fPIC
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -msse -fPIC
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS +=
   LDDEPS +=
@@ -66,8 +66,8 @@ endif
 
 ifeq ($(config),release_x32)
   RESCOMP = windres
-  TARGETDIR = release_x32_windows
-  TARGET = $(TARGETDIR)/bootil_static.lib
+  TARGETDIR = release_x32_linux
+  TARGET = $(TARGETDIR)/libbootil_static_32.a
   OBJDIR = obj/x32/Release
   DEFINES += -DBOOTIL_COMPILE_STATIC -DBOOST_ALL_NO_LIB
   INCLUDES += -I../include -I../src/3rdParty
@@ -93,15 +93,15 @@ endif
 
 ifeq ($(config),release_x64)
   RESCOMP = windres
-  TARGETDIR = release_x64_windows
-  TARGET = $(TARGETDIR)/bootil_static.lib
+  TARGETDIR = release_x64_linux
+  TARGET = $(TARGETDIR)/libbootil_static_64.a
   OBJDIR = obj/x64/Release
   DEFINES += -DBOOTIL_COMPILE_STATIC -DBOOST_ALL_NO_LIB
   INCLUDES += -I../include -I../src/3rdParty
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g -msse
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -msse
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g -msse -fPIC
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -msse -fPIC
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS +=
   LDDEPS +=
