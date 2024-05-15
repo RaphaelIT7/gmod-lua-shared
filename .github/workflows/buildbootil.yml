@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - '.github/workflows/buildbootil.yml'
       - 'Bootil/**'
 
 env:
@@ -19,9 +20,8 @@ jobs:
       - name: Install Premake
         run: |
           cd ${{env.PROJECT_PATH}}
-          wget https://github.com/danielga/garrysmod_common/releases/download/premake-build%2F5.0.0-beta2/premake-5.0.0-beta2-linux.tar.gz -O premake.tar.gz
-          tar -xvf premake.tar.gz --directory=/usr/bin
-          gcc --version
+          curl -L https://github.com/danielga/garrysmod_common/releases/download/premake-build%2F5.0.0-beta2/premake-5.0.0-beta2-windows.zip -o premake.zip
+          tar -xf premake.zip
 
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Generate libs
@@ -59,7 +59,7 @@ jobs:
       - name: Install Dependencies
         run: |
           apt update
-          apt install -y build-essential
+          apt install -y build-essential wget
 
       - uses: actions/checkout@v4
         name: Checkout
@@ -78,7 +78,6 @@ jobs:
           premake5 gmake
           make config=release_x32
           make config=release_x64
-          ls
 
       - uses: actions/upload-artifact@v4
         name: Upload libbootil_static_32.a
