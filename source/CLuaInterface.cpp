@@ -1434,7 +1434,7 @@ int CLuaInterface::GetStack(int level, lua_Debug* dbg)
 
 int CLuaInterface::GetInfo(const char* what, lua_Debug* dbg)
 {
-	::DebugPrint(2, "CLuaInterface::GetStack %s\n", what);
+	::DebugPrint(2, "CLuaInterface::GetInfo %s\n", what);
 
 	return lua_getinfo(state, what, dbg);
 }
@@ -1564,10 +1564,20 @@ void CLuaInterface::GetCurrentFile(std::string &outStr)
 	::DebugPrint(2, "CLuaInterface::GetCurrentFile\n");
 
 	lua_Debug ar;
-	lua_getstack(state, 1, &ar);
-	lua_getinfo(state, "S", &ar);
+	int level = 0;
+	while (lua_getstack(state, level, &ar) != 0)
+	{
+		lua_getinfo(state, "S", &ar);
+		if (ar.source && strcmp(ar.what, "C") != 0)
+		{
+			outStr = ar.source;
+			::DebugPrint(2, "CLuaInterface::GetCurrentFile %s\n", ar.source);
+			return;
+		}
+		++level;
+	}
 
-	outStr = ar.source ? ar.source : "!UNKNOWN";
+	outStr = "!UNKNOWN";
 }
 
 void CLuaInterface::CompileString(Bootil::Buffer& dumper, const std::string& stringToCompile)

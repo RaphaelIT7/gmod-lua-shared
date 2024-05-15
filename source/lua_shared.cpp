@@ -10,9 +10,9 @@ ILuaShared* LuaShared()
 	return &g_CLuaShared;
 }
 
-ConVar lua_debugmode("lua_debugmode_shared", "1", 0);
+ConVar lua_debugmode_shared("lua_debugmode_shared", "1", 0);
 void DebugPrint(const char* fmt, ...) {
-	if (!lua_debugmode.GetBool())
+	if (!lua_debugmode_shared.GetBool())
 		return;
 
 	va_list args;
@@ -145,7 +145,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 
 File* CLuaShared::GetCache(const std::string& unknown)
 {
-	DebugPrint("CLuaShared::GetCache %s", unknown.c_str());
+	DebugPrint("CLuaShared::GetCache %s\n", unknown.c_str());
 
 	auto it = pCache.find(unknown);
 	if (it != pCache.end())
@@ -184,7 +184,7 @@ void CLuaShared::MountLua(const char* pathID)
 
 void CLuaShared::MountLuaAdd(const char* file, const char* path)
 {
-	DebugPrint("CLuaShared::UnMountLua %s %s\n", file, path);
+	DebugPrint("CLuaShared::MountLuaAdd %s %s\n", file, path);
 	// Fancy code
 
 	// AddSearchPath(file, path)

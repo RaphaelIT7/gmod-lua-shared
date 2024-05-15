@@ -66,6 +66,8 @@ Most of it.
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/6a1f8287-c7c5-41dc-868c-3a5bfbc1fa17)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/a35a26bf-5dab-4809-b572-fc56ae2f1bea)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/e86fea60-73d4-412a-af30-f3c1f53ddb9c)
+![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/34406eed-5e6c-4d01-94c9-1ab1075416c8)
+
 
 
 > NOTE for myself: Go thru these [commits](https://github.com/mingodad/ljsjit) and learn how to add gmod's syntax to lua
