@@ -111,6 +111,9 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 {
 	DebugPrint("CLuaShared::LoadFile: %s\n", path.c_str());
 
+	if (path.size() == 0) // Linux crash?
+		return nullptr;
+
 	File* file = new File;
 	FileHandle_t fh = g_pFullFileSystem->Open(path.c_str(), "rb", pathId.c_str());
 	if(fh)

@@ -36,6 +36,8 @@ BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
 
 ## Linux DS issues
 - [ ] Crashes while loading.
+- - [x] Implement Bootil to fill the compressed field to not cause a crash.
+- - [ ] Fix a crash in CLuaShared::LoadFile
 
 ## ILuaBase
 
