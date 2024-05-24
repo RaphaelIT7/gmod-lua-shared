@@ -1742,3 +1742,8 @@ std::string CLuaInterface::RunMacros(std::string code)
 
 	return code;
 }
+
+void CLuaInterface::RegisterMetaTable( const char* name, GarrysMod::Lua::ILuaObject* obj )
+{
+	// ToDo
+}

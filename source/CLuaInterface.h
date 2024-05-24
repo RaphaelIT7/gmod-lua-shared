@@ -610,6 +610,7 @@ public:
 	virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) ) = 0;
 	virtual const char* CheckStringOpt( int iStackPos, const char* def ) = 0;
 	virtual double CheckNumberOpt( int iStackPos, double def ) = 0;
+	virtual void RegisterMetaTable( const char* name, GarrysMod::Lua::ILuaObject* obj ) = 0;
 };
 
 class CLuaInterface : public ILuaInterface
@@ -749,6 +750,7 @@ public:
 	virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) );
 	virtual const char* CheckStringOpt( int iStackPos, const char* def );
 	virtual double CheckNumberOpt( int iStackPos, double def );
+	virtual void RegisterMetaTable( const char* name, GarrysMod::Lua::ILuaObject* obj );
 public:
 	std::string RunMacros(std::string script);
 
