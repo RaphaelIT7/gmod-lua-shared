@@ -1,7 +1,9 @@
 #include "lua_shared.h"
 #include "CLuaConVars.h"
 #include "tier3/tier3.h"
+#ifndef BUILD_GMOD
 #include <Platform.hpp>
+#endif
 
 CLuaShared g_CLuaShared;
 

@@ -1,0 +1,53 @@
+//-----------------------------------------------------------------------------
+//	lua-shared.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		".."
+$Macro GAMENAME		"hl2" // ToDo: Change it later to GMOD
+$Macro OUTBINDIR	"$SRCDIR\..\game\$GAMENAME\bin"
+$Macro SDL3SRCDIR	"$SRCDIR\thirdparty\SDL"
+$Macro SDL3OUTDIR	"$SDL3SRCDIR\out\Release"
+
+$Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;lua;$SRCDIR\bootil\include"
+		$PreprocessorDefinitions		"BUILD_GMOD"
+	}
+}
+
+$Project "lua-shared"
+{
+	$Folder	"Source Files"
+	{
+		$File	"source\CLuaConVars.cpp"
+		$File	"source\CLuaInterface.cpp"
+		$File	"source\lua_shared.cpp"
+		$File	"source\gmod.cpp"
+	}
+
+	$Folder	"Header Files"
+	{
+		$File	"source\CLuaConVars.h"
+		$File	"source\CLuaGameCallback.h"
+		$File	"source\CLuaInterface.h"
+		$File	"source\lua_shared.h"
+		$File	"source\PooledStrings.h"
+		$File	"source\Types.h"
+	}
+
+	$Folder	"Link Libraries"
+	{
+		$Lib 	tier2
+		$Lib 	tier3
+		$Lib 	bootil
+		$Lib 	lua-shared-lib // ToDo: Build LuaJIT directly with this and remove the additional compile.
+		$DynamicFile	"libs\lua51_32.lib" [$WIN32]
+		//$DynamicFile	"libs\lua51_64.lib" [$WIN64]
+	}
+}

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <GarrysMod/Lua/LuaBase.h>
-#include <GarrysMod/Lua/SourceCompat.h>
 
 #if IS_SERVERSIDE
 

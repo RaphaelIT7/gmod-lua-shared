@@ -2,3 +2,5 @@
 development/
 *.bak
 Bootil/projects/obj/**
+**.vcxproj**
+lua-shared.vpc.sentinel

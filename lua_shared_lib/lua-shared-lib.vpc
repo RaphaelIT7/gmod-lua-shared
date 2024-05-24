@@ -1,0 +1,22 @@
+//-----------------------------------------------------------------------------
+//	lua-shared-lib.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$macro SRCDIR		"..\.."
+ 
+$include "$SRCDIR\vpc_scripts\source_lib_base.vpc"
+
+$Project "lua-shared-lib"
+{
+	$Folder	"Source Files"
+	{
+		$File	"source/gmod.cpp"
+	}
+
+	$Folder	"Header Files"
+	{
+		$File	"source/gmod.h"
+	}
+}

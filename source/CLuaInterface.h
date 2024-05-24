@@ -15,6 +15,14 @@
 #define GMOD
 #include "Types.h"
 
+#ifdef BUILD_GMOD
+#ifdef _WIN32
+#define WIN32
+#else
+#define WIN64
+#endif
+#endif
+
 class ILuaShared;
 extern ILuaShared* LuaShared();
 
@@ -37,8 +45,11 @@ namespace State
 
 
 struct lua_Debug;
-extern void GMOD_LoadBinaryModule(lua_State* L, const char*);
-extern void GMOD_UnloadBinaryModules(lua_State* L);
+extern "C"
+{
+	extern void GMOD_LoadBinaryModule(lua_State* L, const char*);
+	extern void GMOD_UnloadBinaryModules(lua_State* L);
+}
 
 // ToDo: Verify and Add GMODLUA_GetUserType and edit lua_typename to call this function.
 /*

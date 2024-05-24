@@ -1,6 +1,8 @@
 #include <convar.h>
 #include <vector>
+#ifndef BUILD_GMOD
 #include "Platform.hpp"
+#endif
 
 #ifdef ARCHITECTURE_X86_64
 #include <keyvalues.h>
