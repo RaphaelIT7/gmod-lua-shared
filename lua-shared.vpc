@@ -46,7 +46,6 @@ $Project "lua-shared"
 		$Lib 	tier2
 		$Lib 	tier3
 		$Lib 	bootil
-		$Lib 	lua-shared-lib // ToDo: Build LuaJIT directly with this and remove the additional compile.
 		$DynamicFile	"libs\lua51_32.lib" [$WIN32]
 		//$DynamicFile	"libs\lua51_64.lib" [$WIN64]
 	}
