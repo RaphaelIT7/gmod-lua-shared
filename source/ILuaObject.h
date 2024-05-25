@@ -24,6 +24,7 @@ namespace GarrysMod
 		class ILuaObject
 		{
 		public:
+			//virtual ~ILuaObject();
 			virtual void Set( ILuaObject *obj ) = 0;
 			virtual void SetFromStack( int i ) = 0;
 			virtual void UnReference( ) = 0;

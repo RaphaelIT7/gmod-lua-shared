@@ -117,7 +117,7 @@ ILuaInterface* CreateLuaInterface(bool bIsServer)
 void CloseLuaInterface(ILuaInterface* LuaInterface)
 {
 	::DebugPrint(1, "CloseLuaInterface\n");
-	// ToDo: Add all fancy operations and delete ILuaGameCallback and the Lua state!
+	// ToDo: Add all fancy operations and delete ILuaGameCallback? (Should we really delete it?)
 	LuaInterface->Shutdown();
 
 	delete LuaInterface;
@@ -142,6 +142,16 @@ void luaL_newmetatable_type(lua_State* L, const char* strName, int iType)
 		lua_pushstring(L, "MetaID");
 		lua_pushinteger(L, iType);
 		lua_settable(L, -3);
+
+		lua_pushvalue(L, LUA_REGISTRYINDEX); // Should we register the metatable?
+			lua_getfield(L, -1, strName);
+			if (lua_type(L, -1) == Type::None || lua_type(L, -1) == Type::Nil)
+			{
+				lua_pop(L, 1);
+				lua_pushvalue(L, -2);
+				lua_setfield(L, -2, strName);
+			}
+		lua_pop(L, 2);
 	}
 }
 
@@ -1745,5 +1755,22 @@ std::string CLuaInterface::RunMacros(std::string code)
 
 void CLuaInterface::RegisterMetaTable( const char* name, GarrysMod::Lua::ILuaObject* obj )
 {
-	// ToDo
+	PushSpecial(SPECIAL_REG);
+		GetField(-1, name);
+		if (IsType(-1, Type::Nil)) // Do we allow one to override the entire table? Probably not.
+		{
+			ReferencePush(obj->m_reference);
+
+			PushString("MetaName");
+			PushString(name);
+			SetTable(-3);
+
+			PushString("MetaID");
+			PushNumber(-1); // ToDo
+			SetTable(-3);
+
+			SetField(-3, name);
+			Pop(1);
+		}
+	Pop(2);
 }
