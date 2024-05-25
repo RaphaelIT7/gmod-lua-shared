@@ -242,7 +242,6 @@ ljamalg.o: ljamalg.c lua.h luaconf.h lauxlib.h lj_assert.c lj_obj.h \
  lib_io.c lib_os.c lib_package.c lib_debug.c lib_bit.c lib_jit.c \
  lib_ffi.c lib_buffer.c lib_init.c
 luajit.o: luajit.c lua.h luaconf.h lauxlib.h lualib.h luajit.h lj_arch.h
-gmod.o: gmod.cpp gmod.h lj_obj.h
 host/buildvm.o: host/buildvm.c host/buildvm.h lj_def.h lua.h luaconf.h \
  lj_arch.h lj_obj.h lj_def.h lj_arch.h lj_gc.h lj_obj.h lj_bc.h lj_ir.h \
  lj_ircall.h lj_ir.h lj_jit.h lj_frame.h lj_bc.h lj_dispatch.h lj_ctype.h \
@@ -258,3 +257,4 @@ host/buildvm_lib.o: host/buildvm_lib.c host/buildvm.h lj_def.h lua.h luaconf.h \
 host/buildvm_peobj.o: host/buildvm_peobj.c host/buildvm.h lj_def.h lua.h \
  luaconf.h lj_arch.h lj_bc.h lj_def.h lj_arch.h
 host/minilua.o: host/minilua.c
+gmod.o: gmod.cpp gmod.h lj_obj.h
