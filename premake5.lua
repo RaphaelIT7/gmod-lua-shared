@@ -45,8 +45,8 @@ CreateWorkspace({name = "lua_shared", abi_compatible = false})
 			[[garrysmod_common\sourcesdk-minimal\tier1\convar.cpp]],
 		})
 
-		include([[..\..\LuaJIT-2.1\premake5.lua]])
-		include([[..\..\lua-shared-lib\premake5.lua]])
+		include([[LuaJIT-2.1\premake5.lua]])
+		include([[lua-shared-lib\premake5.lua]])
 
         targetsuffix("")
         libdirs(current_dir .. "/libs")
