@@ -17,7 +17,7 @@
 @set nogc64=true
 @set DEBUGCFLAGS=
 @set LJCOMPILE=cl /nologo /c /O2 /W3 /D_CRT_SECURE_NO_DEPRECATE /D_CRT_STDIO_INLINE=__declspec(dllexport)__inline
-@set LJLINK=link /nologo /LIBPATH:../../libs/ lua_shared_lib_32.lib
+@set LJLINK=link /nologo
 @set LJMT=mt /nologo
 @set LJLIB=lib /nologo /nodefaultlib
 @set DASMDIR=..\dynasm
@@ -93,15 +93,15 @@ buildvm -m folddef -o lj_folddef.h lj_opt_fold.c
 @set LJLINK=%LJLINK% /%BUILDTYPE%
 @if "%1"=="amalg" goto :AMALGDLL
 goto :STATIC
-%LJCOMPILE% /MD /DLUA_BUILD_AS_DLL lj_*.c lib_*.c
+%LJCOMPILE% /MD /DLUA_BUILD_AS_DLL lj_*.c lib_*.c gmod.cpp
 @if errorlevel 1 goto :BAD
-%LJLINK% /DLL /out:%LJDLLNAME% lj_*.obj lib_*.obj
+%LJLINK% /DLL /out:%LJDLLNAME% lj_*.obj lib_*.obj gmod.obj
 @if errorlevel 1 goto :BAD
 @goto :MTDLL
 :STATIC
-%LJCOMPILE% lj_*.c lib_*.c
+%LJCOMPILE% lj_*.c lib_*.c gmod.cpp
 @if errorlevel 1 goto :BAD
-%LJLIB% /OUT:%LJLIBNAME% lj_*.obj lib_*.obj
+%LJLIB% /OUT:%LJLIBNAME% lj_*.obj lib_*.obj gmod.obj
 @if errorlevel 1 goto :BAD
 @goto :MTDLL
 :AMALGDLL

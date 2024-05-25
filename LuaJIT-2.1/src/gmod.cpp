@@ -1,6 +1,9 @@
 #include "gmod.h"
-#include <string>
-#include "../../lua/lj_obj.h"
+
+namespace std
+{
+	class string;
+}
 
 #define COMMAND_COMPLETION_MAXITEMS		128
 #define COMMAND_COMPLETION_ITEM_LENGTH	128
@@ -184,7 +187,7 @@ namespace GarrysMod
 }
 
 using namespace GarrysMod::Lua;
-DDLL_EXPORT void lua_init_stack_gmod(lua_State* L1, lua_State* L)
+extern "C" void lua_init_stack_gmod(lua_State* L1, lua_State* L)
 {
     if (L && L != L1)
 	{
@@ -194,12 +197,12 @@ DDLL_EXPORT void lua_init_stack_gmod(lua_State* L1, lua_State* L)
 	}
 }
 
-DDLL_EXPORT void GMOD_LuaPrint(const char* str, lua_State* L) // Idk how gmod does it
+extern "C" void GMOD_LuaPrint(const char* str, lua_State* L) // Idk how gmod does it
 {
 	((ILuaInterface*)L->luabase)->Msg("%s", str);
 }
 
-DDLL_EXPORT void* GMOD_LuaCreateEmptyUserdata(lua_State* L)
+extern "C" void* GMOD_LuaCreateEmptyUserdata(lua_State* L)
 {
 	ILuaBase::UserData* udata = (ILuaBase::UserData*)((ILuaBase*)L->luabase)->NewUserdata(sizeof(ILuaBase::UserData));
 	udata->data = nullptr;
@@ -207,7 +210,7 @@ DDLL_EXPORT void* GMOD_LuaCreateEmptyUserdata(lua_State* L)
 	return udata;
 }
 
-DDLL_EXPORT const char* GMODLUA_GetUserType(lua_State* L, int iType)
+extern "C" const char* GMODLUA_GetUserType(lua_State* L, int iType)
 {
 	// lua_getmetatable()
 	// What does it do with "UserData"?
