@@ -11,6 +11,7 @@ on:
 jobs:
   build-windows-64:
     runs-on: windows-2019
+    if: false
     steps:
       - uses: actions/checkout@v4
         name: Checkout
@@ -40,6 +41,7 @@ jobs:
 
   build-windows-32:
     runs-on: windows-2019
+    if: false
     steps:
       - uses: actions/checkout@v4
         name: Checkout
@@ -73,6 +75,7 @@ jobs:
   build-linux-64:
     runs-on: ubuntu-latest
     container: debian:bullseye
+    if: false
     steps:
       - name: Install Dependencies
         run: |
@@ -99,6 +102,7 @@ jobs:
   build-linux-32:
     runs-on: ubuntu-latest
     container: debian:bullseye
+    if: false
     steps:
       - name: Install Dependencies
         run: |

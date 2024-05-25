@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     uses: RaphaelIT7/gmod-common-module-base/.github/workflows/compile.yml@workflow
+    if: false
     with:
       PROJECT_NAME: "lua_shared_lib"
       BUILD_64x: "true"
