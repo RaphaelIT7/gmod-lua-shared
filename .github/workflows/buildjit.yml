@@ -113,7 +113,7 @@ jobs:
       - name: Generate libs
         run: |
           cd LuaJIT-2.1/src/
-          make CC='$(DEFAULT_CC) -m32'
+          make DEFAULT_CC='gcc -m32'
           mv libluajit.a libluajit_32.a
 
       - uses: actions/upload-artifact@v4
