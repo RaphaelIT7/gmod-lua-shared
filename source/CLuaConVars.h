@@ -13,7 +13,7 @@
 class ILuaConVars
 {
 public:
-	//virtual ~ILuaConVars( ) = 0;
+	virtual ~ILuaConVars() {};
 	virtual void Init( ) = 0;
 	virtual ConVar *CreateConVar( const char *, const char *, const char *, int ) = 0;
 	virtual ConCommand *CreateConCommand( const char *, const char *, int, FnCommandCallback_t, FnCommandCompletionCallback) = 0;
