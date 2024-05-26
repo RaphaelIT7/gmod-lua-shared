@@ -21,7 +21,7 @@ $Configuration
 	}
 }
 
-$Project "lua-shared"
+$Project "lua_shared"
 {
 	$Folder	"Source Files"
 	{
