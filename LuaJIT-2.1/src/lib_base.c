@@ -522,9 +522,6 @@ LJLIB_CF(print)
   shortcut = (tvisfunc(tv) && funcV(tv)->c.ffid == FF_tostring) &&
 	     !gcrefu(basemt_it(G(L), LJ_TNUMX));
 
-  char buffer[4096];
-  size_t buffer_pos = 0;
-
   for (i = 0; i < nargs; i++) {
     cTValue *o = &L->base[i];
     const char *str;
@@ -542,23 +539,16 @@ LJLIB_CF(print)
 	lj_err_caller(L, LJ_ERR_PRTOSTR);
       L->top--;
     }
-    //if (i)
+    if (i)
+      GMOD_LuaPrint("\t", L);
       //putchar('\t');
     //fwrite(str, 1, size, stdout);
 
-    if (buffer_pos + size >= sizeof(buffer)) {
-      buffer[buffer_pos] = '\0';
-      GMOD_LuaPrint(buffer, L);
-      buffer_pos = 0;
-    }
-
-    memcpy(buffer + buffer_pos, str, size);
-    buffer_pos += size;
+    GMOD_LuaPrint(str, L);
   }
   //putchar('\n');
 
-  buffer[buffer_pos] = '\0';
-  GMOD_LuaPrint(buffer, L);
+  GMOD_LuaPrint("\n", L);
 
   return 0;
 }
