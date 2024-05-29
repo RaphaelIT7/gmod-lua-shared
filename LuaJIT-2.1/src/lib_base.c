@@ -539,8 +539,8 @@ LJLIB_CF(print)
 	lj_err_caller(L, LJ_ERR_PRTOSTR);
       L->top--;
     }
-    //if (i)
-      //GMOD_LuaPrint("\t", L);
+    if (i)
+      GMOD_LuaPrint("\t", L);
       //putchar('\t');
     //fwrite(str, 1, size, stdout);
 
@@ -548,7 +548,7 @@ LJLIB_CF(print)
   }
   //putchar('\n');
 
-  //GMOD_LuaPrint("\n", L);
+  GMOD_LuaPrint("\n", L);
 
   return 0;
 }
