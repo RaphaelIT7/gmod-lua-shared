@@ -18,7 +18,8 @@
 int g_iTypeNum = 0;
 
 ConVar lua_debugmode("lua_debugmode_interface", "5", 0);
-void DebugPrint(int level, const char* fmt, ...) {
+void DebugPrint(int level, const char* fmt, ...)
+{
 	if (lua_debugmode.GetInt() < level)
 		return;
 
@@ -117,7 +118,7 @@ ILuaInterface* CreateLuaInterface(bool bIsServer)
 void CloseLuaInterface(ILuaInterface* LuaInterface)
 {
 	::DebugPrint(1, "CloseLuaInterface\n");
-	// ToDo: Add all fancy operations and delete ILuaGameCallback? (Should we really delete it?)
+	// ToDo: Add all fancy operations and delete ILuaGameCallback? (Should we really delete it? No.)
 	LuaInterface->Shutdown();
 
 	delete LuaInterface;
@@ -175,6 +176,11 @@ void CLuaInterface::Pop(int iAmt)
 {
 	::DebugPrint(3, "CLuaInterface::Pop %i\n", iAmt);
 	lua_pop(state, iAmt);
+	if (lua_gettop(state) < 0)
+	{
+		__debugbreak();
+		::Error("CLuaInterface::Pop -> That was too much :<");
+	}
 }
 
 void CLuaInterface::GetTable(int iStackPos)
@@ -228,7 +234,12 @@ void CLuaInterface::Call(int iArgs, int iResults)
 int CLuaInterface::PCall(int iArgs, int iResults, int iErrorFunc)
 {
 	::DebugPrint(2, "CLuaInterface::PCall %i %i %i\n", iArgs, iResults, iErrorFunc);
-	return lua_pcall(state, iArgs, iResults, iErrorFunc);
+	//return lua_pcall(state, iArgs, iResults, iErrorFunc);
+	int ret = lua_pcall(state, iArgs, iResults, iErrorFunc);
+	if ( ret != 0 )
+		::DebugPrint(2, "CLuaInterface::PCall went boom. Oh nooo\n");
+
+	return ret;
 }
 
 int CLuaInterface::Equal(int iA, int iB)
@@ -548,9 +559,9 @@ void CLuaInterface::PushVector(const Vector& val)
 
 	ILuaBase::UserData* udata = NewUserdata(20);
 	*(Vector*)udata->data = val;
-	udata->type = GarrysMod::Lua::Type::Angle;
+	udata->type = GarrysMod::Lua::Type::Vector;
 
-	if (PushMetaTable(GarrysMod::Lua::Type::Angle))
+	if (PushMetaTable(GarrysMod::Lua::Type::Vector))
 		SetMetaTable(-2);
 }
 
@@ -818,6 +829,8 @@ void CLuaInterface::TypeError(const char* str, int iStackPos)
 {
 	::DebugPrint(2, "CLuaInterface::TypeError %s %i\n", str, iStackPos);
 	//luaL_typerror(state, iStackPos, str);
+
+	Error("CLuaInterface::TypeError is not implemented!");
 }
 
 void CLuaInterface::CallInternal(int args, int rets)
@@ -1334,6 +1347,8 @@ void CLuaInterface::ErrorNoHalt( const char* fmt, ... )
 {
 	::DebugPrint(2, "CLuaInterface::ErrorNoHalt %s\n", fmt);
 	// ToDo
+
+	Error("CLuaInterface::ErrorNoHalt is not implemented!");
 }
 
 void CLuaInterface::Msg( const char* fmt, ... )
@@ -1386,6 +1401,8 @@ void CLuaInterface::PushColor(Color color)
 {
 	::DebugPrint(2, "CLuaInterface::PushColor\n");
 	// ToDo
+
+	Error("CLuaInterface::PushColor is not implemented!");
 }
 
 int CLuaInterface::GetStack(int level, lua_Debug* dbg)
@@ -1443,6 +1460,8 @@ size_t CLuaInterface::GetDataString(int index, const char **str)
 	::DebugPrint(2, "CLuaInterface::GetDataString\n");
 	// ToDo
 
+	Error("CLuaInterface::GetDataString is not implemented!");
+
 	return 0;
 }
 
@@ -1450,7 +1469,6 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 {
 	::DebugPrint(2, "CLuaInterface::ErrorFromLua %s\n", fmt);
 	CLuaError* error = ReadStackIntoError(state);
-	Pop(1);
 
 	va_list args;
 	va_start(args, fmt);
@@ -1496,6 +1514,8 @@ const char* CLuaInterface::GetCurrentLocation()
 {
 	::DebugPrint(2, "CLuaInterface::GetCurrentLocation\n");
 	// ToDo
+
+	Error("CLuaInterface::GetCurrentLocation is not implemented!");
 
 	return "RandomLocation :D";
 }
@@ -1548,6 +1568,8 @@ void CLuaInterface::CompileString(Bootil::Buffer& dumper, const std::string& str
 {
 	::DebugPrint(2, "CLuaInterface::CompileString\n");
 	// ToDo
+
+	Error("CLuaInterface::CompileString is not implemented!");
 }
 
 bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
@@ -1637,7 +1659,7 @@ void CLuaInterface::PreCreateTable(int arrelems, int nonarrelems)
 
 void CLuaInterface::PushPooledString(int index)
 {
-	::DebugPrint(2, "CLuaInterface::PushPooledString\n");
+	::DebugPrint(2, "CLuaInterface::PushPooledString %i %s\n", index, g_PooledStrings[index]);
 	
 	ReferencePush(m_pStringPool->m_reference);
 	PushNumber(index);
@@ -1656,6 +1678,8 @@ void CLuaInterface::AppendStackTrace(char *, unsigned long)
 {
 	::DebugPrint(2, "CLuaInterface::AppendStackTrace\n");
 	// ToDo
+
+	Error("CLuaInterface::AppendStackTrace is not implemented!");
 }
 
 void* CLuaInterface::CreateConVar(const char* name, const char* defaultValue, const char* helpString, int flags)

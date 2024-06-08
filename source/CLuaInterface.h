@@ -43,6 +43,7 @@ namespace State
 	};
 }
 
+extern void DebugPrint(int level, const char* fmt, ...);
 
 struct lua_Debug;
 extern "C"
@@ -840,7 +841,7 @@ private:
 public:
 	void RunThreadedCalls();
 	inline void DoStackCheck() {
-		//::Msg("Top: %i\n", Top());
+		DebugPrint(5, "Top: %i\n", Top());
 	}
 };
 
