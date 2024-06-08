@@ -28,11 +28,11 @@ NOTE: I should actual give Msg the Value to ACTUALLY print the REAL value and no
 - [x] Fix SetMember functions causing `[MENU ERROR] attempt to index a string value`
 - [x] Find another stack leak.  
 NOTE: The leak was cased by `CallFunctionProtected` returning false instead of true.  
+- [x] Fix `/* */` and `//` in LuaJIT and remove the Workarounds from `CLuaInterface::RunMacros`  
+BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`  
 - [ ] Fix some random error (`the file "(null)"" couldn't be opened`)
 - [ ] Fix the random crash when loading into a game  
 - [ ] Type Errors cause engine errors.
-- [ ] Fix `/* */` and `//` in LuaJIT and remove the Workarounds from `CLuaInterface::RunMacros`  
-BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
 
 ## Linux DS issues
 - [ ] Crashes while loading.
