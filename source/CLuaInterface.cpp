@@ -1344,7 +1344,7 @@ void CLuaInterface::Msg( const char* fmt, ... )
 	va_start(args, fmt);
 
 	char* buffer = new char[4096];
-	V_vsnprintf(buffer, sizeof(buffer), fmt, args);
+	V_vsnprintf(buffer, 4096, fmt, args);
 
 	va_end(args);
 
