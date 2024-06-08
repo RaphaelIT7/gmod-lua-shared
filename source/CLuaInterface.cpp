@@ -665,9 +665,27 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 		// Warning("Lua detected bad FPU precision! Prepare for weirdness!");
 	}
 
+	int reference = -1;
+	PushSpecial(SPECIAL_GLOB);
+		GetField(-1, "require"); // Keep the original require function
+		if (IsType(-1, Type::Function))
+		{
+			reference = ReferenceCreate();
+		} else {
+			Pop(1);
+		}
+	Pop(1);
+
 	DoStackCheck();
 
 	NewGlobalTable("");
+
+	if (reference != -1)
+	{
+		ReferencePush(reference);
+		SetMember(Global(), "requiree");
+		ReferenceFree(reference);
+	}
 
 	::DebugPrint(3, "Table? %s\n", m_pGlobal->isTable() ? "Yes" : "No");
 
@@ -780,7 +798,7 @@ void CLuaInterface::PushLuaObject(GarrysMod::Lua::ILuaObject* obj)
 
 void CLuaInterface::PushLuaFunction(CFunc func)
 {
-	::DebugPrint(4, "CLuaInterface::PushLuaObject\n");
+	::DebugPrint(4, "CLuaInterface::PushLuaFunction\n");
 	lua_pushcclosure(state, func, 0);
 }
 
@@ -1565,7 +1583,6 @@ bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 void CLuaInterface::Require(const char* cname)
 {
 	::DebugPrint(2, "CLuaInterface::Require %s\n", cname);
-	
 
 	std::string name = cname;
 	name = (IsClient() ? "gmcl_" : "gmsv_") + name + "_";
@@ -1698,4 +1715,9 @@ void CLuaInterface::RegisterMetaTable( const char* name, GarrysMod::Lua::ILuaObj
 			Pop(1);
 		}
 	Pop(2);
+}
+
+void CLuaInterface::LuaPrint( const char* str ) // Unofficial function to get GMOD_LuaPrint to work without crashing.
+{
+	m_pGameCallback->Msg( str, false );
 }

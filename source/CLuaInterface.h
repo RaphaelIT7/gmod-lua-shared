@@ -751,6 +751,10 @@ public:
 	virtual const char* CheckStringOpt( int iStackPos, const char* def );
 	virtual double CheckNumberOpt( int iStackPos, double def );
 	virtual void RegisterMetaTable( const char* name, GarrysMod::Lua::ILuaObject* obj );
+
+public:
+	virtual void LuaPrint( const char* str );
+
 public:
 	std::string RunMacros(std::string script);
 
