@@ -182,41 +182,15 @@ namespace GarrysMod
 			virtual void AppendStackTrace( char *, unsigned long ) = 0;
 			virtual void *CreateConVar( const char *, const char *, const char *, int ) = 0;
 			virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), FnCommandCompletionCallback ) = 0;
-		};
-
-		class ILuaGameCallback
-		{
-		public:
-			virtual ILuaObject *CreateLuaObject() = 0;
-			virtual void DestroyLuaObject(ILuaObject *pObject) = 0;
-			virtual void ErrorPrint(const char *error, bool print) = 0;
-			virtual void Msg(const char *msg, bool useless) = 0;
-			//virtual void MsgColour(const char *msg, const Color &color) = 0;
-			//virtual void LuaError(const CLuaError *error) = 0;
-			//virtual void InterfaceCreated(ILuaInterface *iface) = 0;
+			virtual const char* CheckStringOpt( int iStackPos, const char* def );
+			virtual double CheckNumberOpt( int iStackPos, double def );
+			virtual void RegisterMetaTable( const char* name, ILuaObject* obj );
 		};
 
 		class CLuaInterface : public ILuaInterface
 		{
 		public:
-			inline ILuaGameCallback *GetLuaGameCallback() const
-			{
-				return m_pGameCallback;
-			}
-
-		private:
-			int _1 = 1; // Always 1?
-			const char* m_sCurrentPath = NULL;
-			int _3 = 0;
-			int _4 = 0;
-			int m_iPushedPaths = 0;
-			const char* m_sLastPath = NULL;
-			//std::list<ILuaThreadedCall*> m_pThreadedCalls;
-			void* _5[3]; // std::list<ILuaThreadedCall*>
-			ILuaObject* m_ProtectedFunctionReturns[4];
-			ILuaObject* m_TempObjects[32];
-			unsigned char m_iRealm = -1; // CLIENT = 0, SERVER = 1, MENU = 2
-			ILuaGameCallback* m_pGameCallback = nullptr;
+			virtual void LuaPrint( const char* str );
 		};
     }
 }
@@ -234,7 +208,7 @@ extern "C" void lua_init_stack_gmod(lua_State* L1, lua_State* L)
 
 extern "C" void GMOD_LuaPrint(const char* str, lua_State* L) // Idk how gmod does it
 {
-	((CLuaInterface*)L->luabase)->GetLuaGameCallback()->Msg(str, false);
+	((CLuaInterface*)L->luabase)->LuaPrint(str);
 }
 
 extern "C" void* GMOD_LuaCreateEmptyUserdata(lua_State* L)
