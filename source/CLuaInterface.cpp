@@ -178,7 +178,9 @@ void CLuaInterface::Pop(int iAmt)
 	lua_pop(state, iAmt);
 	if (lua_gettop(state) < 0)
 	{
+#ifdef WIN32
 		__debugbreak();
+#endif
 		::Error("CLuaInterface::Pop -> That was too much :<");
 	}
 }
