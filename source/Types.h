@@ -146,7 +146,7 @@ namespace Type
         "CLuaParticle",
         "CLuaEmmiter",
         "ITexture",
-        "usermsg",
+        "bf_read",
         "ConVar",
         "mesh",
         "matrix",
