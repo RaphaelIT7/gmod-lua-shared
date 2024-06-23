@@ -993,14 +993,18 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::GetReturn(int iStackPos)
 		if ( m_ProtectedFunctionReturns[idx] == NULL)
 		{
 			::DebugPrint(1, "CLuaInterface::GetReturn We could crash! (null object!)\n");
+#ifdef WIN32
 			__debugbreak();
+#endif
 		}
 
 		return m_ProtectedFunctionReturns[idx];
 	}
 
 	::DebugPrint(1, "CLuaInterface::GetReturn We could crash! (invalid idx!)\n");
+#ifdef WIN32
 	__debugbreak();
+#endif
 	return nullptr;
 }
 
@@ -1350,7 +1354,9 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	if ( !ret )
 	{
 		::DebugPrint( 1, "Failed to find Script %s!\n", filename );
+#ifdef WIN32
 		__debugbreak();
+#endif
 	}
 
 	return ret;
@@ -1398,6 +1404,7 @@ void CLuaInterface::PushPath( const char* path )
 {
 	::DebugPrint(2, "CLuaInterface::PushPath %s\n", path);
 	V_strncpy( m_sCurrentPath, path, 32 );
+	m_sCurrentPath[ strlen(path) - 1 ] = '\0'; // nuke the last /
 	++m_iPushedPaths;
 }
 

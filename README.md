@@ -34,6 +34,8 @@ BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
 - [ ] Fix the random crash when loading into a game  
 - - [ ] Fix CallFunctionProtected & GetReturn
 - [ ] Type Errors cause engine errors.
+- [ ] Fix a crash when closing the game.
+- [ ] Fix `/* */`. it ignores the full line.
 
 ## Linux DS issues
 - [ ] Crashes while loading.

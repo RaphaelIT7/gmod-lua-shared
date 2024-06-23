@@ -177,6 +177,9 @@ void CLuaShared::MountLua(const char* pathID)
 
 	AddSearchPath((gamepath + "gamemodes\\").c_str(), pathID);
 
+	const IGamemodeSystem::Information& info = g_pFullFileSystem->Gamemodes()->Active();
+	AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
+
 	// Do some stuff = Push somthing 3x & Call a function
 
 	// Do some stuff with "lua"
@@ -221,6 +224,12 @@ void CLuaShared::FindScripts(const std::string& path, const std::string& pathID,
 	const char *pFilename = g_pFullFileSystem->FindFirstEx( path.c_str(), pathID.c_str(), &findHandle );
 	while ( pFilename )
 	{
+		if ( V_stricmp( pFilename, "." ) == 0 || V_stricmp( pFilename, ".." ) == 0 ) // don't add ./ and ../
+		{
+			pFilename = g_pFullFileSystem->FindNext( findHandle );
+			continue;
+		}
+
 		LuaFindResult result;
 		result.fileName = pFilename;
 		result.isFolder = g_pFullFileSystem->FindIsDirectory( findHandle );
