@@ -1,6 +1,7 @@
 #include "lua_shared.h"
 #include "CLuaConVars.h"
 #include "tier3/tier3.h"
+#include "IGamemodeSystem.h"
 #ifndef BUILD_GMOD
 #include <Platform.hpp>
 #endif
@@ -187,20 +188,43 @@ void CLuaShared::MountLua(const char* pathID)
 
 	AddSearchPath((gamepath + "gamemodes\\").c_str(), pathID);
 
-	IGamemodeSystem::UpdatedInformation& info = (IGamemodeSystem::UpdatedInformation&)g_pFullFileSystem->Gamemodes()->Active();
-	if ( info.exists )
+	if ( pGet->IsDedicatedServer() ) // Yes. Dedicated Servers have a different structure.
 	{
-		AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
-
-		std::string nextBase = info.basename;
-		while ( nextBase != "" ) // info.exists isn't available on the 64x yet.
+		NewGamemode::DedicatedSystem* gamemode = (NewGamemode::DedicatedSystem*)g_pFullFileSystem->Gamemodes();
+		IGamemodeSystem::UpdatedInformation& info = (IGamemodeSystem::UpdatedInformation&)gamemode->Active();
+		if ( info.exists )
 		{
-			const IGamemodeSystem::UpdatedInformation& base = (IGamemodeSystem::UpdatedInformation&)g_pFullFileSystem->Gamemodes()->FindByName( nextBase );
-			if ( !base.exists )
-				break;
+			AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
+
+			std::string nextBase = info.basename;
+			while ( nextBase != "" ) // info.exists isn't available on the 64x yet.
+			{
+				const IGamemodeSystem::UpdatedInformation& base = (IGamemodeSystem::UpdatedInformation&)gamemode->FindByName( nextBase );
+				if ( !base.exists )
+					break;
 			
-			AddSearchPath((gamepath + "gamemodes\\" + base.name + "\\entities\\").c_str(), pathID);
-			nextBase = base.basename;
+				AddSearchPath((gamepath + "gamemodes\\" + base.name + "\\entities\\").c_str(), pathID);
+				nextBase = base.basename;
+			}
+		}
+	} else
+	{
+		NewGamemode::System* gamemode = (NewGamemode::System*)g_pFullFileSystem->Gamemodes();
+		IGamemodeSystem::UpdatedInformation& info = (IGamemodeSystem::UpdatedInformation&)gamemode->Active();
+		if ( info.exists )
+		{
+			AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
+
+			std::string nextBase = info.basename;
+			while ( nextBase != "" ) // info.exists isn't available on the 64x yet.
+			{
+				const IGamemodeSystem::UpdatedInformation& base = (IGamemodeSystem::UpdatedInformation&)gamemode->FindByName( nextBase );
+				if ( !base.exists )
+					break;
+			
+				AddSearchPath((gamepath + "gamemodes\\" + base.name + "\\entities\\").c_str(), pathID);
+				nextBase = base.basename;
+			}
 		}
 	}
 
