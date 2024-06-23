@@ -179,7 +179,7 @@ void CLuaShared::MountLua(const char* pathID)
 	AddSearchPath((gamepath + "gamemodes\\").c_str(), pathID);
 
 	IGamemodeSystem::Information& info = (IGamemodeSystem::Information&)g_pFullFileSystem->Gamemodes()->Active();
-	if ( info.exists )
+	if ( info.name != "" )
 	{
 		AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
 
