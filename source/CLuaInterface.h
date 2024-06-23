@@ -844,7 +844,7 @@ private:
 public:
 	void RunThreadedCalls();
 	inline void DoStackCheck() {
-		DebugPrint(5, "Top: %i\n", Top());
+		DebugPrint(2, "Top: %i\n", Top());
 	}
 };
 

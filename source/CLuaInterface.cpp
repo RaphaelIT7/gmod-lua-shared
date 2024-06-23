@@ -17,7 +17,7 @@
 
 int g_iTypeNum = 0;
 
-static ConVar lua_debugmode("lua_debugmode_interface", "2", 0);
+static ConVar lua_debugmode("lua_debugmode_interface", "1", 0);
 void DebugPrint(int level, const char* fmt, ...)
 {
 	if (lua_debugmode.GetInt() < level)
@@ -573,17 +573,30 @@ void CLuaInterface::SetState(lua_State* L)
 	state = L;
 }
 
-int CLuaInterface::CreateMetaTable(const char* strName)
+int CLuaInterface::CreateMetaTable(const char* strName) // Return value is probably a bool?
 {
 	::DebugPrint(2, "CLuaInterface::CreateMetaTable\n");
-	luaL_newmetatable_type(state, strName, -1);
+	//luaL_newmetatable_type(state, strName, -1);
 
-	// Code below is probably wrong.
-	lua_pushstring(state, "MetaID");
-	lua_pushinteger(state, 1);
-	lua_settable(state, -3);
+	int ref = -1;
+	PushSpecial(SPECIAL_REG);
+		GetField(-1, strName);
+		if (IsType(-1, Type::Table))
+		{
+			ref = ReferenceCreate();
+		} else {
+			Pop(1);
+		}
+	Pop(1);
 
-	return 1; // ToDo: What should I return? :<
+	if (ref != -1)
+	{
+		ReferencePush(ref);
+		ReferenceFree(ref);
+		return 1;
+	}
+
+	return 0;
 }
 
 bool CLuaInterface::PushMetaTable(int iType)
@@ -1443,9 +1456,22 @@ int CLuaInterface::GetColor(int iStackPos) // Probably returns the StackPos
 void CLuaInterface::PushColor(Color color)
 {
 	::DebugPrint(2, "CLuaInterface::PushColor\n");
-	// ToDo
+	
+	CreateTable();
+		PushNumber( color.r() );
+		SetField( -2, "r" );
 
-	Error("CLuaInterface::PushColor is not implemented!");
+		PushNumber( color.g() );
+		SetField( -2, "g" );
+
+		PushNumber( color.b() );
+		SetField( -2, "b" );
+
+		PushNumber( color.a() );
+		SetField( -2, "a" );
+
+	if ( CreateMetaTable( "Color" ) == 1 )
+		SetMetaTable( -1 );
 }
 
 int CLuaInterface::GetStack(int level, lua_Debug* dbg)

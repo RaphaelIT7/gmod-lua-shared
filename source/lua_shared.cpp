@@ -104,7 +104,7 @@ void CLuaShared::CloseLuaInterface(ILuaInterface* LuaInterface)
 
 ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
 {
-	DebugPrint("CLuaShared::GetLuaInterface\n");
+	DebugPrint(2, "CLuaShared::GetLuaInterface\n");
 
 	return pInterfaces[realm];
 }

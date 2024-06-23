@@ -544,7 +544,12 @@ LJLIB_CF(print)
       //putchar('\t');
     //fwrite(str, 1, size, stdout);
 
-    GMOD_LuaPrint(str, L);
+  	char* pStr = (char*)malloc( size + 1 ); // Workaround for numbers adding memory to str. I should look into it again later.
+  	strncpy( pStr, str, size );
+  	pStr[ size ] = '\0';
+
+    GMOD_LuaPrint( pStr, L );
+    free(pStr);
   }
   //putchar('\n');
 

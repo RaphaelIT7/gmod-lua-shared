@@ -379,7 +379,7 @@ static LexToken lex_scan(LexState *ls, TValue *tv)
               lex_next(ls);
               break;
             }
-          } else if (ls->c == LEX_EOF) {
+          } else if (ls->c == LEX_EOF) { // should we throw an error?
             break;
           }
         }
