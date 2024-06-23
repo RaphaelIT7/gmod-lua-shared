@@ -1664,7 +1664,7 @@ void CLuaInterface::PushPooledString(int index)
 	::DebugPrint(2, "CLuaInterface::PushPooledString %i %s\n", index, g_PooledStrings[index]);
 	
 	ReferencePush(m_pStringPool->m_reference);
-	PushNumber(index);
+	PushNumber(index+1); // LUA starts at 1 so we add 1
 	GetTable(-2);
 	Remove(-2);
 }
