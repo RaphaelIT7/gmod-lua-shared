@@ -187,17 +187,20 @@ void CLuaShared::MountLua(const char* pathID)
 
 	AddSearchPath((gamepath + "gamemodes\\").c_str(), pathID);
 
-	IGamemodeSystem::Information& info = (IGamemodeSystem::Information&)g_pFullFileSystem->Gamemodes()->Active();
-	if ( info.name != "" )
+	IGamemodeSystem::UpdatedInformation& info = (IGamemodeSystem::UpdatedInformation&)g_pFullFileSystem->Gamemodes()->Active();
+	if ( info.exists )
 	{
 		AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
 
-		std::string str = info.basename;
-		while ( str != "" ) // info.exists isn't available on the 64x yet.
+		std::string nextBase = info.basename;
+		while ( nextBase != "" ) // info.exists isn't available on the 64x yet.
 		{
-			const IGamemodeSystem::Information& base = g_pFullFileSystem->Gamemodes()->FindByName( str );
+			const IGamemodeSystem::UpdatedInformation& base = (IGamemodeSystem::UpdatedInformation&)g_pFullFileSystem->Gamemodes()->FindByName( nextBase );
+			if ( !base.exists )
+				break;
+			
 			AddSearchPath((gamepath + "gamemodes\\" + base.name + "\\entities\\").c_str(), pathID);
-			str = base.basename;
+			nextBase = base.basename;
 		}
 	}
 

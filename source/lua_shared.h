@@ -3,6 +3,21 @@
 #include <GarrysMod/IGet.h>
 #include <unordered_map>
 
+namespace IGamemodeSystem
+{
+	struct UpdatedInformation
+	{
+		bool exists;
+		bool menusystem;
+		std::string title;
+		std::string name;
+		std::string maps;
+		std::string basename;
+		std::string category;
+		uint64_t workshopid;
+	};
+}
+
 struct File
 {
 	int time;

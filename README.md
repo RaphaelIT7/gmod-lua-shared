@@ -36,7 +36,7 @@ BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
 - [ ] Type Errors cause engine errors.
 - [x] Fix a crash when closing the game.
 - [x] Fix `/* */`. it ignores the full line.
-- - [ ] Find out why the local build lib works but the one from the compiler fails
+- - [x] Find out why the local build lib works but the one from the compiler fails
 - [x] Fix `print` breaking with numbers.
 - [ ] Find out why you cannot press a VGUI Button.
 - [x] Fix a crash on level shutdown (menusystem.dll crashes)
