@@ -181,6 +181,9 @@ void CLuaShared::MountLua(const char* pathID)
 	std::string gamepath = pGet->GameDir();
 	gamepath = gamepath + '\\';
 
+	if ( pGet->IsDedicatedServer() )
+		AddSearchPath((gamepath).c_str(), pathID); // Next try to fix DS
+
 	AddSearchPath((gamepath + "lua\\").c_str(), pathID);
 
 	AddSearchPath((gamepath + "lua\\gamemodes\\").c_str(), pathID);
