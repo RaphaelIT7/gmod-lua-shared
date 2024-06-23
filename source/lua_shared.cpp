@@ -259,6 +259,12 @@ void CLuaShared::EmptyCache()
 	DebugPrint("CLuaShared::EmptyCache\n");
 }
 
+bool CLuaShared::ScriptExists(const std::string& file, const std::string& path, bool idk)
+{
+	DebugPrint("CLuaShared::ScriptExists %s %s %s\n", file.c_str(), path.c_str(), idk ? "Yes" : "No");
+	return false;
+}
+
 void CLuaShared::AddSearchPath(const char* path, const char* pathID)
 {
 	DebugPrint("CLuaShared::AddSearchPath %s %s\n", path, pathID);

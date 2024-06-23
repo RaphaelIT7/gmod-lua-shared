@@ -37,6 +37,7 @@ public:
 	virtual const char *GetStackTraces() = 0;
 	virtual void InvalidateCache(const std::string &) = 0;
 	virtual void EmptyCache() = 0;
+	virtual bool ScriptExists(const std::string &, const std::string &, bool) = 0;
 };
 
 class CLuaShared : public ILuaShared
@@ -60,6 +61,7 @@ public:
 	virtual const char* GetStackTraces();
 	virtual void InvalidateCache(const std::string&);
 	virtual void EmptyCache();
+	virtual bool ScriptExists(const std::string &, const std::string &, bool);
 public:
 	IGet* GetIGet() { return pGet; };
 	void AddSearchPath(const char*, const char*);

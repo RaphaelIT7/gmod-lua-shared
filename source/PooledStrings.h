@@ -1,5 +1,4 @@
-static const char* g_PooledStrings[] =
-{
+static const char* g_PooledStrings[] = {
 	"AcceptInput",
 	"AdjustMouseSensitivity",
 	"AllowPlayerPickup",
