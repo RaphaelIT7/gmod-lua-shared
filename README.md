@@ -39,6 +39,7 @@ BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
 - - [ ] Find out why the local build lib works but the one from the compiler fails
 - [x] Fix `print` breaking with numbers.
 - [ ] Find out why you cannot press a VGUI Button.
+- [ ] Fix a crash on level shutdown (menusystem.dll crashes)
 
 ## Linux DS issues
 - [ ] Crashes while loading.

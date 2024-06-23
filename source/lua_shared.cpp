@@ -184,12 +184,9 @@ void CLuaShared::MountLua(const char* pathID)
 		AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
 
 		std::string str = info.basename;
-		while ( info.exists )
+		while ( str != "" ) // info.exists isn't available on the 64x yet.
 		{
 			const IGamemodeSystem::Information& base = g_pFullFileSystem->Gamemodes()->FindByName( str );
-			if ( !base.exists )
-				break;
-
 			AddSearchPath((gamepath + "gamemodes\\" + base.name + "\\entities\\").c_str(), pathID);
 			str = base.basename;
 		}

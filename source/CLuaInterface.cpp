@@ -845,7 +845,7 @@ void CLuaInterface::TypeError(const char* str, int iStackPos)
 	::DebugPrint(2, "CLuaInterface::TypeError %s %i\n", str, iStackPos);
 	//luaL_typerror(state, iStackPos, str);
 
-	Error("CLuaInterface::TypeError is not implemented!");
+	Error("CLuaInterface::TypeError is not implemented!\n");
 }
 
 void CLuaInterface::CallInternal(int args, int rets)
@@ -1393,7 +1393,7 @@ void CLuaInterface::ErrorNoHalt( const char* fmt, ... )
 	::DebugPrint(2, "CLuaInterface::ErrorNoHalt %s\n", fmt);
 	// ToDo
 
-	Error("CLuaInterface::ErrorNoHalt is not implemented!");
+	Error("CLuaInterface::ErrorNoHalt is not implemented!\n");
 }
 
 void CLuaInterface::Msg( const char* fmt, ... )
@@ -1530,7 +1530,7 @@ size_t CLuaInterface::GetDataString(int index, const char **str)
 	::DebugPrint(2, "CLuaInterface::GetDataString\n");
 	// ToDo
 
-	Error("CLuaInterface::GetDataString is not implemented!");
+	Error("CLuaInterface::GetDataString is not implemented!\n");
 
 	return 0;
 }
@@ -1585,7 +1585,7 @@ const char* CLuaInterface::GetCurrentLocation()
 	::DebugPrint(2, "CLuaInterface::GetCurrentLocation\n");
 	// ToDo
 
-	::DebugPrint(1, "CLuaInterface::GetCurrentLocation is not implemented!");
+	::DebugPrint(1, "CLuaInterface::GetCurrentLocation is not implemented!\n");
 
 	return "<nowhere>";
 }
