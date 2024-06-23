@@ -1,6 +1,30 @@
 #include "CLuaConVars.h"
 #include <tier2/tier2.h>
 
+static ConVar lua_debugmode("lua_debugmode_convar", "2", 0);
+static void DebugPrint(int level, const char* fmt, ...)
+{
+	if (lua_debugmode.GetInt() < level)
+		return;
+
+	va_list args;
+	va_start(args, fmt);
+
+	int size = vsnprintf(NULL, 0, fmt, args);
+	if (size < 0) {
+		va_end(args);
+		return;
+	}
+
+	char* buffer = new char[size + 1];
+	vsnprintf(buffer, size + 1, fmt, args);
+
+	Msg("%s", buffer);
+
+	delete[] buffer;
+	va_end(args);
+}
+
 CLuaConVars g_CLuaConVars;
 
 CLuaConVars* LuaConVars()
@@ -15,6 +39,7 @@ CLuaConVars::~CLuaConVars()
 
 void CLuaConVars::Init()
 {
+	DebugPrint( 1, "CLuaConVars::Init\n" );
 	pClientCVars = new KeyValues("CVars");
 	pServerCVars = new KeyValues("CVars");
 
@@ -40,6 +65,7 @@ char* AAllocString( const char *pStr, int nMaxChars = -1 )
 
 ConVar* CLuaConVars::CreateConVar(const char* name, const char* defaultValue, const char* helpString, int flags)
 {
+	DebugPrint( 1, "CLuaConVars::CreateConVar %s %s %s %i\n", name, defaultValue, helpString, flags );
 	char* nameStr = AAllocString(name);
 	char* defaultValueStr = AAllocString(defaultValue);
 	char* helpStringStr = AAllocString(helpString);
@@ -58,6 +84,7 @@ ConVar* CLuaConVars::CreateConVar(const char* name, const char* defaultValue, co
 
 ConCommand* CLuaConVars::CreateConCommand(const char* name, const char* helpString, int flags, FnCommandCallback_t callback, FnCommandCompletionCallback completionFunc)
 {
+	DebugPrint( 1, "CLuaConVars::CreateConCommand %s %s %i\n", name, helpString, flags );
 	char* nameStr = AAllocString(name);
 	char* helpStringStr = AAllocString(helpString);
 
@@ -75,6 +102,7 @@ ConCommand* CLuaConVars::CreateConCommand(const char* name, const char* helpStri
 
 void CLuaConVars::DestroyManaged()
 {
+	DebugPrint( 1, "CLuaConVars::DestroyManaged\n" );
 	// Do some magic ToDo
 
 	if (pClientCVars->IsEmpty("CVars")) // ToDo find out what the input is.
@@ -90,12 +118,12 @@ void CLuaConVars::DestroyManaged()
 
 void CLuaConVars::Cache(const char* key, const char* value)
 {
-
+	DebugPrint( 1, "CLuaConVars::Cache %s %s\n", key, value );
 }
 
 void CLuaConVars::ClearCache()
 {
-
+	DebugPrint( 1, "CLuaConVars::ClearCache\n" );
 }
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaConVars, ILuaConVars, "LUACONVARS001", g_CLuaConVars);

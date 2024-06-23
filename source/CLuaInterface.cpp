@@ -17,8 +17,8 @@
 
 int g_iTypeNum = 0;
 
-ConVar lua_debugmode("lua_debugmode_interface", "5", 0);
-void DebugPrint(int level, const char* fmt, ...)
+static ConVar lua_debugmode("lua_debugmode_interface", "2", 0);
+static void DebugPrint(int level, const char* fmt, ...)
 {
 	if (lua_debugmode.GetInt() < level)
 		return;
@@ -853,7 +853,7 @@ void CLuaInterface::CallInternal(int args, int rets)
 	{
 		if (CallFunctionProtected(args, rets, true))
 		{
-			for (int i=1; i<=rets; ++i)
+			for (int i=0; i<rets; ++i)
 			{
 				GarrysMod::Lua::ILuaObject* obj = NewTemporaryObject();
 				obj->SetFromStack(-1);
@@ -987,13 +987,20 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::GetReturn(int iStackPos)
 {
 	::DebugPrint(2, "CLuaInterface::GetReturn\n");
 	
-	int idx = -iStackPos;
-	if (idx > 0 && idx <= 4)
+	int idx = abs(iStackPos);
+	if (idx >= 0 && idx < 4)
 	{
-		::DebugPrint(1, "CLuaInterface::GetReturn EXPERIMENTAL RETURN! %i\n", idx);
+		if ( m_ProtectedFunctionReturns[idx] == NULL)
+		{
+			::DebugPrint(1, "CLuaInterface::GetReturn We could crash! (null object!)\n");
+			__debugbreak();
+		}
+
 		return m_ProtectedFunctionReturns[idx];
 	}
 
+	::DebugPrint(1, "CLuaInterface::GetReturn We could crash! (invalid idx!)\n");
+	__debugbreak();
 	return nullptr;
 }
 
@@ -1340,6 +1347,12 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 		}
 	}
 
+	if ( !ret )
+	{
+		::DebugPrint( 1, "Failed to find Script %s!\n", filename );
+		__debugbreak();
+	}
+
 	return ret;
 }
 
@@ -1398,6 +1411,9 @@ void CLuaInterface::PopPath()
 const char* CLuaInterface::GetPath()
 {
 	::DebugPrint(2, "CLuaInterface::GetPath\n");
+
+	if ( m_iPushedPaths <= 0 )
+		return NULL;
 
 	return m_sCurrentPath;
 }

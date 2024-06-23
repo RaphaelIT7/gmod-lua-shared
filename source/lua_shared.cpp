@@ -12,8 +12,8 @@ ILuaShared* LuaShared()
 	return &g_CLuaShared;
 }
 
-ConVar lua_debugmode_shared("lua_debugmode_shared", "1", 0);
-void DebugPrint(const char* fmt, ...) {
+static ConVar lua_debugmode_shared("lua_debugmode_shared", "1", 0);
+static void DebugPrint(const char* fmt, ...) {
 	if (!lua_debugmode_shared.GetBool())
 		return;
 
@@ -111,7 +111,7 @@ ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
 
 File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
 {
-	DebugPrint("CLuaShared::LoadFile: %s\n", path.c_str());
+	DebugPrint("CLuaShared::LoadFile: %s %s %s\n", path.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
 
 	File* file = new File;
 	FileHandle_t fh = g_pFullFileSystem->Open(path.c_str(), "rb", pathId.c_str());
@@ -213,9 +213,23 @@ void CLuaShared::SetLuaFindHook(LuaClientDatatableHook* hook)
 	DebugPrint("CLuaShared::SetLuaFindHook\n");
 }
 
-void CLuaShared::FindScripts(const std::string& a, const std::string& b, std::vector<std::string>& out)
+void CLuaShared::FindScripts(const std::string& path, const std::string& pathID, std::vector<LuaFindResult>& out)
 {
-	DebugPrint("CLuaShared::FindScripts %s, %s\n", a.c_str(), b.c_str());
+	DebugPrint("CLuaShared::FindScripts %s, %s\n", path.c_str(), pathID.c_str());
+
+	FileFindHandle_t findHandle;
+	const char *pFilename = g_pFullFileSystem->FindFirstEx( path.c_str(), pathID.c_str(), &findHandle );
+	while ( pFilename )
+	{
+		LuaFindResult result;
+		result.fileName = pFilename;
+		result.isFolder = g_pFullFileSystem->FindIsDirectory( findHandle );
+		out.push_back( result );
+
+		pFilename = g_pFullFileSystem->FindNext( findHandle );
+	}
+
+	g_pFullFileSystem->FindClose( findHandle );
 }
 
 const char* CLuaShared::GetStackTraces()

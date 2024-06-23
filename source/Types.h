@@ -138,7 +138,7 @@ namespace Type
         "CTakeDamageInfo",
         "CEffectData",
         "CMoveData",
-        "recipientfilter",
+        "CRecipientFilter",
         "CUserCmd",
         "Vehicle",
         "IMaterial",

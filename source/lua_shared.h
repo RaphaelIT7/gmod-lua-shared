@@ -14,6 +14,12 @@ struct File
 	unsigned int timesloadedclient;
 };
 
+struct LuaFindResult
+{
+	std::string fileName;
+	bool isFolder;
+};
+
 class LuaClientDatatableHook;
 
 class ILuaShared
@@ -33,7 +39,7 @@ public:
 	virtual void UnMountLua(const char *) = 0;
 	virtual void SetFileContents(const char *, const char *) = 0;	
 	virtual void SetLuaFindHook(LuaClientDatatableHook *) = 0;
-	virtual void FindScripts(const std::string &, const std::string &, std::vector<std::string> &) = 0;
+	virtual void FindScripts(const std::string &, const std::string &, std::vector<LuaFindResult> &) = 0;
 	virtual const char *GetStackTraces() = 0;
 	virtual void InvalidateCache(const std::string &) = 0;
 	virtual void EmptyCache() = 0;
@@ -57,7 +63,7 @@ public:
 	virtual void UnMountLua(const char*);
 	virtual void SetFileContents(const char*, const char*);
 	virtual void SetLuaFindHook(LuaClientDatatableHook*);
-	virtual void FindScripts(const std::string&, const std::string&, std::vector<std::string>&);
+	virtual void FindScripts(const std::string&, const std::string&, std::vector<LuaFindResult>&);
 	virtual const char* GetStackTraces();
 	virtual void InvalidateCache(const std::string&);
 	virtual void EmptyCache();
