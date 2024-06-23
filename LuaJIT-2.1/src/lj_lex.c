@@ -370,28 +370,25 @@ static LexToken lex_scan(LexState *ls, TValue *tv)
     case '/':
       lex_next(ls);
       if (ls->c != '/' && ls->c != '*') return '/';
-      lex_next(ls);
       if (ls->c == '*') {  // Long comment "/* */".
-        lex_next(ls);
-         for(;;) {
-         	if (ls->c == '*') {
+        for(;;) {
+          lex_next(ls);
+          if (ls->c == '*') {
+            lex_next(ls);
+            if (ls->c == '/') {
               lex_next(ls);
-              if (ls->c == '/') {
-                lex_next(ls);
-                break;
-              }
-            } else if (ls->c == LEX_EOF) {
-              lj_lex_error(ls, TK_string, LJ_ERR_XLDELIM);
               break;
-            } else {
-              lex_next(ls);
             }
-         }
+          } else if (ls->c == LEX_EOF) {
+            break;
+          }
+        }
+      } else {
+        /* Short comment "//" */
+        while (!lex_iseol(ls) && ls->c != LEX_EOF)
+          lex_next(ls);
       }
-      /* Short comment "--.*\n". */
-      while (!lex_iseol(ls) && ls->c != LEX_EOF)
-        lex_next(ls);
-        continue;
+      continue;
     // GMOD Syntax end
     case '~':
       lex_next(ls);
