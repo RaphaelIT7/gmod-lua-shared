@@ -52,7 +52,7 @@ void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext
 
 	ConVar_Register(0);
 
-	LuaConVars();
+	LuaConVars()->Init();
 
 	pGet = get;
 }
@@ -98,6 +98,15 @@ ILuaInterface* CLuaShared::CreateLuaInterface(unsigned char realm, bool unknown)
 void CLuaShared::CloseLuaInterface(ILuaInterface* LuaInterface)
 {
 	DebugPrint("CLuaShared::CloseLuaInterface\n");
+
+	if ( LuaInterface->IsServer() )
+		pInterfaces[1] = NULL;
+
+	if ( LuaInterface->IsClient() )
+		pInterfaces[0] = NULL;
+
+	if ( LuaInterface->IsMenu() )
+		pInterfaces[2] = NULL;
 
 	::CloseLuaInterface(LuaInterface);
 }

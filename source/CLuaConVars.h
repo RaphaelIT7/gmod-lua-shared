@@ -26,20 +26,22 @@ struct ManagedCVar
 {
 	const char* name;
 	bool iscvar;
-	ConCommand* cmd;
-	ConVar* cvar;
+	ConCommandBase* var;
+	char* nameStr;
+	char* valStr;
+	char* helpStr;
 };
 
 class CLuaConVars : public ILuaConVars
 {
 public:
-	~CLuaConVars();
-	void Init();
-	ConVar* CreateConVar(const char*, const char*, const char*, int);
-	ConCommand* CreateConCommand(const char*, const char*, int, FnCommandCallback_t, FnCommandCompletionCallback);
-	void DestroyManaged();
-	void Cache(const char*, const char*);
-	void ClearCache();
+	virtual ~CLuaConVars();
+	virtual void Init();
+	virtual ConVar* CreateConVar(const char*, const char*, const char*, int);
+	virtual ConCommand* CreateConCommand(const char*, const char*, int, FnCommandCallback_t, FnCommandCompletionCallback);
+	virtual void DestroyManaged();
+	virtual void Cache(const char*, const char*);
+	virtual void ClearCache();
 private:
 	KeyValues* pClientCVars; // Idk the real name
 	KeyValues* pServerCVars;

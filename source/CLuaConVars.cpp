@@ -1,5 +1,6 @@
 #include "CLuaConVars.h"
 #include <tier2/tier2.h>
+#include "filesystem.h"
 
 static ConVar lua_debugmode("lua_debugmode_convar", "2", 0);
 static void DebugPrint(int level, const char* fmt, ...)
@@ -43,8 +44,11 @@ void CLuaConVars::Init()
 	pClientCVars = new KeyValues("CVars");
 	pServerCVars = new KeyValues("CVars");
 
-	pClientCVars->LoadFromFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/server.vdf", "MOD");
-	pServerCVars->LoadFromFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/client.vdf", "MOD");
+	//if ( !pClientCVars->LoadFromFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/client.vdf", "MOD") )
+	//	DebugPrint( 1, "CLuaConVars::Init Failed to load client.vdf!\n" );
+
+	//if ( !pServerCVars->LoadFromFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/server.vdf", "MOD") )
+	//	DebugPrint( 1, "CLuaConVars::Init Failed to load server.vdf!\n" );
 }
 
 char* AAllocString( const char *pStr, int nMaxChars = -1 )
@@ -63,6 +67,8 @@ char* AAllocString( const char *pStr, int nMaxChars = -1 )
 	return pOut;
 }
 
+#define FCVAR_LUA_CLIENT			(1<<18)
+#define FCVAR_LUA_SERVER			(1<<19)
 ConVar* CLuaConVars::CreateConVar(const char* name, const char* defaultValue, const char* helpString, int flags)
 {
 	DebugPrint( 1, "CLuaConVars::CreateConVar %s %s %s %i\n", name, defaultValue, helpString, flags );
@@ -70,14 +76,38 @@ ConVar* CLuaConVars::CreateConVar(const char* name, const char* defaultValue, co
 	char* defaultValueStr = AAllocString(defaultValue);
 	char* helpStringStr = AAllocString(helpString);
 
+	if ( flags & FCVAR_CLIENTDLL )
+		flags |= FCVAR_LUA_CLIENT;
+	else
+		flags |= FCVAR_LUA_SERVER;
+
 	ConVar* cvar = new ConVar(nameStr, defaultValueStr, flags, helpStringStr);
 
 	// ToDo: Verify this -> managedConVar.push_back(ManagedConVar(cvar));
 	ManagedCVar* mcvar = new ManagedCVar;
 	mcvar->name = name;
-	mcvar->cvar = cvar;
+	mcvar->var = cvar;
 	mcvar->iscvar = true;
+	mcvar->nameStr = nameStr;
+	mcvar->helpStr = helpStringStr;
+	mcvar->valStr = defaultValueStr;
 	pManagedCVars.push_back(mcvar);
+
+	/*if ( flags & FCVAR_LUA_SERVER )
+	{
+		KeyValues* val = pServerCVars->GetFirstValue();
+		const char* str = val->GetString( name, NULL );
+		if ( str )
+			cvar->SetValue( str );
+	}
+
+	if ( flags & FCVAR_LUA_CLIENT )
+	{
+		KeyValues* val = pClientCVars->GetFirstSubKey();
+		const char* str = val->GetString( name, NULL );
+		if ( str )
+			cvar->SetValue( str );
+	}*/
 
 	return cvar;
 }
@@ -93,8 +123,10 @@ ConCommand* CLuaConVars::CreateConCommand(const char* name, const char* helpStri
 	// ToDo: Verify this -> managedCommand.push_back(ManagedConVar(ccmd));
 	ManagedCVar* mcmd = new ManagedCVar;
 	mcmd->name = name;
-	mcmd->cmd = ccmd;
+	mcmd->var = ccmd;
 	mcmd->iscvar = false;
+	mcmd->nameStr = nameStr;
+	mcmd->helpStr = helpStringStr;
 	pManagedCVars.push_back(mcmd);
 
 	return ccmd;
@@ -104,15 +136,33 @@ void CLuaConVars::DestroyManaged()
 {
 	DebugPrint( 1, "CLuaConVars::DestroyManaged\n" );
 	// Do some magic ToDo
+	for ( ManagedCVar* cvar : pManagedCVars )
+	{
+		g_pCVar->UnregisterConCommand( cvar->var );
+		delete cvar->var;
+
+		if ( cvar->nameStr )
+			delete[] cvar->nameStr;
+
+		if ( cvar->valStr )
+			delete[] cvar->valStr;
+
+		if ( cvar->helpStr )
+			delete[] cvar->helpStr;
+
+		delete cvar;
+	}
+
+	pManagedCVars.clear();
 
 	if (pClientCVars->IsEmpty("CVars")) // ToDo find out what the input is.
 	{
-		pClientCVars->SaveToFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/client.vdf", "MOD");
+		//pClientCVars->SaveToFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/client.vdf", "MOD");
 	}
 
 	if (pServerCVars->IsEmpty("CVars")) // ToDo find out what the input is.
 	{
-		pServerCVars->SaveToFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/server.vdf", "MOD");
+		//pServerCVars->SaveToFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/server.vdf", "MOD");
 	}
 }
 

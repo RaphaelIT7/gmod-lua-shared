@@ -34,12 +34,13 @@ BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
 - [x] Fix the random crash when loading into a game  
 - - [x] Fix CallFunctionProtected & GetReturn
 - [ ] Type Errors cause engine errors.
-- [ ] Fix a crash when closing the game.
+- [x] Fix a crash when closing the game.
 - [x] Fix `/* */`. it ignores the full line.
 - - [ ] Find out why the local build lib works but the one from the compiler fails
 - [x] Fix `print` breaking with numbers.
 - [ ] Find out why you cannot press a VGUI Button.
-- [ ] Fix a crash on level shutdown (menusystem.dll crashes)
+- [x] Fix a crash on level shutdown (menusystem.dll crashes)
+- [ ] Implmenent Managed Convars properly -> Save and load their values.
 
 ## Linux DS issues
 - [ ] Crashes while loading.
