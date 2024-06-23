@@ -188,9 +188,18 @@ void CLuaShared::MountLua(const char* pathID)
 	AddSearchPath((gamepath + "gamemodes\\").c_str(), pathID);
 
 	IGamemodeSystem::UpdatedInformation& info = (IGamemodeSystem::UpdatedInformation&)g_pFullFileSystem->Gamemodes()->Active();
+	Msg( "%p\n", &info.basename );
+	Msg( "%p\n", &info.category );
+	Msg( "%p\n", &info.exists );
+	Msg( "%p\n", &info.maps );
+	Msg( "%p\n", &info.menusystem );
+	Msg( "%p\n", &info.name );
+	Msg( "%p\n", &info.title );
+	Msg( "%p\n", &info.workshopid );
+
 	if ( info.exists )
 	{
-		AddSearchPath((gamepath + (std::string)"gamemodes\\" + info.name + (std::string)"\\entities\\").c_str(), pathID);
+		AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
 
 		std::string nextBase = info.basename;
 		while ( nextBase != "" ) // info.exists isn't available on the 64x yet.
@@ -199,7 +208,7 @@ void CLuaShared::MountLua(const char* pathID)
 			if ( !base.exists )
 				break;
 			
-			AddSearchPath((gamepath + (std::string)"gamemodes\\" + base.name + (std::string)"\\entities\\").c_str(), pathID);
+			AddSearchPath((gamepath + "gamemodes\\" + base.name + "\\entities\\").c_str(), pathID);
 			nextBase = base.basename;
 		}
 	}
