@@ -111,7 +111,7 @@ ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
 
 File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
 {
-	DebugPrint("CLuaShared::LoadFile: %s %s %s\n", path.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
+	DebugPrint("CLuaShared::LoadFile: %s %s %s %s\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
 
 	File* file = new File;
 	FileHandle_t fh = g_pFullFileSystem->Open(path.c_str(), "rb", pathId.c_str());
@@ -138,6 +138,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 
 		g_pFullFileSystem->Close(fh);
 	} else {
+		DebugPrint("CLuaShared::LoadFile failed to find the file\n");
 		delete file;
 		return nullptr;
 	}
@@ -177,8 +178,22 @@ void CLuaShared::MountLua(const char* pathID)
 
 	AddSearchPath((gamepath + "gamemodes\\").c_str(), pathID);
 
-	const IGamemodeSystem::Information& info = g_pFullFileSystem->Gamemodes()->Active();
-	AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
+	IGamemodeSystem::Information& info = (IGamemodeSystem::Information&)g_pFullFileSystem->Gamemodes()->Active();
+	if ( info.exists )
+	{
+		AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
+
+		std::string str = info.basename;
+		while ( info.exists )
+		{
+			const IGamemodeSystem::Information& base = g_pFullFileSystem->Gamemodes()->FindByName( str );
+			if ( !base.exists )
+				break;
+
+			AddSearchPath((gamepath + "gamemodes\\" + base.name + "\\entities\\").c_str(), pathID);
+			str = base.basename;
+		}
+	}
 
 	// Do some stuff = Push somthing 3x & Call a function
 

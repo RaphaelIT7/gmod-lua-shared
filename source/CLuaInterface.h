@@ -838,6 +838,9 @@ private:
 	GarrysMod::Lua::ILuaObject* m_pProjectedTextureMeta = nullptr;
 	GarrysMod::Lua::ILuaObject* m_pPhysCollideMeta = nullptr;
 	GarrysMod::Lua::ILuaObject* m_pSurfaceInfoMeta = nullptr;
+private:
+	std::list<char*> m_pPaths;
+
 public:
 	void RunThreadedCalls();
 	inline void DoStackCheck() {

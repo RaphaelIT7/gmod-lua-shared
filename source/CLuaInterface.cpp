@@ -1403,15 +1403,22 @@ void CLuaInterface::Msg( const char* fmt, ... )
 void CLuaInterface::PushPath( const char* path )
 {
 	::DebugPrint(2, "CLuaInterface::PushPath %s\n", path);
-	V_strncpy( m_sCurrentPath, path, 32 );
-	m_sCurrentPath[ strlen(path) - 1 ] = '\0'; // nuke the last /
+	char* str = new char[strlen(path)];
+	V_strncpy( str, path, strlen(path) );
+	str[ strlen(path) - 1 ] = '\0'; // nuke the last /
+	m_sCurrentPath = str;
+	m_pPaths.push_back( str );
 	++m_iPushedPaths;
 }
 
 void CLuaInterface::PopPath()
 {
 	::DebugPrint(2, "CLuaInterface::PopPath\n");
-	//m_sCurrentPath = NULL;
+	char* str = m_pPaths.back();
+	delete[] str;
+	m_pPaths.pop_back();
+
+	m_sCurrentPath = m_pPaths.back();
 	--m_iPushedPaths;
 }
 
@@ -1422,7 +1429,8 @@ const char* CLuaInterface::GetPath()
 	if ( m_iPushedPaths <= 0 )
 		return NULL;
 
-	return m_sCurrentPath;
+	::DebugPrint(2, "CLuaInterface::GetPath %s\n", (const char*)m_pPaths.back());
+	return m_pPaths.back();
 }
 
 int CLuaInterface::GetColor(int iStackPos) // Probably returns the StackPos

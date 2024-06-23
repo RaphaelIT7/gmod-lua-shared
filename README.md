@@ -31,38 +31,17 @@ NOTE: The leak was cased by `CallFunctionProtected` returning false instead of t
 - [x] Fix `/* */` and `//` in LuaJIT and remove the Workarounds from `CLuaInterface::RunMacros`  
 BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`  
 - [ ] Fix some random error (`the file "(null)"" couldn't be opened`)
-- [ ] Fix the random crash when loading into a game  
-- - [ ] Fix CallFunctionProtected & GetReturn
+- [x] Fix the random crash when loading into a game  
+- - [x] Fix CallFunctionProtected & GetReturn
 - [ ] Type Errors cause engine errors.
 - [ ] Fix a crash when closing the game.
 - [x] Fix `/* */`. it ignores the full line.
+- - [ ] Find out why the local build lib works but the one from the compiler fails
 
 ## Linux DS issues
 - [ ] Crashes while loading.
 - - [x] Implement Bootil to fill the compressed field to not cause a crash.
 - - [ ] Fix a crash in CLuaShared::LoadFile
-
-## ILuaBase
-
-- ILuaBase::PushMetaTable(int iType)
-- ILuaBase::PushUserType(void* data, int iType)
-- ILuaBase::SetUserType(int iStackPos, void* data)
-
-## ILuaInterface / CLuaInterface
-
-Everything.
-
-## CLuaConVars
-
-- CLuaConVars::CreateConVar
-- CLuaConVars::CreateConCommand
-- CLuaConVars::DestroyManaged
-- CLuaConVars::Cache
-- CLuaConVars::ClearCache
-
-## CLuaShared
-
-Most of it.
 
 ## Collection of random Engine Errors and Warnings or other things
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/aa4143fc-75f2-4311-b23b-d2de1394d59b)
