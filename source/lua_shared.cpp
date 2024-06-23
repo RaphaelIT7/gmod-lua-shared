@@ -175,6 +175,8 @@ void CLuaShared::MountLua(const char* pathID)
 
 	AddSearchPath((gamepath + "lua\\gamemodes\\").c_str(), pathID);
 
+	AddSearchPath((gamepath + "gamemodes\\").c_str(), pathID);
+
 	// Do some stuff = Push somthing 3x & Call a function
 
 	// Do some stuff with "lua"

@@ -776,7 +776,7 @@ private:
 	// These members represent nothing in particular
 	// They've been selected to fill the required space between the vtable and the callback object
 	int _1 = 1; // Always 1?
-	const char* m_sCurrentPath = NULL;
+	char* m_sCurrentPath = new char[32]; // not how gmod does it :/
 	int _3 = 0;
 	int _4 = 0;
 	int m_iPushedPaths = 0;

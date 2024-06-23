@@ -1292,18 +1292,23 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 
 	ILuaShared* shared = LuaShared();
 	File* file = shared->LoadFile(filename, m_sPathID, true, true);
+	bool ret = false;
 	if (file)
 	{
-		return RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
+		PushPath(ToPath(file->source).c_str());
+		ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
+		PopPath();
 	} else {
 		std::string out;
 		GetCurrentFile(out);
 		if (out != "!UNKNOWN") // ToDo: Fix this mess. This will probably kill performance / loading times.
 		{
-			File* file2 = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
-			if (file2)
+			file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
+			if (file)
 			{
-				return RunStringEx(file2->name.c_str(), file2->source.c_str(), file2->contents.c_str(), true, showErrors, true, noReturns);
+				PushPath(ToPath(file->source).c_str());
+				ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
+				PopPath();
 			} else {
 				lua_Debug ar;
 				lua_getstack(state, 2, &ar); // Going deeper.
@@ -1312,16 +1317,22 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 				out = ar.source ? ar.source : "!UNKNOWN";
 				if (out != "!UNKNOWN")
 				{
-					File* file2 = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
-					if (file2)
+					file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
+					if (file)
 					{
-						return RunStringEx(file2->name.c_str(), file2->source.c_str(), file2->contents.c_str(), true, showErrors, true, noReturns);
+						PushPath(ToPath(file->source).c_str());
+						ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
+						PopPath();
 					} else {
 						if (strcmp(stringToRun, "") != 0)
 						{
-							File* file2 = shared->LoadFile(ToPath(stringToRun) + filename, m_sPathID, true, true);
-							if (file2)
-								return RunStringEx(file2->name.c_str(), file2->source.c_str(), file2->contents.c_str(), true, showErrors, true, noReturns);
+							file = shared->LoadFile(ToPath(stringToRun) + filename, m_sPathID, true, true);
+							if (file)
+							{
+								PushPath(ToPath(file->source).c_str());
+								ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
+								PopPath();
+							}
 						}
 					}
 				}
@@ -1329,7 +1340,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 		}
 	}
 
-	return false;
+	return ret;
 }
 
 void CLuaInterface::SetPathID(const char* pathID)
@@ -1373,8 +1384,7 @@ void CLuaInterface::Msg( const char* fmt, ... )
 void CLuaInterface::PushPath( const char* path )
 {
 	::DebugPrint(2, "CLuaInterface::PushPath %s\n", path);
-	m_sLastPath = m_sCurrentPath;
-	m_sCurrentPath = path;
+	V_strncpy( m_sCurrentPath, path, 32 );
 	++m_iPushedPaths;
 }
 
@@ -1438,6 +1448,7 @@ const char* CLuaInterface::GetUpvalue(int funcIndex, int n)
 bool CLuaInterface::RunStringEx(const char *filename, const char *path, const char *stringToRun, bool run, bool printErrors, bool dontPushErrors, bool noReturns)
 {
 	::DebugPrint(2, "CLuaInterface::RunStringEx %s, %s\n", filename, path);
+
 	std::string code = RunMacros(stringToRun);
 	int res = luaL_loadbuffer(state, code.c_str(), code.length(), filename);
 	if (res != 0)
@@ -1517,9 +1528,9 @@ const char* CLuaInterface::GetCurrentLocation()
 	::DebugPrint(2, "CLuaInterface::GetCurrentLocation\n");
 	// ToDo
 
-	Error("CLuaInterface::GetCurrentLocation is not implemented!");
+	::DebugPrint(1, "CLuaInterface::GetCurrentLocation is not implemented!");
 
-	return "RandomLocation :D";
+	return "<nowhere>";
 }
 
 void CLuaInterface::MsgColour(const Color& col, const char* fmt, ...)

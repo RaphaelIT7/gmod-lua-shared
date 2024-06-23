@@ -32,6 +32,7 @@ NOTE: The leak was cased by `CallFunctionProtected` returning false instead of t
 BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`  
 - [ ] Fix some random error (`the file "(null)"" couldn't be opened`)
 - [ ] Fix the random crash when loading into a game  
+- - [ ] Fix CallFunctionProtected & GetReturn
 - [ ] Type Errors cause engine errors.
 
 ## Linux DS issues
@@ -71,3 +72,4 @@ Most of it.
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/a35a26bf-5dab-4809-b572-fc56ae2f1bea)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/e86fea60-73d4-412a-af30-f3c1f53ddb9c)
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/34406eed-5e6c-4d01-94c9-1ab1075416c8)
+![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/b6052e0b-7555-41d7-896d-1df0f333aa4a)
