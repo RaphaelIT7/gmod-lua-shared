@@ -122,6 +122,9 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 {
 	DebugPrint("CLuaShared::LoadFile: %s %s %s %s\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
 
+	if ( path.empty() ) // Maybe this is a cause?
+		return NULL;
+
 	File* file = new File;
 	FileHandle_t fh = g_pFullFileSystem->Open(path.c_str(), "rb", pathId.c_str());
 	if(fh)
