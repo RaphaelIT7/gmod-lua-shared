@@ -27,5 +27,5 @@ jobs:
 
   test:
     needs: build
-    uses: RaphaelIT7/gmod-lua-threaded/.github/workflows/testing.yml@main
+    uses: RaphaelIT7/gmod-lua-shared/.github/workflows/testing.yml@main
     secrets: inherit
