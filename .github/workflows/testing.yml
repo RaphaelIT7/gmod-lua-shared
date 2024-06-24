@@ -23,7 +23,7 @@ jobs:
             -X POST \
             --data-binary '{ "root": "/garrysmod/bin/", "files": [ "lua_shared_srv.so" ] }'
 
-        - name: Rename lua_shared.so to lua_shared_srv.so
+      - name: Rename lua_shared.so to lua_shared_srv.so
         run: |
           ${{env.PROJECT_PATH}}
           cd projects/linux/gmake/x86/ReleaseWithSymbols/
