@@ -127,7 +127,7 @@ HTTP({
 
 print("Waiting for Server to start")
 
-local started = false
+--[[local started = false
 while not started do
 	JSONHTTP({
 		method = "GET",
@@ -141,14 +141,14 @@ while not started do
 	})
 end
 
-print("Server started")
+print("Server started")]]
 
 local function Sleep(time)
 	local time = os.time() + time
 	while time > os.time() do end
 end
 
-Sleep(10)
+Sleep(30)
 
 HTTP({
 	method = "POST",
