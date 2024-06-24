@@ -18,6 +18,7 @@ jobs:
           curl "https://${{secrets.PTERODACTYL_URL}}/api/client/servers/${{secrets.PTERODACTYL_SERVER}}/files/delete" \
             -H 'Accept: application/json' \
             -H 'Authorization: Bearer ${{secrets.PTERODACTYL_KEY}}' \
+            -H 'Content-Type: application/json' \
             -X POST \
             --data '{ "root": "/garrysmod/bin", "files": [ "lua_shared_srv.so" ] }'
 
@@ -26,6 +27,7 @@ jobs:
           curl "https://${{secrets.PTERODACTYL_URL}}/api/client/servers/${{secrets.PTERODACTYL_SERVER}}/files/rename" \
             -H 'Accept: application/json' \
             -H 'Authorization: Bearer ${{secrets.PTERODACTYL_KEY}}' \
+            -H 'Content-Type: application/json' \
             -X PUT \
             --data '{ "root": "/garrysmod/bin", "files": [ { "from": "lua_shared.so", "to": "lua_shared_srv.so" } ] }'
 
