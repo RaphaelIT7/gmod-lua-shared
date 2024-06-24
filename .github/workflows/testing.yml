@@ -15,8 +15,6 @@ jobs:
 
       - name: Delete lua_shared_srv.so
         run: |
-          ${{env.PROJECT_PATH}}
-          cd projects/linux/gmake/x86/ReleaseWithSymbols/
           curl "https://${{secrets.PTERODACTYL_URL}}/api/client/servers/${{secrets.PTERODACTYL_SERVER}}/files/delete" \
             -H 'Accept: application/json' \
             -H 'Authorization: Bearer ${{secrets.PTERODACTYL_KEY}}' \
@@ -25,8 +23,6 @@ jobs:
 
       - name: Rename lua_shared.so to lua_shared_srv.so
         run: |
-          ${{env.PROJECT_PATH}}
-          cd projects/linux/gmake/x86/ReleaseWithSymbols/
           curl "https://${{secrets.PTERODACTYL_URL}}/api/client/servers/${{secrets.PTERODACTYL_SERVER}}/files/rename" \
             -H 'Accept: application/json' \
             -H 'Authorization: Bearer ${{secrets.PTERODACTYL_KEY}}' \
