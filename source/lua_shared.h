@@ -47,7 +47,7 @@ public:
 	virtual ILuaInterface *CreateLuaInterface(unsigned char, bool) = 0;
 	virtual void CloseLuaInterface(ILuaInterface *) = 0;
 	virtual ILuaInterface *GetLuaInterface(unsigned char) = 0;
-	virtual File *LoadFile(const std::string *path, const std::string *pathId, bool fromDatatable, bool fromFile) = 0;
+	virtual File *LoadFile(const std::string &path, const std::string &pathId, bool fromDatatable, bool fromFile) = 0;
 	virtual File *GetCache(const std::string &) = 0;
 	virtual void MountLua(const char *) = 0;
 	virtual void MountLuaAdd(const char *, const char *) = 0;
@@ -71,7 +71,7 @@ public:
 	virtual ILuaInterface* CreateLuaInterface(unsigned char, bool);
 	virtual void CloseLuaInterface(ILuaInterface*);
 	virtual ILuaInterface* GetLuaInterface(unsigned char);
-	virtual File* LoadFile(const std::string* path, const std::string* pathId, bool fromDatatable, bool fromFile);
+	virtual File* LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile);
 	virtual File* GetCache(const std::string&);
 	virtual void MountLua(const char*);
 	virtual void MountLuaAdd(const char*, const char*);

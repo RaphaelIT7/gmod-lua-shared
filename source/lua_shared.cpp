@@ -118,12 +118,12 @@ ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
 	return pInterfaces[realm];
 }
 
-File* CLuaShared::LoadFile(const std::string* path, const std::string* pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
+File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
 {
-	DebugPrint("CLuaShared::LoadFile: %s %s %s %s\n", path->c_str(), pathId->c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
+	DebugPrint("CLuaShared::LoadFile: %s %s %s %s\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
 
 	File* file = new File;
-	FileHandle_t fh = g_pFullFileSystem->Open(path->c_str(), "rb", pathId->c_str());
+	FileHandle_t fh = g_pFullFileSystem->Open(path.c_str(), "rb", pathId.c_str());
 	if(fh)
 	{
 		int file_len = g_pFullFileSystem->Size(fh);
@@ -132,18 +132,18 @@ File* CLuaShared::LoadFile(const std::string* path, const std::string* pathId, b
 		g_pFullFileSystem->Read((void*)code, file_len, fh);
 		code[file_len] = 0;
 
-		file->name = path->c_str();
+		file->name = path.c_str();
 		file->contents = code;
-		file->time = g_pFullFileSystem->GetFileTime(path->c_str(), pathId->c_str());
+		file->time = g_pFullFileSystem->GetFileTime(path.c_str(), pathId.c_str());
 		file->timesloadedclient = 0;
 		file->timesloadedserver = 0;
-		file->source = path->c_str();
+		file->source = path.c_str();
 
 		Bootil::AutoBuffer buffer;
 		Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);
 		file->compressed = buffer;
 
-		pCache[*path] = file;
+		pCache[path.c_str()] = file;
 
 		g_pFullFileSystem->Close(fh);
 	} else {

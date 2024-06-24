@@ -1315,7 +1315,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	//	return false;
 
 	ILuaShared* shared = LuaShared();
-	File* file = shared->LoadFile(&(std::string)filename, &(std::string)m_sPathID, true, true);
+	File* file = shared->LoadFile(filename, m_sPathID, true, true);
 	bool ret = false;
 	if (file)
 	{
@@ -1327,7 +1327,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 		GetCurrentFile(out);
 		if (out != "!UNKNOWN") // ToDo: Fix this mess. This will probably kill performance / loading times.
 		{
-			file = shared->LoadFile(&(std::string)(ToPath(out.c_str()) + filename), &(std::string)m_sPathID, true, true);
+			file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
 			if (file)
 			{
 				PushPath(ToPath(file->source).c_str());
@@ -1341,7 +1341,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 				out = ar.source ? ar.source : "!UNKNOWN";
 				if (out != "!UNKNOWN")
 				{
-					file = shared->LoadFile(&(std::string)(ToPath(out.c_str()) + filename), &(std::string)m_sPathID, true, true);
+					file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
 					if (file)
 					{
 						PushPath(ToPath(file->source).c_str());
@@ -1350,7 +1350,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 					} else {
 						if (strcmp(stringToRun, "") != 0)
 						{
-							file = shared->LoadFile(&(std::string)(ToPath(stringToRun) + filename), &(std::string)m_sPathID, true, true);
+							file = shared->LoadFile(ToPath(stringToRun) + filename, m_sPathID, true, true);
 							if (file)
 							{
 								PushPath(ToPath(file->source).c_str());
