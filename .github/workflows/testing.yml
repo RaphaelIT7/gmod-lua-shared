@@ -13,6 +13,26 @@ jobs:
         with:
           sparse-checkout: "_testing/"
 
+    - name: Delete lua_shared_srv.so
+      run: |
+        ${{env.PROJECT_PATH}}
+        cd projects/linux/gmake/x86/ReleaseWithSymbols/
+        curl "https://${{secrets.PTERODACTYL_URL}}/api/client/servers/${{secrets.PTERODACTYL_SERVER}}/files/delete" \
+          -H 'Accept: application/json' \
+          -H 'Authorization: Bearer ${{secrets.PTERODACTYL_KEY}}' \
+          -X POST \
+          --data-binary '{ "root": "/garrysmod/bin/", "files": [ "lua_shared_srv.so" ] }'
+
+      - name: Rename lua_shared.so to lua_shared_srv.so
+      run: |
+        ${{env.PROJECT_PATH}}
+        cd projects/linux/gmake/x86/ReleaseWithSymbols/
+        curl "https://${{secrets.PTERODACTYL_URL}}/api/client/servers/${{secrets.PTERODACTYL_SERVER}}/files/rename" \
+          -H 'Accept: application/json' \
+          -H 'Authorization: Bearer ${{secrets.PTERODACTYL_KEY}}' \
+          -X POST \
+          --data-binary '{ "root": "/garrysmod/bin/", "files": [ { "from": "lua_shared.so", "to": "lua_shared_srv.so" } ] }'
+
       - uses: ilammy/msvc-dev-cmd@v1
       - uses: leafo/gh-actions-lua@v10
         with:

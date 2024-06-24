@@ -22,6 +22,7 @@ jobs:
       BUILD_WINDOWS: "false"
       USE_PREFIX: "false"
       UPLOAD: "pterodactyl"
+      PTERODACTYL_PATH: "garrysmod%2Fbin%2F"
     secrets: inherit
 
   test:
