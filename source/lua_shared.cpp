@@ -143,8 +143,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);
 		file->compressed = buffer;
 
-		std::string newpath = path;
-		pCache[newpath] = file;
+		pCache[path.c_str()] = file;
 
 		g_pFullFileSystem->Close(fh);
 	} else {

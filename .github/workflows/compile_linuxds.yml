@@ -1,0 +1,30 @@
+name: Build Project
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'libs/lua51*'
+      - 'libs/luajit*'
+      - 'libs/libluajit*'
+      - 'libs/bootil_static*'
+      - 'libs/libbootil_static*'
+      - 'source/**'
+      - 'premake5.lua'
+
+jobs:
+  build:
+    uses: RaphaelIT7/gmod-common-module-base/.github/workflows/compile.yml@workflow
+    with:
+      PROJECT_NAME: "lua_shared"
+      BUILD_64x: "false"
+      LINUX_FILEEXTENTION: "so"
+      BUILD_WINDOWS: "false"
+      USE_PREFIX: "false"
+      UPLOAD: "pterodactyl"
+    secrets: inherit
+
+  test:
+    needs: build
+    uses: RaphaelIT7/gmod-lua-threaded/.github/workflows/testing.yml@main
+    secrets: inherit
