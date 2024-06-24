@@ -137,13 +137,14 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		file->time = g_pFullFileSystem->GetFileTime(path.c_str(), pathId.c_str());
 		file->timesloadedclient = 0;
 		file->timesloadedserver = 0;
-		file->source = path.c_str();
+		file->source = path.c_str(); // The file that included this file. How do we get it :<
 
 		Bootil::AutoBuffer buffer;
 		Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);
 		file->compressed = buffer;
+		file->hash = Bootil::Hasher::CRC32::Easy(buffer.GetBase(), buffer.GetWritten());
 
-		pCache[path.c_str()] = file;
+		pCache[path.c_str()] = file; // path.c_str() Solves the issue with Linux DS
 
 		g_pFullFileSystem->Close(fh);
 	} else {
@@ -219,12 +220,15 @@ void CLuaShared::MountLua(const char* pathID)
 	// Do some stuff
 }
 
-void CLuaShared::MountLuaAdd(const char* file, const char* path)
+void CLuaShared::MountLuaAdd(const char* file, const char* pathID)
 {
-	DebugPrint("CLuaShared::MountLuaAdd %s %s\n", file, path);
+	DebugPrint("CLuaShared::MountLuaAdd %s %s\n", file, pathID);
 	// Fancy code
 
-	// AddSearchPath(file, path)
+	std::string gamepath = pGet->GameDir();
+	gamepath = gamepath + '\\';
+
+	AddSearchPath( (gamepath + file).c_str(), pathID );
 
 	// Other Fancy code?
 }
@@ -233,6 +237,8 @@ void CLuaShared::UnMountLua(const char* realm)
 {
 	DebugPrint("CLuaShared::UnMountLua %s\n", realm);
 	// ToDo
+
+	g_pFullFileSystem->RemoveSearchPaths( realm );
 }
 
 void CLuaShared::SetFileContents(const char* a, const char* b)
@@ -304,9 +310,9 @@ const char* CLuaShared::GetStackTraces()
 	return buffer;
 }
 
-void CLuaShared::InvalidateCache(const std::string&)
+void CLuaShared::InvalidateCache(const std::string& str)
 {
-	DebugPrint("CLuaShared::InvalidateCache\n");
+	DebugPrint("CLuaShared::InvalidateCache %s\n", str.c_str());
 }
 
 void CLuaShared::EmptyCache()

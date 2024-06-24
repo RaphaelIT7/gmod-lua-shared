@@ -18,7 +18,7 @@ namespace IGamemodeSystem
 	};
 }
 
-struct File
+struct File // ToDo: Check if were missing something. (Maybe Linux DS needs something)
 {
 	int time;
 	std::string name;
@@ -27,6 +27,7 @@ struct File
 	Bootil::AutoBuffer compressed;
 	unsigned int timesloadedserver;
 	unsigned int timesloadedclient;
+	unsigned long hash;
 };
 
 struct LuaFindResult
@@ -86,7 +87,7 @@ public:
 public:
 	IGet* GetIGet() { return pGet; };
 	void AddSearchPath(const char*, const char*);
-private:
+private: // ToDo: Get the real structure below
 	IGet* pGet;
 	ILuaInterface* pInterfaces[3];
 	//std::vector<File*> pCache;
