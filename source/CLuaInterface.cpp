@@ -83,10 +83,8 @@ CLuaError* ReadStackIntoError(lua_State* L)
 
 		char* csource = new char[strlen(source) + 1];
 		char* cfunction = new char[strlen(function) + 1];
-		memcpy(csource, source, strlen(source) );
-		memcpy(cfunction, function, strlen(function) );
-		csource[strlen(source)] = '\n';
-		cfunction[strlen(function)] = '\n';
+		memcpy(csource, source, strlen(source) + 1 );
+		memcpy(cfunction, function, strlen(function) + 1 );
 
 		entry.source = csource;
 		entry.function = cfunction;
@@ -107,9 +105,8 @@ CLuaError* ReadStackIntoError(lua_State* L)
 	lua_error->side = LUA->IsClient() ? "client" : (LUA->IsMenu() ? "menu" : "server");
 #else
 	const char* side = LUA->IsClient() ? "client" : (LUA->IsMenu() ? "menu" : "server");
-	char* newside = new char[strlen(side)+1];
-	memcpy(newside, side, strlen(side));
-	newside[strlen(side)] = '\0';
+	char* newside = new char[strlen(side) + 1];
+	memcpy(newside, side, strlen(side) + 1);
 
 	lua_error->side = newside;
 #endif
