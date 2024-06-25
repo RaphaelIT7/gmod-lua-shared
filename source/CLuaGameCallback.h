@@ -5,15 +5,24 @@ struct CLuaError
 {
 	struct StackEntry
 	{
+#ifndef WIN32
 		std::string source;
 		std::string function;
+#else
+		const char* source;
+		const char* function;
+#endif
 		int line = -1;
 	};
 
+#ifndef WIN32
 	std::string message;
 	std::string side;
+#else
+	const char* message;
+	const char* side;
+#endif
 	std::vector<StackEntry> stack;
-	void* unknown = NULL; // Test
 };
 
 class ILuaGameCallback
