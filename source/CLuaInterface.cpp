@@ -1576,7 +1576,7 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 	delete[] buffer;
 	va_end(args);
 	
-	std::string realm;
+	const char* realm;
 	switch(m_iRealm)
 	{
 		case 0:
