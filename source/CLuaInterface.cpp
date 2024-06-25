@@ -1663,6 +1663,18 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 	}
 	error->side = realm;*/
 
+#ifndef WIN32
+	Msg("Error Message: %s\n", error->message);
+	Msg("Error Side: %i\n", error->side);
+
+	for ( CLuaError::StackEntry entry : error->stack )
+	{
+		Msg("Error Stack function: %s\n", entry.function);
+		Msg("Error Stack source: %s\n", entry.source);
+		Msg("Error Stack line: %i\n", entry.line);
+	}
+#endif
+
 	m_pGameCallback->LuaError(error);
 
 #ifdef WIN32
