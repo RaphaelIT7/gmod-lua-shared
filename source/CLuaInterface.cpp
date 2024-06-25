@@ -85,6 +85,8 @@ CLuaError* ReadStackIntoError(lua_State* L)
 		char* cfunction = new char[strlen(function) + 1];
 		V_strncpy(csource, source, strlen(source) + 1);
 		V_strncpy(cfunction, function, strlen(function) + 1);
+		cfunction[strlen(function)] = '\0';
+		csource[strlen(source)] = '\0';
 
 		entry->source = csource;
 		entry->function = cfunction;
@@ -104,6 +106,7 @@ CLuaError* ReadStackIntoError(lua_State* L)
 #else
 		char* newmessage = new char[strlen(str) + 1];
 		V_strncpy(newmessage, str, strlen(str) + 1);
+		newmessage[strlen(str)] = '\0';
 
 		lua_error->message = newmessage;
 #endif
@@ -116,6 +119,7 @@ CLuaError* ReadStackIntoError(lua_State* L)
 	const char* side = LUA->IsClient() ? "client" : (LUA->IsMenu() ? "menu" : "server");
 	char* newside = new char[strlen(side) + 1];
 	V_strncpy(newside, side, strlen(side) + 1);
+	newside[strlen(side)] = '\0';
 
 	lua_error->side = newside;
 #endif
@@ -1634,6 +1638,7 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 
 	char* buffer = new char[size + 1];
 	vsnprintf(buffer, size + 1, fmt, args);
+	buffer[size] = '\0';
 
 #ifndef WIN32
 	if (error->message)
