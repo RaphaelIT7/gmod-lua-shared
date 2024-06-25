@@ -115,7 +115,7 @@ CLuaError* ReadStackIntoError(lua_State* L)
 #else
 	const char* side = LUA->IsClient() ? "client" : (LUA->IsMenu() ? "menu" : "server");
 	char* newside = new char[strlen(side) + 1];
-	memcpy(newside, side, strlen(side) + 1);
+	V_strncpy(newside, side, strlen(side) + 1);
 
 	lua_error->side = newside;
 #endif
@@ -1634,7 +1634,6 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 
 	char* buffer = new char[size + 1];
 	vsnprintf(buffer, size + 1, fmt, args);
-	buffer[size] = '\0';
 
 #ifndef WIN32
 	if (error->message)

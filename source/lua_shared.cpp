@@ -135,9 +135,9 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		g_pFullFileSystem->Read((void*)code, file_len, fh);
 		code[file_len] = 0;
 
-		std::string name;
-		name.assign( path.c_str() );
-		file->name = name.c_str();
+		char* name = new char[strlen(path.c_str()) + 1];
+		V_strncpy(name, path.c_str(), strlen(path.c_str()) + 1);
+		file->name = name;
 		file->contents = code;
 		file->time = g_pFullFileSystem->GetFileTime(path.c_str(), pathId.c_str());
 		file->timesloadedclient = 0;
