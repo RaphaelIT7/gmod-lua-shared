@@ -73,25 +73,25 @@ CLuaError* ReadStackIntoError(lua_State* L)
 	while (lua_getstack(L, level, &ar)) {
 		lua_getinfo(L, "nSl", &ar);
 
-		CLuaError::StackEntry entry;
+		CLuaError::StackEntry* entry = new CLuaError::StackEntry;
 #ifdef WIN32
-		entry.source = ar.source ? ar.source : "unknown";
-		entry.function = ar.name ? ar.name : "unknown";
+		entry->source = ar.source ? ar.source : "unknown";
+		entry->function = ar.name ? ar.name : "unknown";
 #else
 		const char* source = ar.source ? ar.source : "unknown";
 		const char* function = ar.name ? ar.name : "unknown";
 
-		char* csource = new char[strlen(source)];
-		char* cfunction = new char[strlen(function)];
-		V_strncpy(csource, source, strlen(source));
-		V_strncpy(cfunction, function, strlen(function));
+		char* csource = new char[strlen(source) + 1];
+		char* cfunction = new char[strlen(function) + 1];
+		V_strncpy(csource, source, strlen(source) + 1);
+		V_strncpy(cfunction, function, strlen(function) + 1);
 
-		entry.source = csource;
-		entry.function = cfunction;
+		entry->source = csource;
+		entry->function = cfunction;
 #endif
-		entry.line = ar.currentline;
+		entry->line = ar.currentline;
 
-		lua_error->stack.push_back(entry);
+		lua_error->stack.push_back(*entry);
 
 		++level;
 	}
@@ -114,8 +114,8 @@ CLuaError* ReadStackIntoError(lua_State* L)
 	lua_error->side = LUA->IsClient() ? "client" : (LUA->IsMenu() ? "menu" : "server");
 #else
 	const char* side = LUA->IsClient() ? "client" : (LUA->IsMenu() ? "menu" : "server");
-	char* newside = new char[strlen(side)];
-	memcpy(newside, side, strlen(side));
+	char* newside = new char[strlen(side) + 1];
+	memcpy(newside, side, strlen(side) + 1);
 
 	lua_error->side = newside;
 #endif
