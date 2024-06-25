@@ -83,8 +83,8 @@ CLuaError* ReadStackIntoError(lua_State* L)
 
 		char* csource = new char[strlen(source) + 1];
 		char* cfunction = new char[strlen(function) + 1];
-		memcpy(csource, source, strlen(source) + 1 );
-		memcpy(cfunction, function, strlen(function) + 1 );
+		V_strncpy(csource, source, strlen(source) + 1 );
+		V_strncpy(cfunction, function, strlen(function) + 1 );
 
 		entry.source = csource;
 		entry.function = cfunction;
@@ -103,7 +103,7 @@ CLuaError* ReadStackIntoError(lua_State* L)
 		lua_error->message = str;
 #else
 	char* newmessage = new char[strlen(str) + 1];
-	memcpy(newmessage, str, strlen(str) + 1);
+	V_strncpy(newmessage, str, strlen(str) + 1);
 
 	lua_error->message = newmessage;
 #endif
