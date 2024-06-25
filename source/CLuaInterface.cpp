@@ -98,7 +98,16 @@ CLuaError* ReadStackIntoError(lua_State* L)
 
 	const char* str = lua_tolstring(L, -1, NULL);
 	if (str != NULL) // Setting a std::string to NULL causes a crash
+	{
+#ifdef WIN32
 		lua_error->message = str;
+#else
+	char* newmessage = new char[strlen(str) + 1];
+	memcpy(newmessage, str, strlen(str) + 1);
+
+	lua_error->message = newmessage;
+#endif
+	}
 
 	CLuaInterface* LUA = (CLuaInterface*)L->luabase;
 #ifdef WIN32
