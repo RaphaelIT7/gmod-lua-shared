@@ -102,8 +102,8 @@ CLuaError* ReadStackIntoError(lua_State* L)
 #ifdef WIN32
 		lua_error->message = str;
 #else
-		char* newmessage = new char[strlen(str)];
-		V_strncpy(newmessage, str, strlen(str));
+		char* newmessage = new char[strlen(str) + 1];
+		V_strncpy(newmessage, str, strlen(str) + 1);
 
 		lua_error->message = newmessage;
 #endif
@@ -1602,8 +1602,6 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 	vsnprintf(buffer, size + 1, fmt, args);
 
 	error->message = buffer;
-
-	delete[] buffer;
 	va_end(args);
 	
 	const char* realm;
@@ -1626,6 +1624,7 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 
 	m_pGameCallback->LuaError(error);
 
+	delete[] buffer;
 	delete error;
 }
 
