@@ -5,13 +5,8 @@ struct CLuaError
 {
 	struct StackEntry
 	{
-#ifdef WIN32
 		std::string source;
 		std::string function;
-#else
-		const char* source;
-		const char* function;
-#endif
 		int line = -1;
 	};
 
