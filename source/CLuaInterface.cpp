@@ -1643,6 +1643,8 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 	error->message = buffer;
 	va_end(args);
 	
+	/* NOTE: This is already done in ReadStackIntoError
+	
 	const char* realm;
 	switch(m_iRealm)
 	{
@@ -1659,7 +1661,7 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 			realm = "unknown";
 			break;
 	}
-	error->side = realm;
+	error->side = realm;*/
 
 	m_pGameCallback->LuaError(error);
 
