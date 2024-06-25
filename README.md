@@ -40,12 +40,14 @@ BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
 - [x] Fix `print` breaking with numbers.
 - [ ] Find out why you cannot press a VGUI Button.
 - [x] Fix a crash on level shutdown (menusystem.dll crashes)
-- [ ] Implmenent Managed Convars properly -> Save and load their values.
+- [ ] Implement Managed Convars properly -> Save and load their values.
+- [ ] Implement the cache properly
 
 ## Linux DS issues
 - [ ] Crashes while loading.
 - - [x] Implement Bootil to fill the compressed field to not cause a crash.
-- - [ ] Fix a crash in CLuaShared::LoadFile
+- - [x] Fix a crash in CLuaShared::LoadFile
+- - [ ] Get the proper CLuaError struct
 
 ## Collection of random Engine Errors and Warnings or other things
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/aa4143fc-75f2-4311-b23b-d2de1394d59b)

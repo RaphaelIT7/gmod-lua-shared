@@ -18,7 +18,7 @@ namespace IGamemodeSystem
 	};
 }
 
-struct File // ToDo: Check if were missing something. (Maybe Linux DS needs something)
+struct File
 {
 	int time;
 #ifdef WIN32
