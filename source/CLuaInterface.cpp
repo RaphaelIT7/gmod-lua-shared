@@ -1634,6 +1634,7 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 
 	char* buffer = new char[size + 1];
 	vsnprintf(buffer, size + 1, fmt, args);
+	buffer[size] = '\0';
 
 #ifndef WIN32
 	if (error->message)
@@ -1665,7 +1666,7 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 
 #ifndef WIN32
 	Msg("Error Message: %s\n", error->message);
-	Msg("Error Side: %i\n", error->side);
+	Msg("Error Side: %s\n", error->side);
 
 	for ( CLuaError::StackEntry entry : error->stack )
 	{
