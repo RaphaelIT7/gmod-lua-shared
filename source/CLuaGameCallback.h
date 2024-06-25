@@ -4,14 +4,16 @@ class ILuaInterface;
 
 struct CLuaError
 {
+	~CLuaError();
 	struct StackEntry
 	{
+		~StackEntry();
 #ifdef WIN32
 		std::string source;
 		std::string function;
 #else
-		const char* source;
-		const char* function;
+		const char* source = NULL;
+		const char* function = NULL;
 #endif
 		int line = -1;
 	};
@@ -20,8 +22,8 @@ struct CLuaError
 	std::string message;
 	std::string side;
 #else
-	const char* message;
-	const char* side;
+	const char* message = NULL;
+	const char* side = NULL;
 #endif
 	std::vector<StackEntry> stack;
 };

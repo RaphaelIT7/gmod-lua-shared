@@ -140,6 +140,40 @@ int AdvancedLuaErrorReporter(lua_State *L)
 	return 0;
 }
 
+CLuaError::~CLuaError()
+{
+#ifndef WIN32
+	if (message)
+	{
+		delete[] message;
+		message = NULL;
+	}
+
+	if (side)
+	{
+		delete[] side;
+		side = NULL;
+	}
+#endif
+}
+
+CLuaError::StackEntry::~StackEntry()
+{
+#ifndef WIN32
+	if (source)
+	{
+		delete[] source;
+		source = NULL;
+	}
+
+	if (function)
+	{
+		delete[] function;
+		function = NULL;
+	}
+#endif
+}
+
 ILuaInterface* CreateLuaInterface(bool bIsServer)
 {
 	::DebugPrint(1, "CreateLuaInterface\n");
@@ -1601,6 +1635,11 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 	char* buffer = new char[size + 1];
 	vsnprintf(buffer, size + 1, fmt, args);
 
+#ifndef WIN32
+	if (error->message)
+		delete[] error->message;
+#endif
+
 	error->message = buffer;
 	va_end(args);
 	
@@ -1624,8 +1663,10 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 
 	m_pGameCallback->LuaError(error);
 
+#ifdef WIN32
 	delete[] buffer;
-	delete error;
+#endif
+	delete error; // Deconstuctor will delete our buffer
 }
 
 const char* CLuaInterface::GetCurrentLocation()
