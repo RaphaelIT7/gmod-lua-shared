@@ -87,6 +87,9 @@ CLuaError* ReadStackIntoError(lua_State* L)
 	if (str != NULL) // Setting a std::string to NULL causes a crash
 		lua_error->message = str;
 
+	CLuaInterface* LUA = (CLuaInterface*)L->luabase;
+	lua_error->side = LUA->IsClient() ? "client" : "server";
+
 	return lua_error;
 }
 

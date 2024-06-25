@@ -7,7 +7,7 @@ struct CLuaError
 	{
 		std::string source;
 		std::string function;
-		int line;
+		int line = -1;
 	};
 
 	std::string message;
