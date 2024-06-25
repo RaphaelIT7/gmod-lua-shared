@@ -1,4 +1,5 @@
 #include "ILuaObject.h"
+#include <vector>
 class ILuaInterface;
 
 struct CLuaError
