@@ -1323,7 +1323,11 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	if (file)
 	{
 		PushPath(ToPath(file->source).c_str());
+#ifdef WIN32
 		ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
+#else
+		ret = RunStringEx(file->name, file->source, file->contents, true, showErrors, true, noReturns);
+#endif
 		PopPath();
 	} else {
 		std::string out;
@@ -1334,7 +1338,11 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 			if (file)
 			{
 				PushPath(ToPath(file->source).c_str());
+#ifdef WIN32
 				ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
+#else
+				ret = RunStringEx(file->name, file->source, file->contents, true, showErrors, true, noReturns);
+#endif
 				PopPath();
 			} else {
 				lua_Debug ar;
@@ -1348,7 +1356,11 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 					if (file)
 					{
 						PushPath(ToPath(file->source).c_str());
+#ifdef WIN32
 						ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
+#else
+						ret = RunStringEx(file->name, file->source, file->contents, true, showErrors, true, noReturns);
+#endif
 						PopPath();
 					} else {
 						if (strcmp(stringToRun, "") != 0)
@@ -1357,7 +1369,11 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 							if (file)
 							{
 								PushPath(ToPath(file->source).c_str());
+#ifdef WIN32
 								ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
+#else
+								ret = RunStringEx(file->name, file->source, file->contents, true, showErrors, true, noReturns);
+#endif
 								PopPath();
 							}
 						}

@@ -21,13 +21,18 @@ namespace IGamemodeSystem
 struct File // ToDo: Check if were missing something. (Maybe Linux DS needs something)
 {
 	int time;
+#ifdef WIN32
 	std::string name;
 	std::string source;
 	std::string contents;
+#else
+	const char* name;
+	const char* source;
+	const char* contents;
+#endif
 	Bootil::AutoBuffer compressed;
 	unsigned int timesloadedserver;
 	unsigned int timesloadedclient;
-	unsigned long hash;
 };
 
 struct LuaFindResult
