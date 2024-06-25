@@ -88,7 +88,7 @@ CLuaError* ReadStackIntoError(lua_State* L)
 		lua_error->message = str;
 
 	CLuaInterface* LUA = (CLuaInterface*)L->luabase;
-	lua_error->side = LUA->IsClient() ? "client" : "server";
+	lua_error->side = LUA->IsClient() ? "client" : ( LUA->IsMenu() ? "menu" : "server" );
 
 	return lua_error;
 }

@@ -10,14 +10,12 @@ struct CLuaError
 		int line = -1;
 	};
 
-#ifdef WIN32
 	std::string message;
 	std::string side;
-#else
-	const char* message;
-	const char* side;
-#endif
 	std::vector<StackEntry> stack;
+#ifndef WIN32
+	IAddonSystem::Information info;
+#endif
 };
 
 class ILuaGameCallback
