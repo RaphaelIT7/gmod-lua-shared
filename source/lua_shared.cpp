@@ -133,7 +133,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		code[file_len] = 0;
 
 		std::string name; // Could this maybe solve it?
-		name.assign( path );
+		name.assign( path.c_str() );
 		file->name = name;
 		file->contents = code;
 		file->time = g_pFullFileSystem->GetFileTime(path.c_str(), pathId.c_str());
