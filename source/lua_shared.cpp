@@ -132,19 +132,21 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		g_pFullFileSystem->Read((void*)code, file_len, fh);
 		code[file_len] = 0;
 
-		file->name = path.c_str();
+		std::string name; // Could this maybe solve it?
+		name.assign( path );
+		file->name = name;
 		file->contents = code;
 		file->time = g_pFullFileSystem->GetFileTime(path.c_str(), pathId.c_str());
 		file->timesloadedclient = 0;
 		file->timesloadedserver = 0;
-		file->source = path.c_str(); // The file that included this file. How do we get it :<
+		file->source = name; // The file that included this file. How do we get it :<
 
 		Bootil::AutoBuffer buffer;
 		Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);
 		file->compressed = buffer;
 		file->hash = Bootil::Hasher::CRC32::Easy(buffer.GetBase(), buffer.GetWritten());
 
-		pCache[path.c_str()] = file; // path.c_str() Solves the issue with Linux DS
+		pCache[name] = file; // path.c_str() Solves the issue with Linux DS
 
 		g_pFullFileSystem->Close(fh);
 	} else {
