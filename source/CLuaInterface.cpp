@@ -81,10 +81,10 @@ CLuaError* ReadStackIntoError(lua_State* L)
 		const char* source = ar.source ? ar.source : "unknown";
 		const char* function = ar.name ? ar.name : "unknown";
 
-		char* csource = new char[strlen(source) + 1];
-		char* cfunction = new char[strlen(function) + 1];
-		V_strncpy(csource, source, strlen(source) + 1 );
-		V_strncpy(cfunction, function, strlen(function) + 1 );
+		char* csource = new char[strlen(source)];
+		char* cfunction = new char[strlen(function)];
+		V_strncpy(csource, source, strlen(source));
+		V_strncpy(cfunction, function, strlen(function));
 
 		entry.source = csource;
 		entry.function = cfunction;
@@ -102,10 +102,10 @@ CLuaError* ReadStackIntoError(lua_State* L)
 #ifdef WIN32
 		lua_error->message = str;
 #else
-	char* newmessage = new char[strlen(str) + 1];
-	V_strncpy(newmessage, str, strlen(str) + 1);
+		char* newmessage = new char[strlen(str)];
+		V_strncpy(newmessage, str, strlen(str));
 
-	lua_error->message = newmessage;
+		lua_error->message = newmessage;
 #endif
 	}
 
@@ -114,8 +114,8 @@ CLuaError* ReadStackIntoError(lua_State* L)
 	lua_error->side = LUA->IsClient() ? "client" : (LUA->IsMenu() ? "menu" : "server");
 #else
 	const char* side = LUA->IsClient() ? "client" : (LUA->IsMenu() ? "menu" : "server");
-	char* newside = new char[strlen(side) + 1];
-	memcpy(newside, side, strlen(side) + 1);
+	char* newside = new char[strlen(side)];
+	memcpy(newside, side, strlen(side));
 
 	lua_error->side = newside;
 #endif
