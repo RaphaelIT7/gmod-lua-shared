@@ -1,5 +1,4 @@
 #include "ILuaObject.h"
-#include "GarrysMod/Addon.h"
 class ILuaInterface;
 
 struct CLuaError
@@ -14,9 +13,7 @@ struct CLuaError
 	std::string message;
 	std::string side;
 	std::vector<StackEntry> stack;
-#ifndef WIN32
-	IAddonSystem::Information info;
-#endif
+	void* unknown = NULL; // Test
 };
 
 class ILuaGameCallback
