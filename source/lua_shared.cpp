@@ -146,6 +146,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		file->timesloadedclient = 0;
 		file->timesloadedserver = 1;
 		file->source = "!UNKNOWN";
+		file->size = strlen(code);
 
 		//Bootil::AutoBuffer buffer;
 		//Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);

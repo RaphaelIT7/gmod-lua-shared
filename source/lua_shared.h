@@ -37,10 +37,12 @@ struct File
 	const char* name;
 	const char* source;
 	const char* contents;
+	bool magic = false;
 #endif
 	Bootil::AutoBuffer compressed;
 	unsigned int timesloadedserver;
 	unsigned int timesloadedclient;
+	unsigned int size;
 };
 
 struct LuaFindResult
