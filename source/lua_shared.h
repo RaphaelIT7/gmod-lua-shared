@@ -42,8 +42,6 @@ struct File
 	Bootil::AutoBuffer compressed;
 	unsigned int timesloadedserver;
 	unsigned int timesloadedclient;
-	unsigned int idk;
-	unsigned int size;
 };
 
 struct LuaFindResult

@@ -146,11 +146,8 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		file->timesloadedclient = 0;
 		file->timesloadedserver = 1;
 		file->source = "!UNKNOWN";
-		file->size = strlen(code);
-
-		Bootil::AutoBuffer buffer;
-		Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);
-		file->compressed = buffer;
+		Bootil::Compression::FastLZ::Compress(code, sizeof(code), file->compressed);
+		DebugPrint("CLuaShared::LoadFile content size: %i\n", strlen(code));
 
 		pCache[name] = file;
 
