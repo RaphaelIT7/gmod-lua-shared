@@ -146,6 +146,12 @@ int AdvancedLuaErrorReporter(lua_State *L)
 
 CLuaError::~CLuaError()
 {
+	for ( CLuaError::StackEntry entry : stack )
+	{
+		delete &entry; // They were allocated with new
+	}
+	stack.clear();
+
 #ifndef WIN32
 	if (message)
 	{
