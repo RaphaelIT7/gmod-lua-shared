@@ -153,6 +153,9 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		g_pFullFileSystem->Close(fh);
 	} else {
 		DebugPrint("CLuaShared::LoadFile failed to find the file\n");
+#ifndef WIN32
+		g_pFullFileSystem->PrintSearchPaths();
+#endif
 		delete file;
 		return nullptr;
 	}
@@ -193,7 +196,7 @@ void CLuaShared::MountLua(const char* pathID)
 
 	AddSearchPath((gamepath + "lua\\").c_str(), pathID);
 
-	AddSearchPath((gamepath + "lua\\gamemodes\\").c_str(), pathID);
+	//AddSearchPath((gamepath + "lua\\gamemodes\\").c_str(), pathID);
 
 	AddSearchPath((gamepath + "gamemodes\\").c_str(), pathID);
 
