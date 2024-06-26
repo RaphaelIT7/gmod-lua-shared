@@ -125,8 +125,12 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 	if ( true )
 		return NULL;
 
+	std::string final_path = path.c_str();
+	if ( final_path._Starts_with( "lua/" ) )
+		final_path.erase( 0, 4 );
+
 	File* file = new File;
-	FileHandle_t fh = g_pFullFileSystem->Open(path.c_str(), "rb", pathId.c_str());
+	FileHandle_t fh = g_pFullFileSystem->Open(final_path.c_str(), "rb", pathId.c_str());
 	if(fh)
 	{
 		int file_len = g_pFullFileSystem->Size(fh);
@@ -136,10 +140,10 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		code[file_len] = 0;
 
 		char* name = new char[strlen(path.c_str()) + 1];
-		V_strncpy(name, path.c_str(), strlen(path.c_str()) + 1);
+		V_strncpy(name, final_path.c_str(), strlen(path.c_str()) + 1);
 		file->name = name;
 		file->contents = code;
-		file->time = g_pFullFileSystem->GetFileTime(path.c_str(), pathId.c_str());
+		file->time = g_pFullFileSystem->GetFileTime(final_path.c_str(), pathId.c_str()); // I don't like this.
 		file->timesloadedclient = 0;
 		file->timesloadedserver = 1;
 		file->source = "!UNKNOWN";
@@ -198,7 +202,7 @@ void CLuaShared::MountLua(const char* pathID)
 
 	AddSearchPath((gamepath + "gamemodes\\").c_str(), pathID);
 
-	if ( !pGet->IsDedicatedServer() ) // Fk this for now
+	//if ( !pGet->IsDedicatedServer() ) // Fk this for now
 	{
 		IGamemodeSystem::UpdatedInformation& info = (IGamemodeSystem::UpdatedInformation&)g_pFullFileSystem->Gamemodes()->Active();
 		if ( info.exists )
