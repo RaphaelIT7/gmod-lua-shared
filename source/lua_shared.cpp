@@ -99,11 +99,11 @@ void CLuaShared::CloseLuaInterface(ILuaInterface* LuaInterface)
 {
 	DebugPrint("CLuaShared::CloseLuaInterface\n");
 
-	if ( LuaInterface->IsServer() )
-		pInterfaces[1] = NULL;
-
 	if ( LuaInterface->IsClient() )
 		pInterfaces[0] = NULL;
+
+	if ( LuaInterface->IsServer() )
+		pInterfaces[1] = NULL;
 
 	if ( LuaInterface->IsMenu() )
 		pInterfaces[2] = NULL;
@@ -123,9 +123,8 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 	DebugPrint("CLuaShared::LoadFile: %s %s (%s|%s)\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
 
 	std::string final_path = path.c_str();
-	if ( final_path.find( "lua/" ) == 0 )
-		return NULL; // DataPack requested it probably, so skip it for now
-		//final_path.erase( 0, 4 );
+	if ( final_path.find( "lua/" ) == 0 ) // Should we use the MOD path for the DataPack? It should be faster.
+		final_path.erase( 0, 4 );
 
 	DebugPrint("CLuaShared::LoadFile: final path: %s\n", final_path.c_str());
 
@@ -341,14 +340,10 @@ void CLuaShared::AddSearchPath(const char* path, const char* pathID)
 	std::string strPath = path;
 #ifndef WIN32
 	std::replace( strPath.begin(), strPath.end(), '\\', '/' );
-#endif
-
 	DebugPrint( "CLuaShared::AddSearchPath final path: %s\n", strPath.c_str() );
+#endif
 
 	g_pFullFileSystem->AddSearchPath( strPath.c_str(), pathID );
-#ifndef WIN32
-		g_pFullFileSystem->PrintSearchPaths();
-#endif
 }
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaShared, ILuaShared, "LUASHARED003", g_CLuaShared);

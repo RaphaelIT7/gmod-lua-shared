@@ -1739,7 +1739,7 @@ void CLuaInterface::GetCurrentFile(std::string &outStr)
 		lua_getinfo(state, "S", &ar);
 		if (ar.source && strcmp(ar.what, "C") != 0)
 		{
-			outStr = ar.source;
+			outStr.assign(ar.source);
 			::DebugPrint(2, "CLuaInterface::GetCurrentFile %s\n", ar.source);
 			return;
 		}
