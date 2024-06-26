@@ -48,6 +48,7 @@ BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
 - - [x] Implement Bootil to fill the compressed field to not cause a crash.
 - - [x] Fix a crash in CLuaShared::LoadFile
 - - [ ] Get the proper CLuaError struct
+- - [ ] Find out why `GModDataPack::GetHashFromString` eats up all our memory.
 
 ## Collection of random Engine Errors and Warnings or other things
 ![image](https://github.com/RaphaelIT7/gmod-lua-shared/assets/64648134/aa4143fc-75f2-4311-b23b-d2de1394d59b)
