@@ -232,9 +232,13 @@ void CLuaShared::MountLuaAdd(const char* file, const char* pathID)
 	// Fancy code
 
 	std::string gamepath = pGet->GameDir();
-	gamepath = gamepath + '\\';
+	gamepath = gamepath + '\\' + file;
 
-	AddSearchPath( (gamepath + file).c_str(), pathID );
+#ifndef WIN32
+	std::replace( gamepath.begin(), gamepath.end(), '\\', '/' );
+#endif
+
+	AddSearchPath( gamepath.c_str(), pathID );
 
 	// Other Fancy code?
 }
