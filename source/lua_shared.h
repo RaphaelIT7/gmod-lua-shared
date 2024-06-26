@@ -37,7 +37,7 @@ struct File
 	const char* name;
 	const char* source;
 	const char* contents;
-	bool magic = false;
+	const char* contents2; // Is this a const char*?
 #endif
 	Bootil::AutoBuffer compressed;
 	unsigned int timesloadedserver;
