@@ -153,9 +153,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		g_pFullFileSystem->Close(fh);
 	} else {
 		DebugPrint("CLuaShared::LoadFile failed to find the file\n");
-#ifndef WIN32
-		g_pFullFileSystem->PrintSearchPaths();
-#endif
+
 		delete file;
 		return nullptr;
 	}
@@ -347,6 +345,9 @@ void CLuaShared::AddSearchPath(const char* path, const char* pathID)
 	DebugPrint( "CLuaShared::AddSearchPath final path: %s\n", strPath.c_str() );
 
 	g_pFullFileSystem->AddSearchPath( strPath.c_str(), pathID );
+#ifndef WIN32
+		g_pFullFileSystem->PrintSearchPaths();
+#endif
 }
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaShared, ILuaShared, "LUASHARED003", g_CLuaShared);
