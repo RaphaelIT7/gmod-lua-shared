@@ -28,6 +28,7 @@ namespace IGamemodeSystem
 
 struct File
 {
+	~File();
 	int time;
 #ifdef WIN32
 	std::string name;
@@ -37,9 +38,9 @@ struct File
 	const char* name;
 	const char* source;
 	const char* contents;
+	int random = 1; // Unknown thing
 #endif
 	Bootil::AutoBuffer compressed;
-	int random = 1; // Unknown thing
 	unsigned int timesloadedserver;
 	unsigned int timesloadedclient;
 };
@@ -101,6 +102,8 @@ public:
 public:
 	IGet* GetIGet() { return pGet; };
 	void AddSearchPath(const char*, const char*);
+	File* LoadFile_FromFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile);
+	File* LoadFile_FromDataTable(const std::string& path, const std::string& pathId, bool fromDatatable);
 private: // ToDo: Get the real structure below
 	IGet* pGet;
 	ILuaInterface* pInterfaces[3];

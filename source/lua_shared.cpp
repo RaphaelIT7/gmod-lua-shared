@@ -118,7 +118,33 @@ ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
 	return pInterfaces[realm];
 }
 
-File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
+File::~File()
+{
+#ifndef WIN32
+	if ( name )
+		delete name;
+
+	if ( code )
+		delete code;
+#endif
+}
+
+File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile)
+{
+	File* file = NULL;
+	if ( fromDatatable )
+		file = LoadFile_FromDataTable( path, pathId, fromDatatable );
+
+	if ( file )
+		return file;
+
+	if ( fromFile )
+		file = LoadFile_FromFile( path, pathId, fromDatatable, fromFile );
+
+	return file;
+}
+
+File* CLuaShared::LoadFile_FromFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
 {
 	DebugPrint("CLuaShared::LoadFile: %s %s (%s|%s)\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
 
@@ -128,10 +154,10 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 
 	DebugPrint("CLuaShared::LoadFile: final path: %s\n", final_path.c_str());
 
-	File* file = new File;
 	FileHandle_t fh = g_pFullFileSystem->Open(final_path.c_str(), "rb", pathId.c_str());
 	if(fh)
 	{
+		File* file = new File;
 		int file_len = g_pFullFileSystem->Size(fh);
 		char* code = new char[file_len + 1];
 
@@ -149,17 +175,23 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		//Bootil::Compression::FastLZ::Compress(code, sizeof(code), file->compressed);
 		DebugPrint("CLuaShared::LoadFile content size: %i\n", strlen(code));
 
+#ifndef WIN32
+		delete code; // file->content is a std::string which should make a copy of it.
+#endif
+
 		pCache[name] = file;
 
 		g_pFullFileSystem->Close(fh);
+		return file;
 	} else {
 		DebugPrint("CLuaShared::LoadFile failed to find the file\n");
-
-		delete file;
-		return nullptr;
+		return NULL;
 	}
+}
 
-	return file;
+File* CLuaShared::LoadFile_FromDataTable(const std::string& path, const std::string& pathId, bool fromDatatable)
+{
+	return NULL;
 }
 
 File* CLuaShared::GetCache(const std::string& unknown)
