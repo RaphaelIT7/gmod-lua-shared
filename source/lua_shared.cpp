@@ -142,9 +142,6 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		V_strncpy(name, path.c_str(), strlen(path.c_str()) + 1); // We use path here since I fear that something may break if we change it
 		file->name = name;
 		file->contents = code;
-#ifndef WIN32
-		file->contents2 = code;
-#endif
 		file->time = g_pFullFileSystem->GetFileTime(final_path.c_str(), pathId.c_str()); // I don't like this.
 		file->timesloadedclient = 0;
 		file->timesloadedserver = 1;
