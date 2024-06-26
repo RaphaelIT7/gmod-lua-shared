@@ -1602,7 +1602,11 @@ bool CLuaInterface::RunStringEx(const char *filename, const char *path, const ch
 			Pop(1);
 
 		if (printErrors)
+#ifdef WIN32
 			m_pGameCallback->LuaError(err);
+#else
+			Msg("An error ocurred! (%s)\n", err->message);
+#endif
 
 		delete err;
 
@@ -1680,7 +1684,11 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 	}
 #endif
 
-	m_pGameCallback->LuaError(error);
+#ifdef WIN32
+			m_pGameCallback->LuaError(error);
+#else
+			Msg("An error ocurred! (%s)\n", error->message);
+#endif
 
 #ifdef WIN32
 	delete[] buffer;
@@ -1771,7 +1779,11 @@ bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 		CLuaError* err = ReadStackIntoError(state);
 		if (showError)
 		{
+#ifdef WIN32
 			m_pGameCallback->LuaError(err);
+#else
+			Msg("An error ocurred! (%s)\n", err->message);
+#endif
 		}
 		delete err;
 		Pop(1);
