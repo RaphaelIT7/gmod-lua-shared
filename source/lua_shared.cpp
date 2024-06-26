@@ -124,7 +124,8 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 
 	std::string final_path = path.c_str();
 	if ( final_path.find( "lua/" ) == 0 )
-		final_path.erase( 0, 4 );
+		return NULL; // DataPack requested it probably, so skip it for now
+		//final_path.erase( 0, 4 );
 
 	DebugPrint("CLuaShared::LoadFile: final path: %s\n", final_path.c_str());
 
