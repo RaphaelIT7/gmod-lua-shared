@@ -130,7 +130,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		final_path.erase( 0, 4 );
 
 	File* file = new File;
-	FileHandle_t fh = g_pFullFileSystem->Open(final_path.c_str(), "rb", pathId.c_str());
+	FileHandle_t fh = g_pFullFileSystem->Open(final_path.c_str(), "rb", "lsv");
 	if(fh)
 	{
 		int file_len = g_pFullFileSystem->Size(fh);
@@ -210,7 +210,7 @@ void CLuaShared::MountLua(const char* pathID)
 			AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
 
 			std::string nextBase = info.basename;
-			while ( nextBase != "" ) // info.exists isn't available on the 64x yet.
+			while ( nextBase != "" )
 			{
 				const IGamemodeSystem::UpdatedInformation& base = (IGamemodeSystem::UpdatedInformation&)g_pFullFileSystem->Gamemodes()->FindByName( nextBase );
 				if ( !base.exists )
