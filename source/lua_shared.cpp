@@ -120,7 +120,7 @@ ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
 
 File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
 {
-	DebugPrint("CLuaShared::LoadFile: %s %s %s %s\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
+	DebugPrint("CLuaShared::LoadFile: %s %s (%s|%s)\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
 
 	if ( true )
 		return NULL;
@@ -129,8 +129,10 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 	if ( final_path.find( "lua/" ) == 0 )
 		final_path.erase( 0, 4 );
 
+	DebugPrint("CLuaShared::LoadFile: final path: %s\n", final_path.c_str());
+
 	File* file = new File;
-	FileHandle_t fh = g_pFullFileSystem->Open(final_path.c_str(), "rb", "lsv");
+	FileHandle_t fh = g_pFullFileSystem->Open(final_path.c_str(), "rb", pathId.c_str());
 	if(fh)
 	{
 		int file_len = g_pFullFileSystem->Size(fh);
@@ -293,7 +295,6 @@ const char* CLuaShared::GetStackTraces()
 	DebugPrint("CLuaShared::GetStackTraces\n");
 
 	char* buffer = new char[1000];
-
 	V_strncat(buffer, "	Client\n", 1000, -1);
 	if (!GetLuaInterface(State::CLIENT)) // Probably another check with a stacktrace.
 	{
