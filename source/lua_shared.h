@@ -9,11 +9,19 @@ namespace IGamemodeSystem
 	{
 		bool exists;
 		bool menusystem;
+#ifdef WIN32
 		std::string title;
 		std::string name;
 		std::string maps;
 		std::string basename;
 		std::string category;
+#else
+		const char* title;
+		const char* name;
+		const char* maps;
+		const char* basename;
+		const char* category;
+#endif
 		uint64_t workshopid;
 	};
 }
