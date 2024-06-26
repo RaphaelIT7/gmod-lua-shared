@@ -139,14 +139,14 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		code[file_len] = 0;
 
 		char* name = new char[strlen(path.c_str()) + 1];
-		V_strncpy(name, final_path.c_str(), strlen(path.c_str()) + 1);
+		V_strncpy(name, path.c_str(), strlen(path.c_str()) + 1); // We use path here since I fear that something may break if we change it
 		file->name = name;
 		file->contents = code;
 		file->time = g_pFullFileSystem->GetFileTime(final_path.c_str(), pathId.c_str()); // I don't like this.
 		file->timesloadedclient = 0;
 		file->timesloadedserver = 1;
 		file->source = "!UNKNOWN";
-		Bootil::Compression::FastLZ::Compress(code, sizeof(code), file->compressed);
+		//Bootil::Compression::FastLZ::Compress(code, sizeof(code), file->compressed);
 		DebugPrint("CLuaShared::LoadFile content size: %i\n", strlen(code));
 
 		pCache[name] = file;
