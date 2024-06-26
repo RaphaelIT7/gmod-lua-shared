@@ -147,9 +147,9 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		file->timesloadedserver = 1;
 		file->source = "!UNKNOWN";
 
-		Bootil::AutoBuffer buffer;
-		Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);
-		file->compressed = buffer;
+		//Bootil::AutoBuffer buffer;
+		//Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);
+		//file->compressed = buffer;
 
 		pCache[name] = file;
 
