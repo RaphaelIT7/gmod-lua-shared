@@ -234,10 +234,6 @@ void CLuaShared::MountLuaAdd(const char* file, const char* pathID)
 	std::string gamepath = pGet->GameDir();
 	gamepath = gamepath + '\\' + file;
 
-#ifndef WIN32
-	std::replace( gamepath.begin(), gamepath.end(), '\\', '/' );
-#endif
-
 	AddSearchPath( gamepath.c_str(), pathID );
 
 	// Other Fancy code?
@@ -338,8 +334,16 @@ bool CLuaShared::ScriptExists(const std::string& file, const std::string& path, 
 
 void CLuaShared::AddSearchPath(const char* path, const char* pathID)
 {
-	DebugPrint("CLuaShared::AddSearchPath %s %s\n", path, pathID);
-	g_pFullFileSystem->AddSearchPath(path, pathID);
+	DebugPrint( "CLuaShared::AddSearchPath %s %s\n", path, pathID );
+
+	std::string strPath = path;
+#ifndef WIN32
+	std::replace( strPath.begin(), strPath.end(), '\\', '/' );
+#endif
+
+	DebugPrint( "CLuaShared::AddSearchPath final path: %s\n", strPath.c_str() );
+
+	g_pFullFileSystem->AddSearchPath( strPath.c_str(), pathID );
 }
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaShared, ILuaShared, "LUASHARED003", g_CLuaShared);
