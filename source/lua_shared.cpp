@@ -126,7 +126,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 		return NULL;
 
 	std::string final_path = path.c_str();
-	if ( final_path._Starts_with( "lua/" ) )
+	if ( final_path.find( "lua/" ) == 0 )
 		final_path.erase( 0, 4 );
 
 	File* file = new File;
