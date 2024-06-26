@@ -122,9 +122,6 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 {
 	DebugPrint("CLuaShared::LoadFile: %s %s (%s|%s)\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
 
-	if ( true )
-		return NULL;
-
 	std::string final_path = path.c_str();
 	if ( final_path.find( "lua/" ) == 0 )
 		final_path.erase( 0, 4 );
