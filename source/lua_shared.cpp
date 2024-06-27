@@ -122,10 +122,10 @@ LuaFile::~LuaFile()
 {
 #ifndef WIN32
 	if ( name )
-		delete name;
+		delete[] name;
 
 	if ( code )
-		delete code;
+		delete[] code;
 #endif
 }
 
@@ -176,7 +176,7 @@ LuaFile* CLuaShared::LoadFile_FromFile(const std::string& path, const std::strin
 		DebugPrint("CLuaShared::LoadFile content size: %i\n", strlen(code));
 
 #ifndef WIN32
-		delete code; // file->content is a std::string which should make a copy of it.
+		delete[] code; // file->content is a std::string which should make a copy of it.
 #endif
 
 		pCache[name] = file;
