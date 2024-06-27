@@ -29,9 +29,6 @@ namespace IGamemodeSystem
 struct LuaFile
 {
 	~LuaFile();
-#ifndef WIN32
-	int issomethignhere = 0;
-#endif
 	int time;
 #ifdef WIN32
 	std::string name;
@@ -44,6 +41,9 @@ struct LuaFile
 	int random = 1; // Unknown thing
 #endif
 	Bootil::AutoBuffer compressed;
+#ifndef WIN32
+	int random = 1; // Unknown thing
+#endif
 	unsigned int timesloadedserver;
 	unsigned int timesloadedclient;
 };
