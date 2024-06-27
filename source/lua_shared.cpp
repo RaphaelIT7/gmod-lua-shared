@@ -124,8 +124,8 @@ LuaFile::~LuaFile()
 	if ( name )
 		delete[] name;
 
-	if ( code )
-		delete[] code;
+	if ( contents )
+		delete[] contents;
 #endif
 }
 
