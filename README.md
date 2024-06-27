@@ -42,7 +42,7 @@ BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
 - [x] Fix a crash on level shutdown (menusystem.dll crashes)
 - [ ] Implement Managed Convars properly -> Save and load their values.
 - [ ] Implement the cache properly
-- [ ] Why are entities NULL?
+- [ ] Why is the player NULL in concommand.Run?
 
 ## Linux DS issues
 - [ ] Crashes while loading.

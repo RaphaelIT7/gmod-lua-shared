@@ -22,7 +22,7 @@ public:
 	virtual void ClearCache( ) = 0;
 };
 
-struct ManagedCVar
+struct ManagedConVar
 {
 	const char* name;
 	bool iscvar;
@@ -45,7 +45,7 @@ public:
 private:
 	KeyValues* pClientCVars; // Idk the real name
 	KeyValues* pServerCVars;
-	std::vector<ManagedCVar*> pManagedCVars;
+	std::vector<ManagedConVar*> pManagedCVars;
 };
 
 extern CLuaConVars* LuaConVars();

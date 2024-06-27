@@ -84,7 +84,7 @@ ConVar* CLuaConVars::CreateConVar(const char* name, const char* defaultValue, co
 	ConVar* cvar = new ConVar(nameStr, defaultValueStr, flags, helpStringStr);
 
 	// ToDo: Verify this -> managedConVar.push_back(ManagedConVar(cvar));
-	ManagedCVar* mcvar = new ManagedCVar;
+	ManagedConVar* mcvar = new ManagedConVar;
 	mcvar->name = name;
 	mcvar->var = cvar;
 	mcvar->iscvar = true;
@@ -121,7 +121,7 @@ ConCommand* CLuaConVars::CreateConCommand(const char* name, const char* helpStri
 	ConCommand* ccmd = new ConCommand(nameStr, callback, helpStringStr, flags, completionFunc);
 
 	// ToDo: Verify this -> managedCommand.push_back(ManagedConVar(ccmd));
-	ManagedCVar* mcmd = new ManagedCVar;
+	ManagedConVar* mcmd = new ManagedConVar;
 	mcmd->name = name;
 	mcmd->var = ccmd;
 	mcmd->iscvar = false;
@@ -136,7 +136,7 @@ void CLuaConVars::DestroyManaged()
 {
 	DebugPrint( 1, "CLuaConVars::DestroyManaged\n" );
 	// Do some magic ToDo
-	for ( ManagedCVar* cvar : pManagedCVars )
+	for ( ManagedConVar* cvar : pManagedCVars )
 	{
 		g_pCVar->UnregisterConCommand( cvar->var );
 		delete cvar->var;
