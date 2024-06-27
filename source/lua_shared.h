@@ -38,7 +38,6 @@ struct LuaFile
 	const char* name;
 	const char* source;
 	const char* contents;
-	int random = 1; // Unknown thing
 #endif
 	Bootil::AutoBuffer compressed;
 #ifndef WIN32
