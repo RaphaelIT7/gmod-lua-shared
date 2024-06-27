@@ -1392,7 +1392,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	//	return false;
 
 	ILuaShared* shared = LuaShared();
-	File* file = shared->LoadFile(filename, m_sPathID, true, true);
+	LuaFile* file = shared->LoadFile(filename, m_sPathID, true, true);
 	bool ret = false;
 	if (file)
 	{

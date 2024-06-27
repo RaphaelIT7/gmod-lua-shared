@@ -118,7 +118,7 @@ ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
 	return pInterfaces[realm];
 }
 
-File::~File()
+LuaFile::~LuaFile()
 {
 #ifndef WIN32
 	if ( name )
@@ -129,9 +129,9 @@ File::~File()
 #endif
 }
 
-File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile)
+LuaFile* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile)
 {
-	File* file = NULL;
+	LuaFile* file = NULL;
 	if ( fromDatatable )
 		file = LoadFile_FromDataTable( path, pathId, fromDatatable );
 
@@ -144,7 +144,7 @@ File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, b
 	return file;
 }
 
-File* CLuaShared::LoadFile_FromFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
+LuaFile* CLuaShared::LoadFile_FromFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
 {
 	DebugPrint("CLuaShared::LoadFile: %s %s (%s|%s)\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
 
@@ -157,7 +157,7 @@ File* CLuaShared::LoadFile_FromFile(const std::string& path, const std::string& 
 	FileHandle_t fh = g_pFullFileSystem->Open(final_path.c_str(), "rb", pathId.c_str());
 	if(fh)
 	{
-		File* file = new File;
+		LuaFile* file = new LuaFile;
 		int file_len = g_pFullFileSystem->Size(fh);
 		char* code = new char[file_len + 1];
 
@@ -189,12 +189,12 @@ File* CLuaShared::LoadFile_FromFile(const std::string& path, const std::string& 
 	}
 }
 
-File* CLuaShared::LoadFile_FromDataTable(const std::string& path, const std::string& pathId, bool fromDatatable)
+LuaFile* CLuaShared::LoadFile_FromDataTable(const std::string& path, const std::string& pathId, bool fromDatatable)
 {
 	return NULL;
 }
 
-File* CLuaShared::GetCache(const std::string& unknown)
+LuaFile* CLuaShared::GetCache(const std::string& unknown)
 {
 	DebugPrint("CLuaShared::GetCache %s\n", unknown.c_str());
 
