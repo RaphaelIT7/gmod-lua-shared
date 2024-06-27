@@ -99,11 +99,11 @@ void CLuaShared::CloseLuaInterface(ILuaInterface* LuaInterface)
 {
 	DebugPrint("CLuaShared::CloseLuaInterface\n");
 
-	if ( LuaInterface->IsServer() )
-		pInterfaces[1] = NULL;
-
 	if ( LuaInterface->IsClient() )
 		pInterfaces[0] = NULL;
+
+	if ( LuaInterface->IsServer() )
+		pInterfaces[1] = NULL;
 
 	if ( LuaInterface->IsMenu() )
 		pInterfaces[2] = NULL;
@@ -118,46 +118,83 @@ ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
 	return pInterfaces[realm];
 }
 
-File* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
+LuaFile::~LuaFile()
 {
-	DebugPrint("CLuaShared::LoadFile: %s %s %s %s\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
+#ifndef WIN32
+	if ( name )
+		delete[] name;
 
-	File* file = new File;
-	FileHandle_t fh = g_pFullFileSystem->Open(path.c_str(), "rb", pathId.c_str());
+	if ( contents )
+		delete[] contents;
+#endif
+}
+
+LuaFile* CLuaShared::LoadFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile)
+{
+	LuaFile* file = NULL;
+	if ( fromDatatable )
+		file = LoadFile_FromDataTable( path, pathId, fromDatatable );
+
+	if ( file )
+		return file;
+
+	if ( fromFile )
+		file = LoadFile_FromFile( path, pathId, fromDatatable, fromFile );
+
+	return file;
+}
+
+LuaFile* CLuaShared::LoadFile_FromFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
+{
+	DebugPrint("CLuaShared::LoadFile: %s %s (%s|%s)\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
+
+	std::string final_path = path.c_str();
+	if ( final_path.find( "lua/" ) == 0 ) // Should we use the MOD path for the DataPack? It should be faster.
+		final_path.erase( 0, 4 );
+
+	DebugPrint("CLuaShared::LoadFile: final path: %s\n", final_path.c_str());
+
+	FileHandle_t fh = g_pFullFileSystem->Open(final_path.c_str(), "rb", pathId.c_str());
 	if(fh)
 	{
+		LuaFile* file = new LuaFile;
 		int file_len = g_pFullFileSystem->Size(fh);
 		char* code = new char[file_len + 1];
 
 		g_pFullFileSystem->Read((void*)code, file_len, fh);
 		code[file_len] = 0;
 
-		std::string name;
-		name.assign( path.c_str() );
-		file->name = name.c_str();
+		char* name = new char[strlen(path.c_str()) + 1];
+		V_strncpy(name, path.c_str(), strlen(path.c_str()) + 1); // We use path here since I fear that something may break if we change it
+		file->name = name;
 		file->contents = code;
-		file->time = g_pFullFileSystem->GetFileTime(path.c_str(), pathId.c_str());
+		file->time = g_pFullFileSystem->GetFileTime(final_path.c_str(), pathId.c_str()); // I don't like this.
 		file->timesloadedclient = 0;
-		file->timesloadedserver = 0;
+		file->timesloadedserver = 1;
 		file->source = "!UNKNOWN";
+		//Bootil::Compression::FastLZ::Compress(code, sizeof(code), file->compressed);
+		DebugPrint("CLuaShared::LoadFile content size: %i\n", strlen(code));
 
-		Bootil::AutoBuffer buffer;
-		Bootil::Compression::FastLZ::Compress(code, sizeof(code), buffer);
-		file->compressed = buffer;
+#ifndef WIN32
+		delete[] code; // file->content is a std::string which should make a copy of it.
+#endif
 
 		pCache[name] = file;
 
 		g_pFullFileSystem->Close(fh);
+		return file;
 	} else {
 		DebugPrint("CLuaShared::LoadFile failed to find the file\n");
-		delete file;
-		return nullptr;
+		return NULL;
 	}
-
-	return file;
 }
 
-File* CLuaShared::GetCache(const std::string& unknown)
+LuaFile* CLuaShared::LoadFile_FromDataTable(const std::string& path, const std::string& pathId, bool fromDatatable)
+{
+	return NULL;
+}
+
+LuaFile* CLuaShared::GetCache(const std::string& unknown)
 {
 	DebugPrint("CLuaShared::GetCache %s\n", unknown.c_str());
 
@@ -184,15 +221,17 @@ void CLuaShared::MountLua(const char* pathID)
 	gamepath = gamepath + '\\';
 
 	if ( pGet->IsDedicatedServer() )
+	{
 		AddSearchPath((gamepath).c_str(), pathID); // Next try to fix DS
+	}
 
 	AddSearchPath((gamepath + "lua\\").c_str(), pathID);
 
-	AddSearchPath((gamepath + "lua\\gamemodes\\").c_str(), pathID);
+	//AddSearchPath((gamepath + "lua\\gamemodes\\").c_str(), pathID);
 
 	AddSearchPath((gamepath + "gamemodes\\").c_str(), pathID);
 
-	if ( !pGet->IsDedicatedServer() ) // Fk this for now
+	//if ( !pGet->IsDedicatedServer() ) // Fk this for now
 	{
 		IGamemodeSystem::UpdatedInformation& info = (IGamemodeSystem::UpdatedInformation&)g_pFullFileSystem->Gamemodes()->Active();
 		if ( info.exists )
@@ -200,7 +239,7 @@ void CLuaShared::MountLua(const char* pathID)
 			AddSearchPath((gamepath + "gamemodes\\" + info.name + "\\entities\\").c_str(), pathID);
 
 			std::string nextBase = info.basename;
-			while ( nextBase != "" ) // info.exists isn't available on the 64x yet.
+			while ( nextBase != "" )
 			{
 				const IGamemodeSystem::UpdatedInformation& base = (IGamemodeSystem::UpdatedInformation&)g_pFullFileSystem->Gamemodes()->FindByName( nextBase );
 				if ( !base.exists )
@@ -227,9 +266,9 @@ void CLuaShared::MountLuaAdd(const char* file, const char* pathID)
 	// Fancy code
 
 	std::string gamepath = pGet->GameDir();
-	gamepath = gamepath + '\\';
+	gamepath = gamepath + '\\' + file;
 
-	AddSearchPath( (gamepath + file).c_str(), pathID );
+	AddSearchPath( gamepath.c_str(), pathID );
 
 	// Other Fancy code?
 }
@@ -283,7 +322,6 @@ const char* CLuaShared::GetStackTraces()
 	DebugPrint("CLuaShared::GetStackTraces\n");
 
 	char* buffer = new char[1000];
-
 	V_strncat(buffer, "	Client\n", 1000, -1);
 	if (!GetLuaInterface(State::CLIENT)) // Probably another check with a stacktrace.
 	{
@@ -329,8 +367,15 @@ bool CLuaShared::ScriptExists(const std::string& file, const std::string& path, 
 
 void CLuaShared::AddSearchPath(const char* path, const char* pathID)
 {
-	DebugPrint("CLuaShared::AddSearchPath %s %s\n", path, pathID);
-	g_pFullFileSystem->AddSearchPath(path, pathID);
+	DebugPrint( "CLuaShared::AddSearchPath %s %s\n", path, pathID );
+
+	std::string strPath = path;
+#ifndef WIN32
+	std::replace( strPath.begin(), strPath.end(), '\\', '/' );
+	DebugPrint( "CLuaShared::AddSearchPath final path: %s\n", strPath.c_str() );
+#endif
+
+	g_pFullFileSystem->AddSearchPath( strPath.c_str(), pathID );
 }
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaShared, ILuaShared, "LUASHARED003", g_CLuaShared);

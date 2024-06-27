@@ -73,22 +73,56 @@ CLuaError* ReadStackIntoError(lua_State* L)
 	while (lua_getstack(L, level, &ar)) {
 		lua_getinfo(L, "nSl", &ar);
 
-		CLuaError::StackEntry entry;
-		entry.source = ar.source ? ar.source : "unknown";
-		entry.function = ar.name ? ar.name : "unknown";
-		entry.line = ar.currentline;
+		CLuaError::StackEntry* entry = new CLuaError::StackEntry;
+#ifdef WIN32
+		entry->source = ar.source ? ar.source : "unknown";
+		entry->function = ar.name ? ar.name : "unknown";
+#else
+		const char* source = ar.source ? ar.source : "unknown";
+		const char* function = ar.name ? ar.name : "unknown";
 
-		lua_error->stack.push_back(entry);
+		char* csource = new char[strlen(source) + 1];
+		char* cfunction = new char[strlen(function) + 1];
+		V_strncpy(csource, source, strlen(source) + 1);
+		V_strncpy(cfunction, function, strlen(function) + 1);
+		cfunction[strlen(function)] = '\0';
+		csource[strlen(source)] = '\0';
+
+		entry->source = csource;
+		entry->function = cfunction;
+#endif
+		entry->line = ar.currentline;
+
+		lua_error->stack.push_back(*entry);
 
 		++level;
 	}
 
 	const char* str = lua_tolstring(L, -1, NULL);
 	if (str != NULL) // Setting a std::string to NULL causes a crash
+	{
+#ifdef WIN32
 		lua_error->message = str;
+#else
+		char* newmessage = new char[strlen(str) + 1];
+		V_strncpy(newmessage, str, strlen(str) + 1);
+		newmessage[strlen(str)] = '\0';
+
+		lua_error->message = newmessage;
+#endif
+	}
 
 	CLuaInterface* LUA = (CLuaInterface*)L->luabase;
-	lua_error->side = LUA->IsClient() ? "client" : ( LUA->IsMenu() ? "menu" : "server" );
+#ifdef WIN32
+	lua_error->side = LUA->IsClient() ? "client" : (LUA->IsMenu() ? "menu" : "server");
+#else
+	const char* side = LUA->IsClient() ? "client" : (LUA->IsMenu() ? "menu" : "server");
+	char* newside = new char[strlen(side) + 1];
+	V_strncpy(newside, side, strlen(side) + 1);
+	newside[strlen(side)] = '\0';
+
+	lua_error->side = newside;
+#endif
 
 	return lua_error;
 }
@@ -108,6 +142,46 @@ int AdvancedLuaErrorReporter(lua_State *L)
 	}
 
 	return 0;
+}
+
+CLuaError::~CLuaError()
+{
+	for ( CLuaError::StackEntry entry : stack )
+	{
+		delete &entry; // They were allocated with new
+	}
+	stack.clear();
+
+#ifndef WIN32
+	if (message)
+	{
+		delete[] message;
+		message = NULL;
+	}
+
+	if (side)
+	{
+		delete[] side;
+		side = NULL;
+	}
+#endif
+}
+
+CLuaError::StackEntry::~StackEntry()
+{
+#ifndef WIN32
+	if (source)
+	{
+		delete[] source;
+		source = NULL;
+	}
+
+	if (function)
+	{
+		delete[] function;
+		function = NULL;
+	}
+#endif
 }
 
 ILuaInterface* CreateLuaInterface(bool bIsServer)
@@ -550,7 +624,7 @@ void CLuaInterface::PushAngle(const QAngle& val)
 {
 	::DebugPrint(2, "CLuaInterface::PushAngle\n");
 	
-	ILuaBase::UserData* udata = NewUserdata(20);
+	ILuaBase::UserData* udata = NewUserdata(20); // Should we use PushUserType?
 	*(QAngle*)udata->data = val;
 	udata->type = GarrysMod::Lua::Type::Angle;
 
@@ -846,9 +920,7 @@ void CLuaInterface::LuaError(const char* str, int iStackPos)
 void CLuaInterface::TypeError(const char* str, int iStackPos)
 {
 	::DebugPrint(2, "CLuaInterface::TypeError %s %i\n", str, iStackPos);
-	//luaL_typerror(state, iStackPos, str);
-
-	Error("CLuaInterface::TypeError is not implemented!\n");
+	luaL_typerror(state, iStackPos, str);
 }
 
 void CLuaInterface::CallInternal(int args, int rets)
@@ -1318,11 +1390,11 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	//	return false;
 
 	ILuaShared* shared = LuaShared();
-	File* file = shared->LoadFile(filename, m_sPathID, true, true);
+	LuaFile* file = shared->LoadFile(filename, m_sPathID, true, true);
 	bool ret = false;
 	if (file)
 	{
-		PushPath(ToPath(file->source).c_str());
+		PushPath(ToPath(file->name).c_str());
 #ifdef WIN32
 		ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 #else
@@ -1337,7 +1409,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 			file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
 			if (file)
 			{
-				PushPath(ToPath(file->source).c_str());
+				PushPath(ToPath(file->name).c_str());
 #ifdef WIN32
 				ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 #else
@@ -1355,7 +1427,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 					file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
 					if (file)
 					{
-						PushPath(ToPath(file->source).c_str());
+						PushPath(ToPath(file->name).c_str());
 #ifdef WIN32
 						ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 #else
@@ -1368,7 +1440,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 							file = shared->LoadFile(ToPath(stringToRun) + filename, m_sPathID, true, true);
 							if (file)
 							{
-								PushPath(ToPath(file->source).c_str());
+								PushPath(ToPath(file->name).c_str());
 #ifdef WIN32
 								ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 #else
@@ -1383,7 +1455,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 		}
 	}
 
-	if ( !ret )
+	if ( !file )
 	{
 		::DebugPrint( 1, "Failed to find Script %s!\n", filename );
 #ifdef WIN32
@@ -1534,7 +1606,11 @@ bool CLuaInterface::RunStringEx(const char *filename, const char *path, const ch
 			Pop(1);
 
 		if (printErrors)
+#ifdef WIN32
 			m_pGameCallback->LuaError(err);
+#else
+			Msg("An error ocurred! %s\n", err->message);
+#endif
 
 		delete err;
 
@@ -1570,11 +1646,17 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 
 	char* buffer = new char[size + 1];
 	vsnprintf(buffer, size + 1, fmt, args);
+	buffer[size] = '\0';
+
+#ifndef WIN32
+	if (error->message)
+		delete[] error->message;
+#endif
 
 	error->message = buffer;
-
-	delete[] buffer;
 	va_end(args);
+	
+	/* NOTE: This is already done in ReadStackIntoError
 	
 	const char* realm;
 	switch(m_iRealm)
@@ -1592,19 +1674,47 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 			realm = "unknown";
 			break;
 	}
-	error->side = realm;
+	error->side = realm;*/
 
-	m_pGameCallback->LuaError(error);
+#ifndef WIN32
+	Msg("Error Message: %s\n", error->message);
+	Msg("Error Side: %s\n", error->side);
 
-	delete error;
+	for ( CLuaError::StackEntry entry : error->stack )
+	{
+		Msg("Error Stack function: %s\n", entry.function);
+		Msg("Error Stack source: %s\n", entry.source);
+		Msg("Error Stack line: %i\n", entry.line);
+	}
+#endif
+
+#ifdef WIN32
+			m_pGameCallback->LuaError(error);
+#else
+			Msg("An error ocurred! %s\n", error->message);
+#endif
+
+#ifdef WIN32
+	delete[] buffer;
+#endif
+	delete error; // Deconstuctor will delete our buffer
 }
 
 const char* CLuaInterface::GetCurrentLocation()
 {
 	::DebugPrint(2, "CLuaInterface::GetCurrentLocation\n");
-	// ToDo
+	
+	lua_Debug ar;
+	lua_getstack(state, 1, &ar);
+	lua_getinfo(state, "Sl", &ar);
+	if (ar.source && strcmp(ar.what, "C") != 0)
+	{
+		static char strOutput[511];
+		V_snprintf( strOutput, 511, "%s (line %i)", ar.source, ar.currentline );
 
-	::DebugPrint(1, "CLuaInterface::GetCurrentLocation is not implemented!\n");
+		::DebugPrint(2, "CLuaInterface::GetCurrentLocation %s\n", strOutput);
+		return strOutput;
+	}
 
 	return "<nowhere>";
 }
@@ -1642,7 +1752,7 @@ void CLuaInterface::GetCurrentFile(std::string &outStr)
 		lua_getinfo(state, "S", &ar);
 		if (ar.source && strcmp(ar.what, "C") != 0)
 		{
-			outStr = ar.source;
+			outStr.assign(ar.source);
 			::DebugPrint(2, "CLuaInterface::GetCurrentFile %s\n", ar.source);
 			return;
 		}
@@ -1682,7 +1792,11 @@ bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 		CLuaError* err = ReadStackIntoError(state);
 		if (showError)
 		{
+#ifdef WIN32
 			m_pGameCallback->LuaError(err);
+#else
+			Msg("An error ocurred! %s\n", err->message);
+#endif
 		}
 		delete err;
 		Pop(1);

@@ -3,6 +3,7 @@ name: Build Project
 on:
   workflow_dispatch:
   push:
+    branches: [ "main" ]
     paths:
       - 'libs/lua51*'
       - 'libs/luajit*'

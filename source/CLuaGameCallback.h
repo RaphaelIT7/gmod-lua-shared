@@ -1,22 +1,31 @@
 #include "ILuaObject.h"
-#include "GarrysMod/Addon.h"
+#include <vector>
 class ILuaInterface;
 
 struct CLuaError
 {
+	~CLuaError();
 	struct StackEntry
 	{
+		~StackEntry();
+#ifdef WIN32
 		std::string source;
 		std::string function;
+#else
+		const char* source = NULL;
+		const char* function = NULL;
+#endif
 		int line = -1;
 	};
 
+#ifdef WIN32
 	std::string message;
 	std::string side;
-	std::vector<StackEntry> stack;
-#ifndef WIN32
-	IAddonSystem::Information info;
+#else
+	const char* message = NULL;
+	const char* side = NULL;
 #endif
+	std::vector<StackEntry> stack;
 };
 
 class ILuaGameCallback
