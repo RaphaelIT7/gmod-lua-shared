@@ -29,6 +29,9 @@ namespace IGamemodeSystem
 struct LuaFile
 {
 	~LuaFile();
+#ifndef WIN32
+	int issomethignhere = 0;
+#endif
 	int time;
 #ifdef WIN32
 	std::string name;
