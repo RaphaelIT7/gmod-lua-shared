@@ -624,7 +624,7 @@ void CLuaInterface::PushAngle(const QAngle& val)
 {
 	::DebugPrint(2, "CLuaInterface::PushAngle\n");
 	
-	ILuaBase::UserData* udata = NewUserdata(20);
+	ILuaBase::UserData* udata = NewUserdata(20); // Should we use PushUserType?
 	*(QAngle*)udata->data = val;
 	udata->type = GarrysMod::Lua::Type::Angle;
 
@@ -920,9 +920,7 @@ void CLuaInterface::LuaError(const char* str, int iStackPos)
 void CLuaInterface::TypeError(const char* str, int iStackPos)
 {
 	::DebugPrint(2, "CLuaInterface::TypeError %s %i\n", str, iStackPos);
-	//luaL_typerror(state, iStackPos, str);
-
-	Error("CLuaInterface::TypeError is not implemented!\n");
+	luaL_typerror(state, iStackPos, str);
 }
 
 void CLuaInterface::CallInternal(int args, int rets)
@@ -1705,9 +1703,18 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 const char* CLuaInterface::GetCurrentLocation()
 {
 	::DebugPrint(2, "CLuaInterface::GetCurrentLocation\n");
-	// ToDo
+	
+	lua_Debug ar;
+	lua_getstack(state, 1, &ar);
+	lua_getinfo(state, "Sl", &ar);
+	if (ar.source && strcmp(ar.what, "C") != 0)
+	{
+		static char strOutput[511];
+		V_snprintf( strOutput, 511, "%s (line %i)", ar.source, ar.currentline );
 
-	::DebugPrint(1, "CLuaInterface::GetCurrentLocation is not implemented!\n");
+		::DebugPrint(2, "CLuaInterface::GetCurrentLocation %s\n", strOutput);
+		return strOutput;
+	}
 
 	return "<nowhere>";
 }

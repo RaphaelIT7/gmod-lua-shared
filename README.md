@@ -33,7 +33,7 @@ BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
 - [ ] Fix some random error (`the file "(null)"" couldn't be opened`)
 - [x] Fix the random crash when loading into a game  
 - - [x] Fix CallFunctionProtected & GetReturn
-- [ ] Type Errors cause engine errors.
+- [x] Type Errors cause engine errors.
 - [x] Fix a crash when closing the game.
 - [x] Fix `/* */`. it ignores the full line.
 - - [x] Find out why the local build lib works but the one from the compiler fails
@@ -42,6 +42,7 @@ BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`
 - [x] Fix a crash on level shutdown (menusystem.dll crashes)
 - [ ] Implement Managed Convars properly -> Save and load their values.
 - [ ] Implement the cache properly
+- [ ] Why are entities NULL?
 
 ## Linux DS issues
 - [ ] Crashes while loading.
