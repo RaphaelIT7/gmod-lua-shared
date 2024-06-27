@@ -1396,7 +1396,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	bool ret = false;
 	if (file)
 	{
-		PushPath(ToPath(file->source).c_str());
+		PushPath(ToPath(file->name).c_str());
 #ifdef WIN32
 		ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 #else
@@ -1411,7 +1411,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 			file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
 			if (file)
 			{
-				PushPath(ToPath(file->source).c_str());
+				PushPath(ToPath(file->name).c_str());
 #ifdef WIN32
 				ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 #else
@@ -1429,7 +1429,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 					file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
 					if (file)
 					{
-						PushPath(ToPath(file->source).c_str());
+						PushPath(ToPath(file->name).c_str());
 #ifdef WIN32
 						ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 #else
@@ -1442,7 +1442,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 							file = shared->LoadFile(ToPath(stringToRun) + filename, m_sPathID, true, true);
 							if (file)
 							{
-								PushPath(ToPath(file->source).c_str());
+								PushPath(ToPath(file->name).c_str());
 #ifdef WIN32
 								ret = RunStringEx(file->name.c_str(), file->source.c_str(), file->contents.c_str(), true, showErrors, true, noReturns);
 #else
@@ -1457,7 +1457,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 		}
 	}
 
-	if ( !ret )
+	if ( !file )
 	{
 		::DebugPrint( 1, "Failed to find Script %s!\n", filename );
 #ifdef WIN32
