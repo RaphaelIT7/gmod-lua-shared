@@ -1522,8 +1522,11 @@ void CLuaInterface::PopPath()
 	delete[] str;
 	m_pPaths.pop_back();
 
-	m_sCurrentPath = m_pPaths.back();
 	--m_iPushedPaths;
+	if ( m_iPushedPaths > 0 )
+		m_sCurrentPath = m_pPaths.back();
+	else
+		m_sCurrentPath = NULL;
 }
 
 const char* CLuaInterface::GetPath()
