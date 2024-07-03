@@ -8,7 +8,7 @@ struct CLuaError
 	struct StackEntry
 	{
 		~StackEntry();
-#ifdef WIN32
+#ifdef _WIN32
 		std::string source;
 		std::string function;
 #else
@@ -18,7 +18,7 @@ struct CLuaError
 		int line = -1;
 	};
 
-#ifdef WIN32
+#ifdef _WIN32
 	std::string message;
 	std::string side;
 #else
