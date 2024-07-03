@@ -2,6 +2,7 @@
 #include <filesystem.h>
 #include <GarrysMod/IGet.h>
 #include <unordered_map>
+#include <string>
 
 namespace IGamemodeSystem
 {
