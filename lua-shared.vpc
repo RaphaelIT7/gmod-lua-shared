@@ -25,6 +25,7 @@ $Project "lua_shared"
 {
 	$Folder	"Source Files"
 	{
+		-$File	"$SRCDIR\public\tier0\memoverride.cpp"
 		$File	"source\CLuaConVars.cpp"
 		$File	"source\CLuaInterface.cpp"
 		$File	"source\lua_shared.cpp"
