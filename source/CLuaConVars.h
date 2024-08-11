@@ -10,6 +10,8 @@
 #include <KeyValues.h>
 #endif
 
+#define FCVAR_LUA_CLIENT			(1<<18)
+#define FCVAR_LUA_SERVER			(1<<19)
 class ILuaConVars
 {
 public:

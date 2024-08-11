@@ -56,6 +56,7 @@ struct LuaFindResult
 
 class LuaClientDatatableHook;
 
+extern IGet* get;
 class ILuaShared
 {
 public:
@@ -103,12 +104,10 @@ public:
 	virtual void EmptyCache();
 	virtual bool ScriptExists(const std::string &, const std::string &, bool);
 public:
-	IGet* GetIGet() { return pGet; };
 	void AddSearchPath(const char*, const char*);
 	LuaFile* LoadFile_FromFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile);
 	LuaFile* LoadFile_FromDataTable(const std::string& path, const std::string& pathId, bool fromDatatable);
 private: // ToDo: Get the real structure below
-	IGet* pGet;
 	ILuaInterface* pInterfaces[3];
 	//std::vector<File*> pCache;
 	std::unordered_map<std::string, LuaFile*> pCache;

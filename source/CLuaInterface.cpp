@@ -1033,7 +1033,7 @@ GarrysMod::Lua::ILuaObject* CLuaInterface::NewTemporaryObject()
 
 bool CLuaInterface::isUserData(int iStackPos)
 {
-	::DebugPrint(4, "CLuaInterface::isUserData %s\n", lua_type(state, iStackPos) == Type::UserData ? "Yes" : "No");
+	::DebugPrint(4, "CLuaInterface::isUserData %i %s\n", iStackPos, lua_type(state, iStackPos) == Type::UserData ? "Yes" : "No");
 
 	return lua_type(state, iStackPos) == Type::UserData;
 }
@@ -1836,11 +1836,10 @@ void CLuaInterface::Require(const char* cname)
 
 
 	std::string path = (std::string)"lua/bin/" + name;
-	IGet* get = ((CLuaShared*)LuaShared())->GetIGet();
-	if (get->FileSystem()->FileExists(path.c_str(), "MOD"))
+	if (g_pFullFileSystem->FileExists(path.c_str(), "MOD"))
 	{
 		char dllpath[512];
-		get->FileSystem()->RelativePathToFullPath(path.c_str(), "MOD", dllpath, sizeof(dllpath));
+		g_pFullFileSystem->RelativePathToFullPath(path.c_str(), "MOD", dllpath, sizeof(dllpath));
 		GMOD_LoadBinaryModule(state, dllpath);
 		//delete[] dllpath; //NOTE: Delete this and it will cause a critical error? probably because the value is still in use by Lua
 	} else {
@@ -1871,6 +1870,8 @@ void CLuaInterface::PushPooledString(int index)
 	PushNumber(index+1); // LUA starts at 1 so we add 1
 	GetTable(-2);
 	Remove(-2);
+
+	::DebugPrint(2, "CLuaInterface::PushPooledString %i %s %s\n", index, g_PooledStrings[index], GetString(-1));
 }
 
 const char* CLuaInterface::GetPooledString(int index)
@@ -1891,6 +1892,11 @@ void CLuaInterface::AppendStackTrace(char *, unsigned long)
 void* CLuaInterface::CreateConVar(const char* name, const char* defaultValue, const char* helpString, int flags)
 {
 	::DebugPrint(2, "CLuaInterface::CreateConVar\n");
+
+	if ( IsServer() )
+		flags |= FCVAR_LUA_SERVER;
+	else
+		flags |= FCVAR_LUA_CLIENT;
 
 	return LuaConVars()->CreateConVar(name, defaultValue, helpString, flags);
 }

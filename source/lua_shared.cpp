@@ -40,9 +40,11 @@ CLuaShared::~CLuaShared()
 	DebugPrint("CLuaShared::~CLuaShared\n");
 }
 
-void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext*, IGet* get)
+IGet* get;
+CSteamAPIContext* steamapicontext = NULL;
+void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool magicBool, CSteamAPIContext* context, IGet* pGet)
 {
-	DebugPrint("CLuaShared::Init\n");
+	DebugPrint("CLuaShared::Init %s %p %p\n", magicBool ? "true" : "false", context, pGet);
 
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);
@@ -54,7 +56,9 @@ void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool, CSteamAPIContext
 
 	LuaConVars()->Init();
 
-	pGet = get;
+	steamapicontext = context;
+
+	get = pGet;
 }
 
 void CLuaShared::Shutdown()
@@ -217,10 +221,10 @@ void CLuaShared::MountLua(const char* pathID)
 {
 	DebugPrint("CLuaShared::MountLua %s\n", pathID);
 
-	std::string gamepath = pGet->GameDir();
+	std::string gamepath = get->GameDir();
 	gamepath = gamepath + '\\';
 
-	if ( pGet->IsDedicatedServer() )
+	if ( get->IsDedicatedServer() )
 	{
 		AddSearchPath((gamepath).c_str(), pathID); // Next try to fix DS
 	}
@@ -231,7 +235,7 @@ void CLuaShared::MountLua(const char* pathID)
 
 	AddSearchPath((gamepath + "gamemodes\\").c_str(), pathID);
 
-	//if ( !pGet->IsDedicatedServer() ) // Fk this for now
+	//if ( !get->IsDedicatedServer() ) // Fk this for now
 	{
 		IGamemodeSystem::UpdatedInformation& info = (IGamemodeSystem::UpdatedInformation&)g_pFullFileSystem->Gamemodes()->Active();
 		if ( info.exists )
@@ -265,7 +269,7 @@ void CLuaShared::MountLuaAdd(const char* file, const char* pathID)
 	DebugPrint("CLuaShared::MountLuaAdd %s %s\n", file, pathID);
 	// Fancy code
 
-	std::string gamepath = pGet->GameDir();
+	std::string gamepath = get->GameDir();
 	gamepath = gamepath + '\\' + file;
 
 	AddSearchPath( gamepath.c_str(), pathID );
@@ -328,6 +332,7 @@ const char* CLuaShared::GetStackTraces()
 		V_strncat(buffer, "    Lua Interface = NULL\n\n", 1000, -1);
 	} else {
 		// Do Magic.
+		// Dump the stack by looping thru it. See GetCurrentLine or whatever the function was
 	}
 
 	V_strncat(buffer, "	Server\n", 1000, -1);
@@ -367,15 +372,15 @@ bool CLuaShared::ScriptExists(const std::string& file, const std::string& path, 
 
 void CLuaShared::AddSearchPath(const char* path, const char* pathID)
 {
-	DebugPrint( "CLuaShared::AddSearchPath %s %s\n", path, pathID );
+	DebugPrint("CLuaShared::AddSearchPath %s %s\n", path, pathID);
 
 	std::string strPath = path;
 #ifndef WIN32
-	std::replace( strPath.begin(), strPath.end(), '\\', '/' );
-	DebugPrint( "CLuaShared::AddSearchPath final path: %s\n", strPath.c_str() );
+	std::replace(strPath.begin(), strPath.end(), '\\', '/');
+	DebugPrint("CLuaShared::AddSearchPath final path: %s\n", strPath.c_str());
 #endif
 
-	g_pFullFileSystem->AddSearchPath( strPath.c_str(), pathID );
+	g_pFullFileSystem->AddSearchPath(strPath.c_str(), pathID);
 }
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaShared, ILuaShared, "LUASHARED003", g_CLuaShared);
