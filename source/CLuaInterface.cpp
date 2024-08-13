@@ -1389,8 +1389,9 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	//if (true)
 	//	return false;
 
+	bool bDataTable = ((std::string)filename).rfind("!lua", 0) == 0;
 	ILuaShared* shared = LuaShared();
-	LuaFile* file = shared->LoadFile(filename, m_sPathID, true, true);
+	LuaFile* file = shared->LoadFile(filename, m_sPathID, bDataTable, true);
 	bool ret = false;
 	if (file)
 	{
@@ -1406,7 +1407,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 		GetCurrentFile(out);
 		if (out != "!UNKNOWN") // ToDo: Fix this mess. This will probably kill performance / loading times.
 		{
-			file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
+			file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, bDataTable, true);
 			if (file)
 			{
 				PushPath(ToPath(file->name).c_str());
@@ -1424,7 +1425,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 				out = ar.source ? ar.source : "!UNKNOWN";
 				if (out != "!UNKNOWN")
 				{
-					file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, true, true);
+					file = shared->LoadFile(ToPath(out.c_str()) + filename, m_sPathID, bDataTable, true);
 					if (file)
 					{
 						PushPath(ToPath(file->name).c_str());
@@ -1437,7 +1438,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 					} else {
 						if (strcmp(stringToRun, "") != 0)
 						{
-							file = shared->LoadFile(ToPath(stringToRun) + filename, m_sPathID, true, true);
+							file = shared->LoadFile(ToPath(stringToRun) + filename, m_sPathID, bDataTable, true);
 							if (file)
 							{
 								PushPath(ToPath(file->name).c_str());
@@ -1459,7 +1460,7 @@ bool CLuaInterface::FindAndRunScript(const char *filename, bool run, bool showEr
 	{
 		::DebugPrint( 1, "Failed to find Script %s!\n", filename );
 #ifdef WIN32
-		__debugbreak();
+		//__debugbreak();
 #endif
 	}
 
@@ -1482,9 +1483,40 @@ const char* CLuaInterface::GetPathID()
 void CLuaInterface::ErrorNoHalt( const char* fmt, ... )
 {
 	::DebugPrint(2, "CLuaInterface::ErrorNoHalt %s\n", fmt);
-	// ToDo
 
-	Error("CLuaInterface::ErrorNoHalt is not implemented!\n");
+	CLuaError* error = ReadStackIntoError(state);
+
+	va_list args;
+	va_start(args, fmt);
+
+	int size = vsnprintf(NULL, 0, fmt, args);
+	if (size < 0) {
+		va_end(args);
+		return;
+	}
+
+	char* buffer = new char[size + 1];
+	vsnprintf(buffer, size + 1, fmt, args);
+	buffer[size] = '\0';
+
+#ifndef WIN32
+	if (error->message)
+		delete[] error->message;
+#endif
+
+	error->message = buffer;
+	va_end(args);
+
+#ifdef WIN32
+		m_pGameCallback->LuaError(error);
+#else
+		Msg("An error ocurred! %s\n", error->message);
+#endif
+
+#ifdef WIN32
+	delete[] buffer;
+#endif
+	//delete error; // Deconstuctor will delete our buffer
 }
 
 void CLuaInterface::Msg( const char* fmt, ... )
@@ -1615,7 +1647,7 @@ bool CLuaInterface::RunStringEx(const char *filename, const char *path, const ch
 			Msg("An error ocurred! %s\n", err->message);
 #endif
 
-		delete err;
+		//delete err;
 
 		return false;
 	} else {
@@ -1700,7 +1732,7 @@ void CLuaInterface::ErrorFromLua(const char *fmt, ...)
 #ifdef WIN32
 	delete[] buffer;
 #endif
-	delete error; // Deconstuctor will delete our buffer
+	//delete error; // Deconstuctor will delete our buffer
 }
 
 const char* CLuaInterface::GetCurrentLocation()
@@ -1801,7 +1833,7 @@ bool CLuaInterface::CallFunctionProtected(int iArgs, int iRets, bool showError)
 			Msg("An error ocurred! %s\n", err->message);
 #endif
 		}
-		delete err;
+		//delete err;
 		Pop(1);
 	}
 

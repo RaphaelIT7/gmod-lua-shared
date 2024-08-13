@@ -57,6 +57,8 @@ struct LuaFindResult
 class LuaClientDatatableHook;
 
 extern IGet* get;
+extern ILuaConVars* g_pOrigLuaConVars;
+extern ILuaShared* g_pOrigLuaShared;
 class ILuaShared
 {
 public:

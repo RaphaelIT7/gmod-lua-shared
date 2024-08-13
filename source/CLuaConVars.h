@@ -50,4 +50,4 @@ private:
 	std::vector<ManagedConVar*> pManagedCVars;
 };
 
-extern CLuaConVars* LuaConVars();
+extern ILuaConVars* LuaConVars();

@@ -1,6 +1,7 @@
 #include "CLuaConVars.h"
 #include <tier2/tier2.h>
 #include "filesystem.h"
+#include "lua_shared.h"
 
 static ConVar lua_debugmode("lua_debugmode_convar", "2", 0);
 static void DebugPrint(int level, const char* fmt, ...)
@@ -28,8 +29,11 @@ static void DebugPrint(int level, const char* fmt, ...)
 
 CLuaConVars g_CLuaConVars;
 
-CLuaConVars* LuaConVars()
+ILuaConVars* LuaConVars()
 {
+	if (g_pOrigLuaConVars)
+		return g_pOrigLuaConVars;
+
 	return &g_CLuaConVars;
 }
 
