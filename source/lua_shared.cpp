@@ -1,8 +1,8 @@
 #include "lua_shared.h"
 #include "CLuaConVars.h"
 #include "tier3/tier3.h"
-#include "GarrysMod/FactoryLoader.hpp"
 #ifndef BUILD_GMOD
+#include "GarrysMod/FactoryLoader.hpp"
 #include <Platform.hpp>
 #endif
 
@@ -59,6 +59,7 @@ void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool magicBool, CSteam
 
 	ConVar_Register(0);
 
+#ifndef BUILD_GMOD
 	g_pOrigLuaModule = Sys_LoadModule("garrysmod/bin/orig_lua_shared.dll"); // We need to load it or else the FactoryLoader fails because the dll isn't loaded.
 	SourceSDK::FactoryLoader lua_shared_loader("orig_lua_shared");
 	if (lua_shared_loader.GetFactory())
@@ -67,6 +68,7 @@ void CLuaShared::Init(CreateInterfaceFn interfaceFactory, bool magicBool, CSteam
 		g_pOrigLuaConVars = (ILuaConVars*)lua_shared_loader.GetFactory()("LUACONVARS001", NULL);
 		Msg("Loading original lua_shared to not break stuff\n");
 	}
+#endif
 
 	if (!g_pOrigLuaShared)
 		LuaConVars()->Init();

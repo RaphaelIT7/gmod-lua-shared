@@ -17,7 +17,7 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	"$BASE;lua;$SRCDIR\bootil\include"
-		$PreprocessorDefinitions		"BUILD_GMOD;_CRT_SECURE_NO_WARNINGS"
+		$PreprocessorDefinitions		"$BASE;BUILD_GMOD;_CRT_SECURE_NO_WARNINGS"
 	}
 }
 
@@ -49,5 +49,10 @@ $Project "lua_shared"
 		$Lib 	bootil
 		$DynamicFile	"libs\lua51_32.lib" [$WIN32]
 		//$DynamicFile	"libs\lua51_64.lib" [$WIN64]
+	}
+
+	$Folder "Resource Scripts" [$WINDOWS]
+	{
+		-$File	"$SRCDIR\build\win\resource_scripts\windows_dll_base.rc"
 	}
 }
