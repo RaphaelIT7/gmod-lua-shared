@@ -17,7 +17,7 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	"$BASE;lua;$SRCDIR\bootil\include"
-		$PreprocessorDefinitions		"BUILD_GMOD"
+		$PreprocessorDefinitions		"BUILD_GMOD;_CRT_SECURE_NO_WARNINGS"
 	}
 }
 
