@@ -485,4 +485,4 @@ void CLuaShared::AddSearchPath(const char* path, const char* pathID)
 	g_pFullFileSystem->AddSearchPath(strPath.c_str(), pathID);
 }
 
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaShared, ILuaShared, "LUASHARED003", g_CLuaShared);
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaShared, ILuaShared, GMOD_LUASHARED_INTERFACE, g_CLuaShared);

@@ -1,4 +1,5 @@
 #include "CLuaInterface.h"
+#include "lua.hpp"
 #include "CLuaConVars.h"
 #include "../lua/lj_obj.h"
 #include "../lua/luajit_rolling.h"
@@ -72,10 +73,10 @@ CLuaError* ReadStackIntoError(lua_State* L)
 	while (lua_getstack(L, level, &ar)) {
 		lua_getinfo(L, "nSl", &ar);
 
-		CLuaError::StackEntry* entry = new CLuaError::StackEntry;
+		CLuaError::StackEntry& entry = lua_error->stack.emplace_back();
 #ifdef WIN32
-		entry->source = ar.source ? ar.source : "unknown";
-		entry->function = ar.name ? ar.name : "unknown";
+		entry.source = ar.source ? ar.source : "unknown";
+		entry.function = ar.name ? ar.name : "unknown";
 #else
 		const char* source = ar.source ? ar.source : "unknown";
 		const char* function = ar.name ? ar.name : "unknown";
@@ -87,12 +88,10 @@ CLuaError* ReadStackIntoError(lua_State* L)
 		cfunction[strlen(function)] = '\0';
 		csource[strlen(source)] = '\0';
 
-		entry->source = csource;
-		entry->function = cfunction;
+		entry.source = csource;
+		entry.function = cfunction;
 #endif
-		entry->line = ar.currentline;
-
-		lua_error->stack.push_back(*entry);
+		entry.line = ar.currentline;
 
 		++level;
 	}
@@ -141,46 +140,6 @@ int AdvancedLuaErrorReporter(lua_State *L)
 	}
 
 	return 0;
-}
-
-CLuaError::~CLuaError()
-{
-	for ( CLuaError::StackEntry entry : stack )
-	{
-		delete &entry; // They were allocated with new
-	}
-	stack.clear();
-
-#ifndef WIN32
-	if (message)
-	{
-		delete[] message;
-		message = NULL;
-	}
-
-	if (side)
-	{
-		delete[] side;
-		side = NULL;
-	}
-#endif
-}
-
-CLuaError::StackEntry::~StackEntry()
-{
-#ifndef WIN32
-	if (source)
-	{
-		delete[] source;
-		source = NULL;
-	}
-
-	if (function)
-	{
-		delete[] function;
-		function = NULL;
-	}
-#endif
 }
 
 ILuaInterface* CreateLuaInterface(bool bIsServer)

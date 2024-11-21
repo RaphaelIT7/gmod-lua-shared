@@ -4,6 +4,8 @@
 
 #define FCVAR_LUA_CLIENT			(1<<18)
 #define FCVAR_LUA_SERVER			(1<<19)
+
+#define GMOD_LUACONVARS_INTERFACE "LUACONVARS001"
 class ILuaConVars
 {
 public:

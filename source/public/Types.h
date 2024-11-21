@@ -172,7 +172,7 @@ namespace Type
 }
 
 #ifndef CFunc
-class lua_State;
+struct lua_State;
 typedef int ( *CFunc )( lua_State* L );
 #endif
 #endif

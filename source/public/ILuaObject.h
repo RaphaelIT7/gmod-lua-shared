@@ -3,6 +3,7 @@
 #ifndef GMOD_ILUAOBJECT_H
 #define GMOD_ILUAOBJECT_H
 #include "Types.h"
+#include "mathlib/mathlib.h"
 
 #if IS_SERVERSIDE
 

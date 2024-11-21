@@ -1,7 +1,6 @@
 #ifndef GMOD_ILUAINTERFACE_H
 #define GMOD_ILUAINTERFACE_H
 #include <string>
-#include <lua.hpp>
 #include <mathlib/vector.h>
 #include "ILuaObject.h"
 
@@ -10,6 +9,7 @@
 
 class ILuaGameCallback;
 class CCommand;
+struct lua_Debug;
 namespace Bootil
 {
 	class Buffer;
@@ -140,9 +140,9 @@ public:
 	// See: lua_next( lua_State*, int );
 	virtual int         Next(int iStackPos) = 0;
 
-#ifndef GMOD_ALLOW_DEPRECATED
-protected:
-#endif
+//#ifndef GMOD_ALLOW_DEPRECATED
+//protected:
+//#endif
 	// Deprecated: Use the UserType functions instead of this
 	virtual ILuaBase::UserData* NewUserdata(unsigned int iSize) = 0;
 
@@ -192,9 +192,9 @@ public:
 	// returns NULL upon failure
 	virtual CFunc       GetCFunction(int iStackPos = -1) = 0;
 
-#if !defined( GMOD_ALLOW_DEPRECATED ) && !defined( GMOD_ALLOW_LIGHTUSERDATA )
-protected:
-#endif
+//#if !defined( GMOD_ALLOW_DEPRECATED ) && !defined( GMOD_ALLOW_LIGHTUSERDATA )
+//protected:
+//#endif
 	// Deprecated: You should probably be using the UserType functions instead of this
 	virtual ILuaBase::UserData* GetUserdata(int iStackPos = -1) = 0;
 
@@ -220,9 +220,9 @@ public:
 	virtual void        PushCClosure(CFunc val, int iVars) = 0;
 
 
-#if !defined( GMOD_ALLOW_DEPRECATED ) && !defined( GMOD_ALLOW_LIGHTUSERDATA )
-protected:
-#endif
+//#if !defined( GMOD_ALLOW_DEPRECATED ) && !defined( GMOD_ALLOW_LIGHTUSERDATA )
+//protected:
+//#endif
 	// Deprecated: Don't use light userdata in GMod
 	virtual void        PushUserdata(ILuaBase::UserData*) = 0;
 
@@ -249,9 +249,9 @@ public:
 	// Note: GetTypeName does not work with user-created types
 	virtual const char* GetTypeName(int iType) = 0;
 
-#ifndef GMOD_ALLOW_DEPRECATED
-protected:
-#endif
+//#ifndef GMOD_ALLOW_DEPRECATED
+//protected:
+//#endif
 	// Deprecated: Use CreateMetaTable
 	virtual void        CreateMetaTableType(const char* strName, int iType) = 0;
 
@@ -355,7 +355,7 @@ public:
 	}
 
 	// Gets the environment table of the value at the given index
-	inline void GetFEnv(int iStackPos)
+	/*inline void GetFEnv(int iStackPos)
 	{
 		lua_getfenv(state, iStackPos);
 	}
@@ -370,7 +370,7 @@ public:
 	inline const char* PushFormattedString(const char* fmt, va_list args)
 	{
 		return lua_pushvfstring(state, fmt, args);
-	}
+	}*/
 
 	// Pushes a formatted string onto the stack
 	inline const char* PushFormattedString(const char* fmt, ...)
@@ -383,14 +383,14 @@ public:
 	}
 
 	// Throws an error (uses the value at the top of the stack)
-	[[noreturn]]
-	inline void Error()
+	//[[noreturn]]
+	/*inline void Error()
 	{
 		lua_error(state);
 
 		// Should never be reached since 'lua_error' never returns.
 		std::abort();
-	}
+	}*/
 
 	// Throws an error (pushes a formatted string onto the stack and uses it)
 	[[noreturn]]
@@ -400,12 +400,12 @@ public:
 		va_start(args, fmt);
 		PushFormattedString(fmt, args);
 		va_end(args);
-		Error();
+		//Error();
 	}
 
 	// Throws an error related to type differences
-	[[noreturn]]
-	/*inline void TypeError(int iStackPos, const char* tname)
+	/*[[noreturn]]
+	inline void TypeError(int iStackPos, const char* tname)
 	{
 		luaL_typerror(state, iStackPos, tname);
 
@@ -414,10 +414,10 @@ public:
 	}*/
 
 	// Converts the value at the given index to a generic C pointer (void*)
-	inline const void* GetPointer(int iStackPos)
+	/*inline const void* GetPointer(int iStackPos)
 	{
 		return lua_topointer(state, iStackPos);
-	}
+	}*/
 
 	// Calls a metamethod on the object at iStackPos
 	/*inline int CallMeta(int iStackPos, const char* e)

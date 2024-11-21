@@ -1,5 +1,10 @@
+#ifndef GMOD_ILUASHARED_H
+#define GMOD_ILUASHARED_H
 #include <string>
 #include <vector>
+#include "Bootil/Bootil.h"
+#include "Bootil/Types/Buffer.h"
+#include "interface.h"
 
 struct LuaFile
 {
@@ -31,6 +36,8 @@ struct LuaFindResult
 class LuaClientDatatableHook;
 class CSteamAPIContext;
 class ILuaInterface;
+
+#define GMOD_LUASHARED_INTERFACE "LUASHARED003"
 class ILuaShared
 {
 public:
@@ -54,3 +61,4 @@ public:
 	virtual void EmptyCache() = 0;
 	virtual bool ScriptExists(const std::string &, const std::string &, bool) = 0;
 };
+#endif

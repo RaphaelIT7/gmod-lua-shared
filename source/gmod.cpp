@@ -1,4 +1,5 @@
 #include "CLuaInterface.h"
+#include "lua.hpp"
 
 #ifdef WIN32
 #include <Windows.h>

@@ -188,4 +188,4 @@ void CLuaConVars::ClearCache()
 	DebugPrint(1, "CLuaConVars::ClearCache\n");
 }
 
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaConVars, ILuaConVars, "LUACONVARS001", g_CLuaConVars);
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaConVars, ILuaConVars, GMOD_LUACONVARS_INTERFACE, g_CLuaConVars);

@@ -8,10 +8,44 @@ class ILuaInterface;
 
 struct CLuaError
 {
-	~CLuaError();
+	~CLuaError()
+	{
+		stack.clear();
+
+#ifndef WIN32
+		if (message)
+		{
+			delete[] message;
+			message = NULL;
+		}
+
+		if (side)
+		{
+			delete[] side;
+			side = NULL;
+		}
+#endif
+	}
+
 	struct StackEntry
 	{
-		~StackEntry();
+		~StackEntry()
+		{
+#ifndef WIN32
+			if (source)
+			{
+				delete[] source;
+				source = NULL;
+			}
+
+			if (function)
+			{
+				delete[] function;
+				function = NULL;
+			}
+#endif
+		}
+
 #ifdef _WIN32
 		std::string source;
 		std::string function;
