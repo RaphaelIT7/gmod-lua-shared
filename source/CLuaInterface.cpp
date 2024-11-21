@@ -1262,13 +1262,7 @@ int CLuaInterface::GetFlags(int iStackPos)
 
 	return (int)GetNumber(iStackPos); // ToDo: Verify this
 }
-/// <summary>
-/// Finds the value at the key from keyIndex from the metatable from the object at iStackPos.
-/// If the key was found, the value will be pushed to the stack; otherwise, nothing happens.
-/// </summary>
-/// <param name="iStackPos">Stack position of the object</param>
-/// <param name="keyIndex">Stack position of the key</param>
-/// <returns>true if keyIndex's stack item was found on the metatable; otherwise false.</returns>
+
 bool CLuaInterface::FindOnObjectsMetaTable(int iStackPos, int keyIndex)
 {
 	::DebugPrint(2, "CLuaInterface::FindOnObjectsMetaTable %i %i %s\n", iStackPos, keyIndex, lua_tolstring(state, keyIndex, NULL));

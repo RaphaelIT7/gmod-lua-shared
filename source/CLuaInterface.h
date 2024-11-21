@@ -570,6 +570,15 @@ public:
 	virtual void SetType( unsigned char ) = 0;
 	virtual void PushLong( long num ) = 0;
 	virtual int GetFlags( int index ) = 0;
+    /// <summary>
+    /// Finds the value at the key from keyIndex from the metatable from the
+    /// object at iStackPos. If the key was found, the value will be pushed
+    /// to the stack; otherwise, nothing happens.
+    /// </summary>
+    /// <param name="iStackPos">Stack position of the object</param>
+    /// <param name="keyIndex">Stack position of the key</param>
+    /// <returns>true if keyIndex's stack item was found on the metatable;
+    /// otherwise false.</returns>
 	virtual bool FindOnObjectsMetaTable( int objIndex, int keyIndex ) = 0;
 	virtual bool FindObjectOnTable( int tableIndex, int keyIndex ) = 0;
 	virtual void SetMemberFast( GarrysMod::Lua::ILuaObject *table, int keyIndex, int valueIndex ) = 0;
