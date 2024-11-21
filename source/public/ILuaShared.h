@@ -28,6 +28,7 @@ struct LuaFindResult
 	bool isFolder;
 };
 
+class LuaClientDatatableHook;
 class CSteamAPIContext;
 class ILuaInterface;
 class ILuaShared

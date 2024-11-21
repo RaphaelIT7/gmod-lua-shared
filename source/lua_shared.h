@@ -27,7 +27,6 @@ namespace IGamemodeSystem
 	};
 }
 
-class LuaClientDatatableHook;
 class IGet;
 class ILuaConVars;
 class ILuaShared;
