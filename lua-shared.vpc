@@ -38,8 +38,17 @@ $Project "lua_shared"
 		$File	"source\CLuaGameCallback.h"
 		$File	"source\CLuaInterface.h"
 		$File	"source\lua_shared.h"
-		$File	"source\PooledStrings.h"
-		$File	"source\Types.h"
+	}
+
+	$Folder	"Public Header Files"
+	{
+		$File	"source\public\ILuaConVars.h"
+		$File	"source\public\ILuaGameCallback.h"
+		$File	"source\public\ILuaInterface.h"
+		$File	"source\public\ILuaObject.h"
+		$File	"source\public\ILuaShared.h"
+		$File	"source\public\PooledStrings.h"
+		$File	"source\public\Types.h"
 	}
 
 	$Folder	"Link Libraries"
