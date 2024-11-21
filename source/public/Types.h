@@ -1,3 +1,5 @@
+#ifndef GMOD_TYPES_H
+#define GMOD_TYPES_H
 namespace Type
 {
     enum
@@ -116,7 +118,7 @@ namespace Type
 #endif
      };
 
-#if ( defined( GMOD ) || defined( GMOD_ALLOW_DEPRECATED ) )
+//#if ( defined( GMOD ) || defined( GMOD_ALLOW_DEPRECATED ) )
     // You should use ILuaBase::GetTypeName instead of directly accessing this array
     static const char* Name[] =
     {
@@ -166,5 +168,11 @@ namespace Type
         "SurfaceInfo",
         nullptr
     };
-#endif
+//#endif
 }
+
+#ifndef CFunc
+class lua_State;
+typedef int ( *CFunc )( lua_State* L );
+#endif
+#endif
