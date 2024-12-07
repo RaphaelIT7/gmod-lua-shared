@@ -18,7 +18,7 @@
 int g_iTypeNum = 0;
 
 static ConVar lua_debugmode("lua_debugmode_interface", "1", 0);
-void DebugPrint(int level, const char* fmt, ...)
+inline void DebugPrint(int level, const char* fmt, ...)
 {
 	if (lua_debugmode.GetInt() < level)
 		return;
@@ -444,7 +444,7 @@ void CLuaInterface::ReferencePush(int i)
 {
 	::DebugPrint(4, "CLuaInterface::ReferencePush\n");
 	lua_rawgeti(state, LUA_REGISTRYINDEX, i);
-	::DebugPrint(4, "CLuaInterface::ReferencePush pushed a %i\n", GetType(-1));
+	//::DebugPrint(4, "CLuaInterface::ReferencePush pushed a %i\n", GetType(-1));
 }
 
 void CLuaInterface::PushSpecial(int iType)
@@ -637,24 +637,17 @@ int CLuaInterface::CreateMetaTable(const char* strName) // Return value is proba
 bool CLuaInterface::PushMetaTable(int iType)
 {
 	::DebugPrint(2, "CLuaInterface::PushMetaTable %i\n", iType);
-	int ref = -1;
+	bool bFound = false;
 	const char* type = GetActualTypeName(iType);
 	PushSpecial(SPECIAL_REG);
 		GetField(-1, type);
-		if (IsType(-1, Type::Table))
-		{
-			ref = ReferenceCreate();
-		} else {
-			Pop(1);
-		}
-	Pop(1);
+		bFound = IsType(-1, Type::Table);
+	Remove(-2);
 
-	if (ref != -1)
-	{
-		ReferencePush(ref);
-		ReferenceFree(ref);
+	if (bFound)
 		return true;
-	}
+
+	Pop(1);
 
 	::Msg("I failed u :< %i\n", iType);
 
