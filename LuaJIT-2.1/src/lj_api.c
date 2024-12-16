@@ -254,11 +254,36 @@ LUALIB_API void luaL_checkany(lua_State *L, int idx)
     lj_err_arg(L, idx, LJ_ERR_NOVAL);
 }
 
-LUA_API const char *lua_typename(lua_State *L, int t)
+// Based off https://github.com/meepen/gluajit/blob/master/src/lj_api.c#L225-L247
+/*extern "C"*/ const char* GMODLUA_GetUserType(lua_State* L, int iStackPos)
 {
-  return GMODLUA_GetUserType(L, t);
+	static char strName[128];
+	const char* strTypeName = "UserData";
+	if (lua_getmetatable(L, iStackPos))
+	{
+		lua_pushstring(L, "MetaName");
+		lua_gettable(L, -2);
 
-  //return lj_obj_typename[t+1];
+		if (lua_isstring(L, -1))
+		{
+			strncpy(strName, lua_tostring(L, -1), sizeof(strName));
+			strTypeName = strName;
+		}
+
+		lua_pop(L, 1);
+	}
+
+	lua_pop(L, 1);
+
+	return strTypeName;
+}
+
+LUA_API const char *lua_typename(lua_State *L, int t, int stackpos)
+{
+  if (stackpos && t == 7)
+    return GMODLUA_GetUserType(L, stackpos);
+
+  return lj_obj_typename[t+1];
 }
 
 LUA_API int lua_iscfunction(lua_State *L, int idx)

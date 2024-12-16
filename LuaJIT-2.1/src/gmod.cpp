@@ -216,19 +216,3 @@ extern "C" void GMOD_LuaCreateEmptyUserdata(lua_State* L)
 
 	((ILuaBase*)L->luabase)->PushUserType(NULL, 7);
 }
-
-extern "C" const char* GMODLUA_GetUserType(lua_State* L, int iType)
-{
-	// lua_getmetatable()
-	// What does it do with "UserData"?
-	// lua_pushstring(L, "MetaName")
-	// lua_gettable(L)
-	// lua_isstring
-	// lua_tolstring
-
-	if (iType == 1)
-		return "boolean"; // For some reason GetTypeName returns "bool"..... that is breaking stuff.
-
-	ILuaBase* LUA = (ILuaBase*)L->luabase;
-	return LUA->GetTypeName(iType);
-}
