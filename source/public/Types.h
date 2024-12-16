@@ -123,7 +123,7 @@ namespace Type
     static const char* Name[] =
     {
         "nil",
-        "bool",
+        "boolean",
         "lightuserdata",
         "number",
         "string",

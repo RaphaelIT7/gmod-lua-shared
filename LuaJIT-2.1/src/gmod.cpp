@@ -226,6 +226,9 @@ extern "C" const char* GMODLUA_GetUserType(lua_State* L, int iType)
 	// lua_isstring
 	// lua_tolstring
 
+	if (iType == 1)
+		return "boolean"; // For some reason GetTypeName returns "bool"..... that is breaking stuff.
+
 	ILuaBase* LUA = (ILuaBase*)L->luabase;
 	return LUA->GetTypeName(iType);
 }
