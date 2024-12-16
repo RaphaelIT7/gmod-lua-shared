@@ -186,12 +186,6 @@ namespace GarrysMod
 			virtual double CheckNumberOpt( int iStackPos, double def );
 			virtual void RegisterMetaTable( const char* name, ILuaObject* obj );
 		};
-
-		class CLuaInterface : public ILuaInterface
-		{
-		public:
-			virtual void LuaPrint( const char* str );
-		};
     }
 }
 
@@ -208,15 +202,19 @@ extern "C" void lua_init_stack_gmod(lua_State* L1, lua_State* L)
 
 extern "C" void GMOD_LuaPrint(const char* str, lua_State* L) // Idk how gmod does it
 {
-	((CLuaInterface*)L->luabase)->LuaPrint(str);
+	((ILuaInterface*)L->luabase)->Msg("%s", str);
 }
 
-extern "C" void* GMOD_LuaCreateEmptyUserdata(lua_State* L)
+extern "C" void GMOD_LuaCreateEmptyUserdata(lua_State* L)
 {
-	ILuaBase::UserData* udata = (ILuaBase::UserData*)((ILuaBase*)L->luabase)->NewUserdata(sizeof(ILuaBase::UserData));
-	udata->data = nullptr;
-	udata->type = 7; // 7 = Userdata
-	return udata;
+	//ILuaBase::UserData* udata = (ILuaBase::UserData*)((ILuaBase*)L->luabase)->NewUserdata(sizeof(ILuaBase::UserData)); // Gmod uses CLuaInterface::PushUserType(NULL, 7) Instead
+	//udata->data = nullptr;
+	//udata->type = 7; // 7 = Userdata
+
+	//return udata;
+	
+
+	((ILuaBase*)L->luabase)->PushUserType(NULL, 7);
 }
 
 extern "C" const char* GMODLUA_GetUserType(lua_State* L, int iType)
