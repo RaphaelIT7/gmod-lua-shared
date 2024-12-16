@@ -729,6 +729,8 @@ LUA_API void lua_createtable(lua_State *L, int narray, int nrec)
   incr_top(L);
 }
 
+// Origin -> https://github.com/meepen/gluajit/blob/master/src/lj_api.c#L691-L719
+static int g_iTypeNum;
 LUALIB_API int luaL_newmetatable(lua_State *L, const char *tname)
 {
   GCtab *regt = tabV(registry(L));
@@ -738,11 +740,25 @@ LUALIB_API int luaL_newmetatable(lua_State *L, const char *tname)
     settabV(L, tv, mt);
     settabV(L, L->top++, mt);
     lj_gc_anybarriert(L, regt);
+    lua_pushstring(L, "MetaName");
+    lua_pushstring(L, tname);
+    lua_rawset(L, -3);
+    lua_pushstring(L, "MetaID");
+    lua_pushnumber(L, g_iTypeNum);
+    lua_rawset(L, -3);
     return 1;
   } else {
     copyTV(L, L->top++, tv);
     return 0;
   }
+}
+
+LUALIB_API int luaL_newmetatable_type(lua_State *L, const char *tname, int tid)
+{
+  g_iTypeNum = tid;
+  int ret = luaL_newmetatable(L, tname);
+  g_iTypeNum = 0;
+  return ret;
 }
 
 LUA_API int lua_pushthread(lua_State *L)
