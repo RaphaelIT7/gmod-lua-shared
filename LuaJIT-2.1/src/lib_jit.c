@@ -35,6 +35,7 @@
 #include "lj_lib.h"
 
 #include "luajit.h"
+#include "gmod.h"
 
 /* -- jit.* functions ----------------------------------------------------- */
 
@@ -550,6 +551,7 @@ LJLIB_CF(jit_opt_start)
 static void jit_profile_callback(lua_State *L2, lua_State *L, int samples,
 				 int vmstate)
 {
+  lua_init_stack_gmod(L2, L); /* Workaround hoing to get a crash fixed since for some reason L2->luabase is broken */
   TValue key;
   cTValue *tv;
   key.u64 = KEY_PROFILE_FUNC;
