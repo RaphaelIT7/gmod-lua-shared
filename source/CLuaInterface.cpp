@@ -7,13 +7,7 @@
 #include "lua_shared.h"
 #include "../lua/lj_obj.h"
 #include <regex>
-
-#ifdef ARCHITECTURE_X86
-#include "Color.h"
-#else
 #include "color.h"
-#endif
-
 
 int g_iTypeNum = 0;
 
