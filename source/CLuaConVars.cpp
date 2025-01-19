@@ -4,7 +4,7 @@
 #include "lua_shared.h"
 
 static ConVar lua_debugmode("lua_debugmode_convar", "2", 0);
-static void DebugPrint(int level, const char* fmt, ...)
+static void CVarDebugPrint(int level, const char* fmt, ...)
 {
 	if (lua_debugmode.GetInt() < level)
 		return;
@@ -44,15 +44,15 @@ CLuaConVars::~CLuaConVars()
 
 void CLuaConVars::Init()
 {
-	DebugPrint(1, "CLuaConVars::Init\n");
+	CVarDebugPrint(1, "CLuaConVars::Init\n");
 	pClientCVars = new KeyValues("CVars");
 	pServerCVars = new KeyValues("CVars");
 
 	if (!pClientCVars->LoadFromFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/client.vdf", "MOD"))
-		DebugPrint(1, "CLuaConVars::Init Failed to load client.vdf!\n");
+		CVarDebugPrint(1, "CLuaConVars::Init Failed to load client.vdf!\n");
 
 	if (!pServerCVars->LoadFromFile((IBaseFileSystem*)g_pFullFileSystem, "cfg/server.vdf", "MOD"))
-		DebugPrint(1, "CLuaConVars::Init Failed to load server.vdf!\n");
+		CVarDebugPrint(1, "CLuaConVars::Init Failed to load server.vdf!\n");
 }
 
 char* AAllocString(const char *pStr, int nMaxChars = -1)
@@ -73,7 +73,7 @@ char* AAllocString(const char *pStr, int nMaxChars = -1)
 
 ConVar* CLuaConVars::CreateConVar(const char* name, const char* defaultValue, const char* helpString, int flags)
 {
-	DebugPrint(1, "CLuaConVars::CreateConVar %s %s %s %i\n", name, defaultValue, helpString, flags);
+	CVarDebugPrint(1, "CLuaConVars::CreateConVar %s %s %s %i\n", name, defaultValue, helpString, flags);
 	char* nameStr = AAllocString(name);
 	char* defaultValueStr = AAllocString(defaultValue);
 	char* helpStringStr = AAllocString(helpString);
@@ -125,7 +125,7 @@ ConVar* CLuaConVars::CreateConVar(const char* name, const char* defaultValue, co
 
 ConCommand* CLuaConVars::CreateConCommand(const char* name, const char* helpString, int flags, FnCommandCallback_t callback, FnCommandCompletionCallback completionFunc)
 {
-	DebugPrint( 1, "CLuaConVars::CreateConCommand %s %s %i\n", name, helpString, flags );
+	CVarDebugPrint( 1, "CLuaConVars::CreateConCommand %s %s %i\n", name, helpString, flags );
 	char* nameStr = AAllocString(name);
 	char* helpStringStr = AAllocString(helpString);
 
@@ -146,7 +146,7 @@ ConCommand* CLuaConVars::CreateConCommand(const char* name, const char* helpStri
 
 void CLuaConVars::DestroyManaged()
 {
-	DebugPrint(1, "CLuaConVars::DestroyManaged\n");
+	CVarDebugPrint(1, "CLuaConVars::DestroyManaged\n");
 	// Do some magic ToDo
 	for (ManagedConVar* cvar : pManagedCVars)
 	{
@@ -180,12 +180,12 @@ void CLuaConVars::DestroyManaged()
 
 void CLuaConVars::Cache(const char* key, const char* value)
 {
-	DebugPrint(1, "CLuaConVars::Cache %s %s\n", key, value);
+	CVarDebugPrint(1, "CLuaConVars::Cache %s %s\n", key, value);
 }
 
 void CLuaConVars::ClearCache()
 {
-	DebugPrint(1, "CLuaConVars::ClearCache\n");
+	CVarDebugPrint(1, "CLuaConVars::ClearCache\n");
 }
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CLuaConVars, ILuaConVars, GMOD_LUACONVARS_INTERFACE, g_CLuaConVars);
