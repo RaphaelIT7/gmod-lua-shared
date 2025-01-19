@@ -9,8 +9,6 @@
 #include <regex>
 #include "color.h"
 
-int g_iTypeNum = 0;
-
 static ConVar lua_debugmode("lua_debugmode_interface", "1", 0);
 inline void DebugPrint(int level, const char* fmt, ...)
 {
@@ -151,38 +149,6 @@ void CloseLuaInterface(ILuaInterface* LuaInterface)
 	LuaInterface->Shutdown();
 
 	delete LuaInterface;
-}
-
-// =================================
-// Functions needed
-// =================================
-
-void luaL_newmetatable_type(lua_State* L, const char* strName, int iType)
-{
-	::DebugPrint(3, "luaL_newmetatable_type\n");
-	luaL_newmetatable(L, strName);
-	g_iTypeNum++;
-
-	if (iType != -1)
-	{
-		lua_pushstring(L, "MetaName");
-		lua_pushstring(L, strName);
-		lua_settable(L, -3);
-
-		lua_pushstring(L, "MetaID");
-		lua_pushinteger(L, iType);
-		lua_settable(L, -3);
-
-		lua_pushvalue(L, LUA_REGISTRYINDEX); // Should we register the metatable?
-			lua_getfield(L, -1, strName);
-			if (lua_type(L, -1) == Type::None || lua_type(L, -1) == Type::Nil)
-			{
-				lua_pop(L, 1);
-				lua_pushvalue(L, -2);
-				lua_setfield(L, -2, strName);
-			}
-		lua_pop(L, 2);
-	}
 }
 
 // =================================
@@ -519,14 +485,15 @@ const char* CLuaInterface::GetTypeName(int iType)
 	}
 }
 
+extern "C" int luaL_newmetatable_type(lua_State *L, const char *tname, int tid);
 void CLuaInterface::CreateMetaTableType(const char* strName, int iType)
 {
-	::DebugPrint(2, "CLuaInterface::CreateMetaTableType\n");
-	luaL_newmetatable_type(state, strName, iType);
+	::DebugPrint(1, "CLuaInterface::CreateMetaTableType(%s, %i)\n", strName, iType);
+	int ret = luaL_newmetatable_type(state, strName, iType);
+	pTypeNames[iType] = strName;
 
-	if (iType > 254) {
-		return;
-	}
+	if ( ret == 0 )
+		::DebugPrint(1, "CLuaInterface::CreateMetaTableType(%s, %i) failed to create metatable\n", strName, iType);
 }
 
 const char* CLuaInterface::CheckString(int iStackPos)
@@ -604,7 +571,7 @@ void CLuaInterface::SetState(lua_State* L)
 
 int CLuaInterface::CreateMetaTable(const char* strName) // Return value is probably a bool?
 {
-	::DebugPrint(2, "CLuaInterface::CreateMetaTable\n");
+	::DebugPrint(1, "CLuaInterface::CreateMetaTable\n");
 	//luaL_newmetatable_type(state, strName, -1);
 
 	int ref = -1;
@@ -756,7 +723,6 @@ bool CLuaInterface::Init( ILuaGameCallback* callback, bool bIsServer )
 
 	DoStackCheck();
 
-	// lua_getfield(state, "debug");
 
 	// lua_pushnil(state);
 	// lua_setfield(state, -2, "setlocal");
@@ -1829,6 +1795,9 @@ const char* CLuaInterface::GetActualTypeName(int type)
 	::DebugPrint(4, "CLuaInterface::GetActualTypeName\n");
 
 	//lua_typename(state, lua_type(state, type));
+
+	if ( pTypeNames[type] != NULL )
+		return pTypeNames[type];
 
 	return Type::Name[type];
 }

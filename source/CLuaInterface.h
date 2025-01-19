@@ -309,6 +309,7 @@ private:
 	ILuaObject* m_pSurfaceInfoMeta = nullptr;
 private:
 	std::list<char*> m_pPaths;
+	const char* pTypeNames[255];
 
 public:
 	void RunThreadedCalls();
