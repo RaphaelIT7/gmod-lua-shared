@@ -1,6 +1,6 @@
 /*
 ** Base and coroutine library.
-** Copyright (C) 2005-2023 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2025 Mike Pall. See Copyright Notice in luajit.h
 **
 ** Major portions taken verbatim or adapted from the Lua interpreter.
 ** Copyright (C) 1994-2011 Lua.org, PUC-Rio. See Copyright Notice in lua.h
@@ -36,7 +36,6 @@
 #include "lj_strscan.h"
 #include "lj_strfmt.h"
 #include "lj_lib.h"
-#include "gmod.h"
 
 /* -- Base library: checks ------------------------------------------------ */
 
@@ -147,6 +146,8 @@ LJLIB_CF(getfenv)		LJLIB_REC(.)
   cTValue *o = L->base;
   if (!(o < L->top && tvisfunc(o))) {
     int level = lj_lib_optint(L, 1, 1);
+    if (level < 0)
+      lj_err_arg(L, 1, LJ_ERR_INVLVL);
     o = lj_debug_frame(L, level, &level);
     if (o == NULL)
       lj_err_arg(L, 1, LJ_ERR_INVLVL);
@@ -169,6 +170,8 @@ LJLIB_CF(setfenv)
       setgcref(L->env, obj2gco(t));
       return 0;
     }
+    if (level < 0)
+      lj_err_arg(L, 1, LJ_ERR_INVLVL);
     o = lj_debug_frame(L, level, &level);
     if (o == NULL)
       lj_err_arg(L, 1, LJ_ERR_INVLVL);
@@ -361,7 +364,11 @@ LJLIB_ASM_(xpcall)		LJLIB_REC(.)
 static int load_aux(lua_State *L, int status, int envarg)
 {
   if (status == LUA_OK) {
-    if (tvistab(L->base+envarg-1)) {
+    /*
+    ** Set environment table for top-level function.
+    ** Don't do this for non-native bytecode, which returns a prototype.
+    */
+    if (tvistab(L->base+envarg-1) && tvisfunc(L->top-1)) {
       GCfunc *fn = funcV(L->top-1);
       GCtab *t = tabV(L->base+envarg-1);
       setgcref(fn->c.env, obj2gco(t));
@@ -483,7 +490,7 @@ LJLIB_PUSH(top-2)  /* Upvalue holds weak table. */
 LJLIB_CF(newproxy)
 {
   lua_settop(L, 1);
-  GMOD_LuaCreateEmptyUserdata(L);
+  lua_newuserdata(L, 0);
   if (lua_toboolean(L, 1) == 0) {  /* newproxy(): without metatable. */
     return 1;
   } else if (lua_isboolean(L, 1)) {  /* newproxy(true): with metatable. */
@@ -521,7 +528,6 @@ LJLIB_CF(print)
   }
   shortcut = (tvisfunc(tv) && funcV(tv)->c.ffid == FF_tostring) &&
 	     !gcrefu(basemt_it(G(L), LJ_TNUMX));
-
   for (i = 0; i < nargs; i++) {
     cTValue *o = &L->base[i];
     const char *str;
@@ -540,21 +546,10 @@ LJLIB_CF(print)
       L->top--;
     }
     if (i)
-      GMOD_LuaPrint("\t", L);
-      //putchar('\t');
-    //fwrite(str, 1, size, stdout);
-
-  	char* pStr = (char*)malloc( size + 1 ); // Workaround for numbers adding memory to str. I should look into it again later.
-  	strncpy( pStr, str, size );
-  	pStr[ size ] = '\0';
-
-    GMOD_LuaPrint( pStr, L );
-    free(pStr);
+      putchar('\t');
+    fwrite(str, 1, size, stdout);
   }
-  //putchar('\n');
-
-  GMOD_LuaPrint("\n", L);
-
+  putchar('\n');
   return 0;
 }
 

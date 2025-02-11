@@ -1,6 +1,6 @@
 /*
 ** Table library.
-** Copyright (C) 2005-2023 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2025 Mike Pall. See Copyright Notice in luajit.h
 **
 ** Major portions taken verbatim or adapted from the Lua interpreter.
 ** Copyright (C) 1994-2008 Lua.org, PUC-Rio. See Copyright Notice in lua.h
@@ -102,8 +102,7 @@ LJLIB_CF(table_insert)		LJLIB_REC(.)
     copyTV(L, dst, L->top-1);  /* Set new value. */
     lj_gc_barriert(L, t, dst);
   }
-  setnumV(L->top-1, i);
-  return 1;
+  return 0;
 }
 
 LJLIB_LUA(table_remove) /*

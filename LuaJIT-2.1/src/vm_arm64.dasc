@@ -1,6 +1,6 @@
 |// Low-level VM code for ARM64 CPUs.
 |// Bytecode interpreter, fast functions and helper functions.
-|// Copyright (C) 2005-2023 Mike Pall. See Copyright Notice in luajit.h
+|// Copyright (C) 2005-2025 Mike Pall. See Copyright Notice in luajit.h
 |
 |.arch arm64
 |.section code_op, code_sub
@@ -1211,6 +1211,10 @@ static void build_subroutines(BuildCtx *ctx)
   |//-- Base library: catch errors ----------------------------------------
   |
   |.ffunc pcall
+  |  ldr TMP1, L->maxstack
+  |  add TMP2, BASE, NARGS8:RC
+  |  cmp TMP1, TMP2
+  |  blo ->fff_fallback
   |   cmp NARGS8:RC, #8
   |  ldrb TMP0w, GL->hookmask
   |   blo ->fff_fallback
@@ -1230,6 +1234,10 @@ static void build_subroutines(BuildCtx *ctx)
   |  b ->vm_call_dispatch
   |
   |.ffunc xpcall
+  |  ldr TMP1, L->maxstack
+  |  add TMP2, BASE, NARGS8:RC
+  |  cmp TMP1, TMP2
+  |  blo ->fff_fallback
   |     ldp CARG1, CARG2, [BASE]
   |  ldrb TMP0w, GL->hookmask
   |   subs NARGS8:TMP1, NARGS8:RC, #16
@@ -1650,22 +1658,14 @@ static void build_subroutines(BuildCtx *ctx)
   |
   |//-- Bit library --------------------------------------------------------
   |
-  |// FP number to bit conversion for soft-float. Clobbers CARG1-CARG3
+  |// FP number to bit conversion. Clobbers CARG1-CARG2, FARG1-FARG2.
   |->vm_tobit_fb:
   |  bls ->fff_fallback
-  |  add CARG2, CARG1, CARG1
-  |  mov CARG3, #1076
-  |  sub CARG3, CARG3, CARG2, lsr #53
-  |  cmp CARG3, #53
-  |  bhi >1
-  |  and CARG2, CARG2, #U64x(001fffff,ffffffff)
-  |  orr CARG2, CARG2, #U64x(00200000,00000000)
-  |   cmp CARG1, #0
-  |  lsr CARG2, CARG2, CARG3
-  |   cneg CARG1w, CARG2w, mi
-  |  br lr
-  |1:
-  |  mov CARG1w, #0
+  |  fmov FARG1, CARG1
+  |  movz CARG2, #0x4338, lsl #48
+  |  fmov FARG2, CARG2
+  |  fadd FARG1, FARG1, FARG2
+  |  fmov CARG1w, s0
   |  br lr
   |
   |.macro .ffunc_bit, name
@@ -4212,7 +4212,6 @@ static void emit_asm_debug(BuildCtx *ctx)
 	"LEFDEY:\n\n", fcsize);
     }
 #endif
-    fprintf(ctx->fp, ".subsections_via_symbols\n");
     }
     break;
 #endif

@@ -1,6 +1,6 @@
 |// Low-level VM code for x64 CPUs in LJ_GC64 mode.
 |// Bytecode interpreter, fast functions and helper functions.
-|// Copyright (C) 2005-2023 Mike Pall. See Copyright Notice in luajit.h
+|// Copyright (C) 2005-2025 Mike Pall. See Copyright Notice in luajit.h
 |
 |.arch x64
 |.section code_op, code_sub
@@ -1463,6 +1463,9 @@ static void build_subroutines(BuildCtx *ctx)
   |//-- Base library: catch errors ----------------------------------------
   |
   |.ffunc_1 pcall
+  |  mov L:RB, SAVE_L
+  |  lea RA, [BASE+NARGS:RD*8]
+  |  cmp RA, L:RB->maxstack; ja ->fff_fallback
   |  lea RA, [BASE+16]
   |  sub NARGS:RDd, 1
   |  mov PCd, 16+FRAME_PCALL
@@ -1481,6 +1484,9 @@ static void build_subroutines(BuildCtx *ctx)
   |  jmp ->vm_call_dispatch
   |
   |.ffunc_2 xpcall
+  |  mov L:RB, SAVE_L
+  |  lea RA, [BASE+NARGS:RD*8]
+  |  cmp RA, L:RB->maxstack; ja ->fff_fallback
   |  mov LFUNC:RA, [BASE+8]
   |  checktp_nc LFUNC:RA, LJ_TFUNC, ->fff_fallback
   |  mov LFUNC:RB, [BASE]		// Swap function and traceback.
@@ -4935,7 +4941,6 @@ static void emit_asm_debug(BuildCtx *ctx)
 	  "LEFDEY:\n\n", fcsize);
     }
 #endif
-    fprintf(ctx->fp, ".subsections_via_symbols\n");
     }
     break;
 #endif

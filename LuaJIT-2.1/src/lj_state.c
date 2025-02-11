@@ -1,6 +1,6 @@
 /*
 ** State and stack handling.
-** Copyright (C) 2005-2023 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2025 Mike Pall. See Copyright Notice in luajit.h
 **
 ** Portions taken verbatim or adapted from the Lua interpreter.
 ** Copyright (C) 1994-2008 Lua.org, PUC-Rio. See Copyright Notice in lua.h
@@ -29,7 +29,6 @@
 #include "lj_lex.h"
 #include "lj_alloc.h"
 #include "luajit.h"
-#include "gmod.h"
 
 /* -- Stack handling ------------------------------------------------------ */
 
@@ -103,27 +102,49 @@ void lj_state_shrinkstack(lua_State *L, MSize used)
 /* Try to grow stack. */
 void LJ_FASTCALL lj_state_growstack(lua_State *L, MSize need)
 {
-  MSize n;
-  if (L->stacksize >= LJ_STACK_MAXEX) {
-    /* 4. Throw 'error in error handling' when we are _over_ the limit. */
-    if (L->stacksize > LJ_STACK_MAXEX)
-      lj_err_throw(L, LUA_ERRERR);  /* Does not invoke an error handler. */
-    /* 1. We are _at_ the limit after the last growth. */
-    if (L->status < LUA_ERRRUN) {  /* 2. Throw 'stack overflow'. */
-      L->status = LUA_ERRRUN;  /* Prevent ending here again for pushed msg. */
-      lj_err_msg(L, LJ_ERR_STKOV);  /* May invoke an error handler. */
+  MSize n = L->stacksize + need;
+  if (LJ_LIKELY(n < LJ_STACK_MAX)) {  /* The stack can grow as requested. */
+    if (n < 2 * L->stacksize) {  /* Try to double the size. */
+      n = 2 * L->stacksize;
+      if (n > LJ_STACK_MAX)
+	n = LJ_STACK_MAX;
     }
-    /* 3. Add space (over the limit) for pushed message and error handler. */
+    resizestack(L, n);
+  } else {  /* Request would overflow. Raise a stack overflow error. */
+    if (LJ_HASJIT) {
+      TValue *base = tvref(G(L)->jit_base);
+      if (base) L->base = base;
+    }
+    if (curr_funcisL(L)) {
+      L->top = curr_topL(L);
+      if (L->top > tvref(L->maxstack)) {
+	/* The current Lua frame violates the stack, so replace it with a
+	** dummy. This can happen when BC_IFUNCF is trying to grow the stack.
+	*/
+	L->top = L->base;
+	setframe_gc(L->base - 1 - LJ_FR2, obj2gco(L), LJ_TTHREAD);
+      }
+    }
+    if (L->stacksize <= LJ_STACK_MAXEX) {
+      /* An error handler might want to inspect the stack overflow error, but
+      ** will need some stack space to run in. We give it a stack size beyond
+      ** the normal limit in order to do so, then rely on lj_state_relimitstack
+      ** calls during unwinding to bring us back to a convential stack size.
+      ** The + 1 is space for the error message, and 2 * LUA_MINSTACK is for
+      ** the lj_state_checkstack() call in lj_err_run().
+      */
+      resizestack(L, LJ_STACK_MAX + 1 + 2 * LUA_MINSTACK);
+      lj_err_stkov(L);  /* May invoke an error handler. */
+    } else {
+      /* If we're here, then the stack overflow error handler is requesting
+      ** to grow the stack even further. We have no choice but to abort the
+      ** error handler.
+      */
+      GCstr *em = lj_err_str(L, LJ_ERR_STKOV);  /* Might OOM. */
+      setstrV(L, L->top++, em);  /* There is always space to push an error. */
+      lj_err_throw(L, LUA_ERRERR);  /* Does not invoke an error handler. */
+    }
   }
-  n = L->stacksize + need;
-  if (n > LJ_STACK_MAX) {
-    n += 2*LUA_MINSTACK;
-  } else if (n < 2*L->stacksize) {
-    n = 2*L->stacksize;
-    if (n >= LJ_STACK_MAX)
-      n = LJ_STACK_MAX;
-  }
-  resizestack(L, n);
 }
 
 void LJ_FASTCALL lj_state_growstack1(lua_State *L)
@@ -167,7 +188,6 @@ static TValue *cpluaopen(lua_State *L, lua_CFunction dummy, void *ud)
   UNUSED(dummy);
   UNUSED(ud);
   stack_init(L, L);
-  lua_init_stack_gmod(g, L);
   /* NOBARRIER: State initialization, all objects are white. */
   setgcref(L->env, obj2gco(lj_tab_new(L, 0, LJ_MIN_GLOBAL)));
   settabV(L, registry(L), lj_tab_new(L, 0, LJ_MIN_REGISTRY));
@@ -176,6 +196,9 @@ static TValue *cpluaopen(lua_State *L, lua_CFunction dummy, void *ud)
   lj_lex_init(L);
   fixstring(lj_err_str(L, LJ_ERR_ERRMEM));  /* Preallocate memory error msg. */
   g->gc.threshold = 4*g->gc.total;
+#if LJ_HASFFI
+  lj_ctype_initfin(L);
+#endif
   lj_trace_initstate(g);
   lj_err_verify();
   return NULL;
@@ -340,7 +363,6 @@ lua_State *lj_state_new(lua_State *L)
   setgcrefr(L1->env, L->env);
   stack_init(L1, L);  /* init stack */
   lj_assertL(iswhite(obj2gco(L1)), "new thread object is not white");
-  lua_init_stack_gmod(L1, L);
   return L1;
 }
 
@@ -349,8 +371,11 @@ void LJ_FASTCALL lj_state_free(global_State *g, lua_State *L)
   lj_assertG(L != mainthread(g), "free of main thread");
   if (obj2gco(L) == gcref(g->cur_L))
     setgcrefnull(g->cur_L);
-  lj_func_closeuv(L, tvref(L->stack));
-  lj_assertG(gcref(L->openupval) == NULL, "stale open upvalues");
+  if (gcref(L->openupval) != NULL) {
+    lj_func_closeuv(L, tvref(L->stack));
+    lj_trace_abort(g);  /* For aa_uref soundness. */
+    lj_assertG(gcref(L->openupval) == NULL, "stale open upvalues");
+  }
   lj_mem_freevec(g, tvref(L->stack), L->stacksize, TValue);
   lj_mem_freet(g, L);
 }

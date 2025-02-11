@@ -1,5 +1,5 @@
 @rem Script to build LuaJIT with MSVC.
-@rem Copyright (C) 2005-2023 Mike Pall. See Copyright Notice in luajit.h
+@rem Copyright (C) 2005-2025 Mike Pall. See Copyright Notice in luajit.h
 @rem
 @rem Open a "Visual Studio Command Prompt" (either x86 or x64).
 @rem Then cd to this directory and run this script. Use the following
@@ -13,9 +13,15 @@
 @if not defined INCLUDE goto :FAIL
 
 @setlocal
-@rem Add more debug flags here, e.g. DEBUGCFLAGS=/DLUA_USE_APICHECK
+@rem Add more debug flags here, e.g. DEBUGCFLAGS=/DLUA_USE_ASSERT
 @set DEBUGCFLAGS=
 @set LJCOMPILE=cl /nologo /c /O2 /W3 /D_CRT_SECURE_NO_DEPRECATE /D_CRT_STDIO_INLINE=__declspec(dllexport)__inline
+@set LJDYNBUILD=/DLUA_BUILD_AS_DLL /MD
+@set LJDYNBUILD_DEBUG=/DLUA_BUILD_AS_DLL /MDd 
+@set LJCOMPILETARGET=/Zi
+@set LJLINKTYPE=/DEBUG /RELEASE
+@set LJLINKTYPE_DEBUG=/DEBUG
+@set LJLINKTARGET=/OPT:REF /OPT:ICF /INCREMENTAL:NO
 @set LJLINK=link /nologo
 @set LJMT=mt /nologo
 @set LJLIB=lib /nologo /nodefaultlib
@@ -24,7 +30,6 @@
 @set DASC=vm_x64.dasc
 @set LJDLLNAME=lua51.dll
 @set LJLIBNAME=lua51.lib
-@set BUILDTYPE=release
 @set ALL_LIB=lib_base.c lib_math.c lib_bit.c lib_string.c lib_table.c lib_io.c lib_os.c lib_package.c lib_debug.c lib_jit.c lib_ffi.c lib_buffer.c
 
 @setlocal
@@ -91,28 +96,36 @@ buildvm -m folddef -o lj_folddef.h lj_opt_fold.c
 
 @if "%1" neq "debug" goto :NODEBUG
 @shift
-@set BUILDTYPE=debug
-@set LJCOMPILE=%LJCOMPILE% /Zi %DEBUGCFLAGS%
-@set LJLINK=%LJLINK% /opt:ref /opt:icf /incremental:no
+@set LJCOMPILE=%LJCOMPILE% %DEBUGCFLAGS%
+@set LJDYNBUILD=%LJDYNBUILD_DEBUG%
+@set LJLINKTYPE=%LJLINKTYPE_DEBUG%
 :NODEBUG
-@set LJLINK=%LJLINK% /%BUILDTYPE%
+@set LJCOMPILE=%LJCOMPILE% %LJCOMPILETARGET%
+@set LJLINK=%LJLINK% %LJLINKTYPE% %LJLINKTARGET%
 @if "%1"=="amalg" goto :AMALGDLL
-goto :STATIC
-%LJCOMPILE% /MD /DLUA_BUILD_AS_DLL lj_*.c lib_*.c gmod.cpp
+@if "%1"=="static" goto :STATIC
+%LJCOMPILE% %LJDYNBUILD% lj_*.c lib_*.c
 @if errorlevel 1 goto :BAD
-%LJLINK% /DLL /out:%LJDLLNAME% lj_*.obj lib_*.obj gmod.obj
+%LJLINK% /DLL /OUT:%LJDLLNAME% lj_*.obj lib_*.obj
 @if errorlevel 1 goto :BAD
 @goto :MTDLL
 :STATIC
-%LJCOMPILE% lj_*.c lib_*.c gmod.cpp
+%LJCOMPILE% lj_*.c lib_*.c
 @if errorlevel 1 goto :BAD
-%LJLIB% /OUT:%LJLIBNAME% lj_*.obj lib_*.obj gmod.obj
+%LJLIB% /OUT:%LJLIBNAME% lj_*.obj lib_*.obj
 @if errorlevel 1 goto :BAD
 @goto :MTDLL
 :AMALGDLL
-%LJCOMPILE% /MD /DLUA_BUILD_AS_DLL ljamalg.c
+@if "%2"=="static" goto :AMALGSTATIC
+%LJCOMPILE% %LJDYNBUILD% ljamalg.c
 @if errorlevel 1 goto :BAD
-%LJLINK% /DLL /out:%LJDLLNAME% ljamalg.obj lj_vm.obj
+%LJLINK% /DLL /OUT:%LJDLLNAME% ljamalg.obj lj_vm.obj
+@if errorlevel 1 goto :BAD
+@goto :MTDLL
+:AMALGSTATIC
+%LJCOMPILE% ljamalg.c
+@if errorlevel 1 goto :BAD
+%LJLINK% /OUT:%LJDLLNAME% ljamalg.obj lj_vm.obj
 @if errorlevel 1 goto :BAD
 :MTDLL
 if exist %LJDLLNAME%.manifest^
@@ -120,11 +133,14 @@ if exist %LJDLLNAME%.manifest^
 
 %LJCOMPILE% luajit.c
 @if errorlevel 1 goto :BAD
-%LJLINK% /out:luajit.exe luajit.obj %LJLIBNAME%
+%LJLINK% /OUT:luajit.exe luajit.obj %LJLIBNAME%
 @if errorlevel 1 goto :BAD
 if exist luajit.exe.manifest^
   %LJMT% -manifest luajit.exe.manifest -outputresource:luajit.exe
 
+@del *.obj *.manifest minilua.exe buildvm.exe
+@del host\buildvm_arch.h
+@del lj_bcdef.h lj_ffdef.h lj_libdef.h lj_recdef.h lj_folddef.h
 @echo.
 @echo === Successfully built LuaJIT for Windows/%LJARCH% ===
 
