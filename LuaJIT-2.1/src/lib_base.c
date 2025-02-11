@@ -36,6 +36,7 @@
 #include "lj_strscan.h"
 #include "lj_strfmt.h"
 #include "lj_lib.h"
+#include "gmod.h"
 
 /* -- Base library: checks ------------------------------------------------ */
 
@@ -490,7 +491,7 @@ LJLIB_PUSH(top-2)  /* Upvalue holds weak table. */
 LJLIB_CF(newproxy)
 {
   lua_settop(L, 1);
-  lua_newuserdata(L, 0);
+  GMOD_LuaCreateEmptyUserdata(L);
   if (lua_toboolean(L, 1) == 0) {  /* newproxy(): without metatable. */
     return 1;
   } else if (lua_isboolean(L, 1)) {  /* newproxy(true): with metatable. */
@@ -528,6 +529,7 @@ LJLIB_CF(print)
   }
   shortcut = (tvisfunc(tv) && funcV(tv)->c.ffid == FF_tostring) &&
 	     !gcrefu(basemt_it(G(L), LJ_TNUMX));
+
   for (i = 0; i < nargs; i++) {
     cTValue *o = &L->base[i];
     const char *str;
@@ -546,10 +548,21 @@ LJLIB_CF(print)
       L->top--;
     }
     if (i)
-      putchar('\t');
-    fwrite(str, 1, size, stdout);
+      GMOD_LuaPrint("\t", L);
+      //putchar('\t');
+    //fwrite(str, 1, size, stdout);
+
+  	char* pStr = (char*)malloc( size + 1 ); // Workaround for numbers adding memory to str. I should look into it again later.
+  	strncpy( pStr, str, size );
+  	pStr[ size ] = '\0';
+
+    GMOD_LuaPrint( pStr, L );
+    free(pStr);
   }
-  putchar('\n');
+  //putchar('\n');
+
+  GMOD_LuaPrint("\n", L);
+
   return 0;
 }
 

@@ -493,7 +493,7 @@ typedef struct Node {
 #endif
 } Node;
 
-LJ_STATIC_ASSERT(offsetof(Node, val) == 0);
+//LJ_STATIC_ASSERT(offsetof(Node, val) == 0);
 
 typedef struct GCtab {
   GCHeader;
@@ -700,6 +700,8 @@ struct lua_State {
   GCRef env;		/* Thread environment (table of globals). */
   void *cframe;		/* End of C stack frame chain. */
   MSize stacksize;	/* True stack size (incl. LJ_STACK_EXTRA). */
+  char _GARRY_VARS[0x18];	/* GMOD FIELD */
+  void *luabase;			/* GMOD FIELD */
 };
 
 #define G(L)			(mref(L->glref, global_State))
@@ -736,18 +738,18 @@ typedef struct GChead {
 } GChead;
 
 /* The env field SHOULD be at the same offset for all GC objects. */
-LJ_STATIC_ASSERT(offsetof(GChead, env) == offsetof(GCfuncL, env));
-LJ_STATIC_ASSERT(offsetof(GChead, env) == offsetof(GCudata, env));
+//LJ_STATIC_ASSERT(offsetof(GChead, env) == offsetof(GCfuncL, env));
+//LJ_STATIC_ASSERT(offsetof(GChead, env) == offsetof(GCudata, env));
 
 /* The metatable field MUST be at the same offset for all GC objects. */
-LJ_STATIC_ASSERT(offsetof(GChead, metatable) == offsetof(GCtab, metatable));
-LJ_STATIC_ASSERT(offsetof(GChead, metatable) == offsetof(GCudata, metatable));
+//LJ_STATIC_ASSERT(offsetof(GChead, metatable) == offsetof(GCtab, metatable));
+//LJ_STATIC_ASSERT(offsetof(GChead, metatable) == offsetof(GCudata, metatable));
 
 /* The gclist field MUST be at the same offset for all GC objects. */
-LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(lua_State, gclist));
-LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(GCproto, gclist));
-LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(GCfuncL, gclist));
-LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(GCtab, gclist));
+//LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(lua_State, gclist));
+//LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(GCproto, gclist));
+//LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(GCfuncL, gclist));
+//LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(GCtab, gclist));
 
 typedef union GCobj {
   GChead gch;

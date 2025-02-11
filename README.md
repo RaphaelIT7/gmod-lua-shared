@@ -1,7 +1,7 @@
 # gmod-lua-shared
 
 My goal is to recreate the lua_shared.dll from Gmod.  
-Current LUAJIT Version used for this: https://github.com/LuaJIT/LuaJIT/commit/e826d0c101d750fac8334d71e221c50d8dbe236c
+Current LUAJIT Version used for this: https://github.com/LuaJIT/LuaJIT/commit/a4f56a459a588ae768801074b46ba0adcfb49eb1
 > Note: This is still WIP  
 
 Maybe if I finish this I also try to get Lua 5.4 to work :D

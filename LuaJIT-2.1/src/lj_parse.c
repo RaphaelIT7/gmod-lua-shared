@@ -107,8 +107,10 @@ typedef struct FuncScope {
 #define FSCOPE_GOLA		0x04	/* Goto or label used in scope. */
 #define FSCOPE_UPVAL		0x08	/* Upvalue in scope. */
 #define FSCOPE_NOCLOSE		0x10	/* Do not close upvalues. */
+#define FSCOPE_CONTINUE		0x20	/* Continue used in scope. */
 
 #define NAME_BREAK		((GCstr *)(uintptr_t)1)
+#define NAME_CONTINUE		((GCstr *)(uintptr_t)2)
 
 /* Index into variable stack. */
 typedef uint16_t VarIndex;
@@ -1163,7 +1165,7 @@ static MSize gola_new(LexState *ls, GCstr *name, uint8_t info, BCPos pc)
       lj_lex_error(ls, 0, LJ_ERR_XLIMC, LJ_MAX_VSTACK);
     lj_mem_growvec(ls->L, ls->vstack, ls->sizevstack, LJ_MAX_VSTACK, VarInfo);
   }
-  lj_assertFS(name == NAME_BREAK || lj_tab_getstr(fs->kt, name) != NULL,
+  lj_assertFS(name == NAME_BREAK || name == NAME_CONTINUE || lj_tab_getstr(fs->kt, name) != NULL,
 	      "unanchored label name");
   /* NOBARRIER: name is anchored in fs->kt and ls->vstack is not a GCobj. */
   setgcref(ls->vstack[vtop].name, obj2gco(name));
@@ -1218,6 +1220,7 @@ static void gola_resolve(LexState *ls, FuncScope *bl, MSize idx)
 	lj_assertLS((uintptr_t)name >= VARNAME__MAX, "expected goto name");
 	ls->linenumber = ls->fs->bcbase[vg->startpc].line;
 	lj_assertLS(strref(vg->name) != NAME_BREAK, "unexpected break");
+	lj_assertLS(strref(vg->name) != NAME_CONTINUE, "unexpected continue");
 	lj_lex_error(ls, 0, LJ_ERR_XGSCOPE,
 		     strdata(strref(vg->name)), strdata(name));
       }
@@ -1243,8 +1246,8 @@ static void gola_fixup(LexState *ls, FuncScope *bl)
 	    gola_patch(ls, vg, v);
 	  }
       } else if (gola_isgoto(v)) {
-	if (bl->prev) {  /* Propagate goto or break to outer scope. */
-	  bl->prev->flags |= name == NAME_BREAK ? FSCOPE_BREAK : FSCOPE_GOLA;
+	if (bl->prev) {  /* Propagate goto, break or continue to outer scope. */
+	  bl->prev->flags |= name == NAME_BREAK ? FSCOPE_BREAK : (name == NAME_CONTINUE ? FSCOPE_CONTINUE : FSCOPE_GOLA);
 	  v->slot = bl->nactvar;
 	  if ((bl->flags & FSCOPE_UPVAL))
 	    gola_close(ls, v);
@@ -1252,6 +1255,8 @@ static void gola_fixup(LexState *ls, FuncScope *bl)
 	  ls->linenumber = ls->fs->bcbase[v->startpc].line;
 	  if (name == NAME_BREAK)
 	    lj_lex_error(ls, 0, LJ_ERR_XBREAK);
+	  else if (name == NAME_CONTINUE)
+	    lj_lex_error(ls, 0, LJ_ERR_XCONTINUE);
 	  else
 	    lj_lex_error(ls, 0, LJ_ERR_XLUNDEF, strdata(name));
 	}
@@ -2367,6 +2372,13 @@ static void parse_return(LexState *ls)
   bcemit_INS(fs, ins);
 }
 
+/* Parse 'continue' statement. */
+static void parse_continue(LexState *ls)
+{
+  ls->fs->bl->flags |= FSCOPE_CONTINUE;
+  gola_new(ls, NAME_CONTINUE, VSTACK_GOTO, bcemit_jmp(ls->fs));
+}
+
 /* Parse 'break' statement. */
 static void parse_break(LexState *ls)
 {
@@ -2443,6 +2455,10 @@ static void parse_while(LexState *ls, BCLine line)
   lex_check(ls, TK_do);
   loop = bcemit_AD(fs, BC_LOOP, fs->nactvar, 0);
   parse_block(ls);
+  if(fs->bl->flags | FSCOPE_CONTINUE) {
+    MSize idx = gola_new(ls, NAME_CONTINUE, VSTACK_LABEL, fs->pc);
+    gola_resolve(ls, fs->bl, idx);
+  }
   jmp_patch(fs, bcemit_jmp(fs), start);
   lex_match(ls, TK_end, TK_while, line);
   fscope_end(fs);
@@ -2462,6 +2478,10 @@ static void parse_repeat(LexState *ls, BCLine line)
   lj_lex_next(ls);  /* Skip 'repeat'. */
   bcemit_AD(fs, BC_LOOP, fs->nactvar, 0);
   parse_chunk(ls);
+  if(fs->bl->flags | FSCOPE_CONTINUE) {
+    MSize idx = gola_new(ls, NAME_CONTINUE, VSTACK_LABEL, fs->pc);
+    gola_resolve(ls, fs->bl, idx);
+  }
   lex_match(ls, TK_until, TK_repeat, line);
   condexit = expr_cond(ls);  /* Parse condition (still inside inner scope). */
   if (!(bl2.flags & FSCOPE_UPVAL)) {  /* No upvalues? Just end inner scope. */
@@ -2507,6 +2527,10 @@ static void parse_for_num(LexState *ls, GCstr *varname, BCLine line)
   var_add(ls, 1);
   bcreg_reserve(fs, 1);
   parse_block(ls);
+  if(fs->bl->flags | FSCOPE_CONTINUE) {
+    MSize idx = gola_new(ls, NAME_CONTINUE, VSTACK_LABEL, fs->pc);
+    gola_resolve(ls, fs->bl, idx);
+  }
   fscope_end(fs);
   /* Perform loop inversion. Loop control instructions are at the end. */
   loopend = bcemit_AJ(fs, BC_FORL, base, NO_JMP);
@@ -2580,6 +2604,10 @@ static void parse_for_iter(LexState *ls, GCstr *indexname)
   var_add(ls, nvars-3);
   bcreg_reserve(fs, nvars-3);
   parse_block(ls);
+  if(fs->bl->flags | FSCOPE_CONTINUE) {
+    MSize idx = gola_new(ls, NAME_CONTINUE, VSTACK_LABEL, fs->pc);
+    gola_resolve(ls, fs->bl, idx);
+  }
   fscope_end(fs);
   /* Perform loop inversion. Loop control instructions are at the end. */
   jmp_patchins(fs, loop, fs->pc);
@@ -2678,6 +2706,10 @@ static int parse_stmt(LexState *ls)
   case TK_return:
     parse_return(ls);
     return 1;  /* Must be last. */
+  case TK_continue:
+    lj_lex_next(ls);
+    parse_continue(ls);
+    break;  /* Must be last in Lua 5.1. */
   case TK_break:
     lj_lex_next(ls);
     parse_break(ls);
