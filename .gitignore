@@ -1,6 +1,12 @@
 
 development/
 *.bak
-Bootil/projects/obj/**
+*.obj
+*.sln
+*.make
+*.pdb
 **.vcxproj**
 lua-shared.vpc.sentinel
+Bootil/projects/Makefile
+Bootil/projects/**/*.lib
+Bootil/projects/**/*.a
