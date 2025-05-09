@@ -19,7 +19,7 @@ jobs:
       - name: Generate libs
         run: |
           cd LuaJIT-2.1/src/
-          .\msvcbuild.bat
+          .\msvcbuild.bat static
           ren lua51.lib lua51_64.lib
           ren luajit.lib luajit_64.lib
 
@@ -51,7 +51,7 @@ jobs:
       - name: Generate libs
         run: |
           cd LuaJIT-2.1/src/
-          .\msvcbuild_86.bat
+          .\msvcbuild_86.bat static
           ren lua51.lib lua51_32.lib
           ren luajit.lib luajit_32.lib
 
