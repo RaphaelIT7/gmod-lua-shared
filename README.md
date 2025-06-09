@@ -9,40 +9,44 @@ Maybe if I finish this I also try to get Lua 5.4 to work :D
 # ToDo
 
 ## Current Issues
-- [x] Engine Error: `Error loading lua_shared (Sys_GetFactory)`
-- [x] `Segmentation fault (core dumped) ../../../source/CLuaInterface.cpp:958`
-- [x] CLuaInterface::Global needs to be implemented. Or else we crash.
-- [x] CLuaInterface::SetMember needs to be implemented.
-- [x] CLuaInterface::GetMetaTableObject needs to be implemented.
-- [x] CLuaInterface::FindAndRunScript needs to be implemented.
-- [x] CLuaInterface::PushUserType needs to be implemented?
-- [x] Random Crashes on Windows? (Seems to be solved???)
-- [x] ILuaObjects are broken? (obj->isTable() = false, (obj->GetType() == Type::Table) = true?, obj->Push() = nothing???) Best example is Global();
-NOTE: Added a workaround to fix it.  
-- [x] Fixed the Stack
-- [x] (IMPORTANT) Find out why functions like Material crash. Are we missing something?  
-- [x] Implement continue  
-- [x] What makes this call? What is broken? `CLuaInterface::CheckString 1068146288`  
-NOTE: I should actual give Msg the Value to ACTUALLY print the REAL value and not some memory.
-- [x] What causes a stack leak? A bunch of nil values end up on the stack.  
-- [x] Fix SetMember functions causing `[MENU ERROR] attempt to index a string value`
-- [x] Find another stack leak.  
-NOTE: The leak was cased by `CallFunctionProtected` returning false instead of true.  
-- [x] Fix `/* */` and `//` in LuaJIT and remove the Workarounds from `CLuaInterface::RunMacros`  
-BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`  
-- [ ] Fix some random error (`the file "(null)"" couldn't be opened`)
-- [x] Fix the random crash when loading into a game  
-- - [x] Fix CallFunctionProtected & GetReturn
-- [x] Type Errors cause engine errors.
-- [x] Fix a crash when closing the game.
-- [x] Fix `/* */`. it ignores the full line.
-- - [x] Find out why the local build lib works but the one from the compiler fails
-- [x] Fix `print` breaking with numbers.
-- [ ] Find out why you cannot press a VGUI Button.
-- [x] Fix a crash on level shutdown (menusystem.dll crashes)
-- [ ] Implement Managed Convars properly -> Save and load their values.
-- [ ] Implement the cache properly
-- [ ] Why is the player NULL in concommand.Run?
+- [x] Engine Error: `Error loading lua_shared (Sys_GetFactory)`<br>
+- [x] `Segmentation fault (core dumped) ../../../source/CLuaInterface.cpp:958`<br>
+- [x] CLuaInterface::Global needs to be implemented. Or else we crash.<br>
+- [x] CLuaInterface::SetMember needs to be implemented.<br>
+- [x] CLuaInterface::GetMetaTableObject needs to be implemented.<br>
+- [x] CLuaInterface::FindAndRunScript needs to be implemented.<br>
+- [x] CLuaInterface::PushUserType needs to be implemented?<br>
+- [x] Random Crashes on Windows? (Seems to be solved???)<br>
+- [x] ILuaObjects are broken? (obj->isTable() = false, (obj->GetType() == Type::Table) = true?, obj->Push() = nothing???) Best example is Global();<br>
+NOTE: Added a workaround to fix it.<br>
+- [x] Fixed the Stack<br>
+- [x] (IMPORTANT) Find out why functions like Material crash. Are we missing something?<br>
+- [x] Implement continue<br>
+- [x] What makes this call? What is broken? `CLuaInterface::CheckString 1068146288<br>
+NOTE: I should actual give Msg the Value to ACTUALLY print the REAL value and not some memory.<br>
+- [x] What causes a stack leak? A bunch of nil values end up on the stack.<br>
+- [x] Fix SetMember functions causing `[MENU ERROR] attempt to index a string value`<br>
+- [x] Find another stack leak.<br>
+NOTE: The leak was cased by `CallFunctionProtected` returning false instead of true.<br>
+- [x] Fix `/* */` and `//` in LuaJIT and remove the Workarounds from `CLuaInterface::RunMacros`<br>
+BUG: `[MENU ERROR] [string "includes/util/color.lua"]:81: ')' expected near '~'`<br>
+- [ ] Fix some random error (`the file "(null)"" couldn't be opened`)<br>
+- [x] Fix the random crash when loading into a game<br>
+- - [x] Fix CallFunctionProtected & GetReturn<br>
+- [x] Type Errors cause engine errors.<br>
+- [x] Fix a crash when closing the game.<br>
+- [x] Fix `/* */`. it ignores the full line.<br>
+- - [x] Find out why the local build lib works but the one from the compiler fails<br>
+- [x] Fix `print` breaking with numbers.<br>
+- [x] Find out why you cannot press a VGUI Button.<br>
+- [x] Fix a crash on level shutdown (menusystem.dll crashes)<br>
+- [ ] Implement Managed Convars properly -> Save and load their values.<br>
+- [ ] Implement the cache properly<br>
+- [x] Why is the player NULL in concommand.Run?<br>
+NOTE: This was caused by the ILuaObjects being broken since on windows the vtable is offset.<br>
+- [x] Fixed FindAndRunScript function being utter garbage<br>
+- [ ] Figure out why the player and weapon color aren't set on spawn properly.<br>
+
 
 ## Linux DS issues
 - [ ] Crashes while loading.

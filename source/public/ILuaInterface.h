@@ -488,7 +488,7 @@ public:
 	virtual void DestroyObject( ILuaObject *obj ) = 0;
 	virtual ILuaObject *CreateObject( ) = 0;
 	virtual void SetMember( ILuaObject *table, ILuaObject *key, ILuaObject *value ) = 0;
-	virtual ILuaObject* GetNewTable( ) = 0;
+	virtual ILuaObject *GetNewTable( ) = 0;
 	virtual void SetMember( ILuaObject *table, float key ) = 0;
 	virtual void SetMember( ILuaObject *table, float key, ILuaObject *value ) = 0;
 	virtual void SetMember( ILuaObject *table, const char *key ) = 0;
@@ -513,7 +513,7 @@ public:
 	virtual void PopPath( ) = 0;
 	virtual const char *GetPath( ) = 0;
 	virtual int GetColor( int index ) = 0;
-	virtual void PushColor( Color color ) = 0;
+	virtual ILuaObject* PushColor( Color color ) = 0;
 	virtual int GetStack( int level, lua_Debug *dbg ) = 0;
 	virtual int GetInfo( const char *what, lua_Debug *dbg ) = 0;
 	virtual const char *GetLocal( lua_Debug *dbg, int n ) = 0;
@@ -524,7 +524,7 @@ public:
 	virtual const char *GetCurrentLocation( ) = 0;
 	virtual void MsgColour( const Color &col, const char *fmt, ... ) = 0;
 	virtual void GetCurrentFile( std::string &outStr ) = 0;
-	virtual void CompileString( Bootil::Buffer &dumper, const std::string &stringToCompile ) = 0;
+	virtual bool CompileString( Bootil::Buffer &dumper, const std::string &stringToCompile ) = 0;
 	virtual bool CallFunctionProtected( int, int, bool ) = 0;
 	virtual void Require( const char *name ) = 0;
 	virtual const char *GetActualTypeName( int type ) = 0;
@@ -532,11 +532,11 @@ public:
 	virtual void PushPooledString( int index ) = 0;
 	virtual const char *GetPooledString( int index ) = 0;
 	virtual int AddThreadedCall( ILuaThreadedCall * ) = 0;
-	virtual void AppendStackTrace( char *, unsigned long ) = 0;
+	virtual void AppendStackTrace( char *, unsigned int ) = 0;
 	virtual void *CreateConVar( const char *, const char *, const char *, int ) = 0;
 	virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) ) = 0;
 	virtual const char* CheckStringOpt( int iStackPos, const char* def ) = 0;
 	virtual double CheckNumberOpt( int iStackPos, double def ) = 0;
-	virtual void RegisterMetaTable( const char* name, ILuaObject* obj ) = 0;
+	virtual int RegisterMetaTable( const char* name, ILuaObject* obj ) = 0;
 };
 #endif

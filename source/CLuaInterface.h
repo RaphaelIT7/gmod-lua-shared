@@ -81,8 +81,6 @@ void GMOD_LuaCreateEmptyUserdata(LuaState* L) {
 }
 */
 
-extern int g_iTypeNum;
-
 class CLuaInterface : public ILuaInterface
 {
 public:
@@ -196,7 +194,7 @@ public:
 	virtual void PopPath( );
 	virtual const char *GetPath( );
 	virtual int GetColor( int index );
-	virtual void PushColor( Color color );
+	virtual ILuaObject* PushColor( Color color );
 	virtual int GetStack( int level, lua_Debug *dbg );
 	virtual int GetInfo( const char *what, lua_Debug *dbg );
 	virtual const char *GetLocal( lua_Debug *dbg, int n );
@@ -207,7 +205,7 @@ public:
 	virtual const char *GetCurrentLocation( );
 	virtual void MsgColour( const Color &col, const char *fmt, ... );
 	virtual void GetCurrentFile( std::string &outStr );
-	virtual void CompileString( Bootil::Buffer &dumper, const std::string &stringToCompile );
+	virtual bool CompileString( Bootil::Buffer &dumper, const std::string &stringToCompile );
 	virtual bool CallFunctionProtected( int iArgs, int iRets, bool showError );
 	virtual void Require( const char *name );
 	virtual const char *GetActualTypeName( int type );
@@ -215,18 +213,19 @@ public:
 	virtual void PushPooledString( int index );
 	virtual const char *GetPooledString( int index );
 	virtual int AddThreadedCall( ILuaThreadedCall * );
-	virtual void AppendStackTrace( char *, unsigned long );
+	virtual void AppendStackTrace( char *, unsigned int );
 	virtual void *CreateConVar( const char *, const char *, const char *, int );
 	virtual void *CreateConCommand( const char *, const char *, int, void ( * )( const CCommand & ), int ( * )( const char *, char ( * )[128] ) );
 	virtual const char* CheckStringOpt( int iStackPos, const char* def );
 	virtual double CheckNumberOpt( int iStackPos, double def );
-	virtual void RegisterMetaTable( const char* name, ILuaObject* obj );
+	virtual int RegisterMetaTable( const char* name, ILuaObject* obj );
 
 public:
 	virtual void LuaPrint( const char* str );
 
 public:
 	std::string RunMacros(std::string script);
+	int FilterConVarFlags(int& flags);
 
 public:
 	inline ILuaGameCallback *GetLuaGameCallback() const
@@ -270,46 +269,10 @@ private:
 	ILuaObject* m_pGlobal = nullptr;
 	ILuaObject* m_pStringPool = nullptr;
 	// But wait, theres more. In the next fields the metatables objects are saved but idk if it just has a field for each metatable or if it uses a map.
-	char _8[1];
-	char _9[39];
-	ILuaObject* m_pWeaponMeta = nullptr;
-	ILuaObject* m_pVectorMeta = nullptr;
-	ILuaObject* m_pAngleMeta = nullptr;
-	ILuaObject* m_pPhysObjMeta = nullptr;
-	ILuaObject* m_pISaveMeta = nullptr;
-	ILuaObject* m_pIRestoreMeta = nullptr;
-	ILuaObject* m_pCTakeDamageInfoMeta = nullptr;
-	ILuaObject* m_pCEffectDataMeta = nullptr;
-	ILuaObject* m_pCMoveDataMeta = nullptr;
-	ILuaObject* m_pCRecipientFilterMeta = nullptr;
-	ILuaObject* m_pCUserCmd = nullptr;
-	ILuaObject* m_unknown1 = nullptr; // Probably only Menu state
-	ILuaObject* m_pIMaterialMeta = nullptr;
-	ILuaObject* m_pPanelMeta = nullptr;
-	ILuaObject* m_pCLuaParticleMeta = nullptr;
-	char _10[3];
-	ILuaObject* m_pITextureMeta = nullptr;
-	ILuaObject* m_pBf_readMeta = nullptr;
-	ILuaObject* m_pConVarMeta = nullptr;
-	ILuaObject* m_pIMeshMeta = nullptr;
-	ILuaObject* m_pVMatrixMeta = nullptr;
-	ILuaObject* m_pCSoundPatchMeta = nullptr;
-	ILuaObject* m_pPixelvis_handle_tMeta = nullptr;
-	ILuaObject* m_pDlight_tMeta = nullptr;
-	ILuaObject* m_pIVideoWriterMeta = nullptr;
-	ILuaObject* m_pFileMeta = nullptr;
-	ILuaObject* m_pCLuaLocomotionMeta = nullptr;
-	ILuaObject* m_pPathFollowerMeta = nullptr;
-	ILuaObject* m_pCNavAreaMeta = nullptr;
-	ILuaObject* m_pIGModAudioChannelMeta = nullptr;
-	ILuaObject* m_pCNavLadderMeta = nullptr;
-	ILuaObject* m_pCNewParticleEffectMeta = nullptr;
-	ILuaObject* m_pProjectedTextureMeta = nullptr;
-	ILuaObject* m_pPhysCollideMeta = nullptr;
-	ILuaObject* m_pSurfaceInfoMeta = nullptr;
+	unsigned char m_iMetaTableIDCounter = 44;
+	ILuaObject* m_pMetaTables[255]; // Their index is based off their type. means m_MetaTables[Type::Entity] returns the Entity metatable.
 private:
 	std::list<char*> m_pPaths;
-	const char* pTypeNames[255];
 
 public:
 	void RunThreadedCalls();

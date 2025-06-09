@@ -14,10 +14,16 @@ struct LuaFile
 	std::string name;
 	std::string source;
 	std::string contents;
+	inline const char* GetName() { return name.c_str(); }
+	inline const char* GetSource() { return source.c_str(); }
+	inline const char* GetContents() { return contents.c_str(); }
 #else
 	const char* name;
 	const char* source;
 	const char* contents;
+	inline const char* GetName() { return name; }
+	inline const char* GetSource() { return source; }
+	inline const char* GetContents() { return contents; }
 #endif
 	Bootil::AutoBuffer compressed;
 #ifndef WIN32

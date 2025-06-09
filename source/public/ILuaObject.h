@@ -23,7 +23,7 @@ class ILuaInterface;
 
 class ILuaObject
 {
-public:
+private: // Virtual functions are unsafe since the offsets are wrong on Windows.
 	//virtual ~ILuaObject();
 	virtual void Set( ILuaObject *obj ) = 0;
 	virtual void SetFromStack( int i ) = 0;
@@ -121,6 +121,7 @@ public:
 
 	virtual void SetMemberDouble( float, double ) = 0;
 	virtual double GetMemberDouble( const char *, double ) = 0;
+	//virtual double GetMemberDouble( float, double ) = 0;
 	// NOTE: All members below do NOT exist in ILuaObjects returned from the menusystem!
 
 	virtual BaseEntity *GetMemberEntity( const char *, BaseEntity * ) = 0;
@@ -150,7 +151,8 @@ public:
 	virtual void SetMemberMatrix( int, VMatrix const * ) = 0;
 
 	virtual void SetMemberPhysObject( const char *, IPhysicsObject * ) = 0;
-public:
+	virtual double GetMemberDouble( float, double ) = 0;
+private:
 	bool m_bUserData;
 	int m_iLUA_TYPE;
 	int m_reference;

@@ -142,20 +142,20 @@ ILuaInterface* CLuaShared::CreateLuaInterface(unsigned char realm, bool unknown)
 	return iFace;
 }
 
-void CLuaShared::CloseLuaInterface(ILuaInterface* LuaInterface)
+void CLuaShared::CloseLuaInterface(ILuaInterface* luaInterface)
 {
 	DebugPrint("CLuaShared::CloseLuaInterface\n");
 
-	if ( LuaInterface->IsClient() )
+	if ( luaInterface->IsClient() )
 		pInterfaces[0] = NULL;
 
-	if ( LuaInterface->IsServer() )
+	if ( luaInterface->IsServer() )
 		pInterfaces[1] = NULL;
 
-	if ( LuaInterface->IsMenu() )
+	if ( luaInterface->IsMenu() )
 		pInterfaces[2] = NULL;
 
-	::CloseLuaInterface(LuaInterface);
+	::CloseLuaInterface(luaInterface);
 }
 
 ILuaInterface* CLuaShared::GetLuaInterface(unsigned char realm)
@@ -200,6 +200,7 @@ LuaFile* CLuaShared::LoadFile(const std::string& path, const std::string& pathId
 	return file;
 }
 
+// ToDo: Redo this function since we reworked how CLuaInterface::FindAndRunScript calls this function and it now properly mimics gmod.
 LuaFile* CLuaShared::LoadFile_FromFile(const std::string& path, const std::string& pathId, bool fromDatatable, bool fromFile) // BUG: On Linux, it crashes at pCache[path] = file; for some reason. Something seems really wrong.
 {
 	DebugPrint("CLuaShared::LoadFile: %s %s (%s|%s)\n", path.c_str(), pathId.c_str(), fromDatatable ? "DT" : "No DT", fromFile ? "File" : "No File");
@@ -378,12 +379,12 @@ void CLuaShared::SetLuaFindHook(LuaClientDatatableHook* hook)
 	}
 }
 
-void CLuaShared::FindScripts(const std::string& path, const std::string& pathID, std::vector<LuaFindResult>& out)
+void CLuaShared::FindScripts(const std::string& path, const std::string& pathID, std::vector<LuaFindResult>& outPut)
 {
 	DebugPrint("CLuaShared::FindScripts %s, %s\n", path.c_str(), pathID.c_str());
 	if (g_pOrigLuaShared)
 	{
-		g_pOrigLuaShared->FindScripts(path, pathID, out);
+		g_pOrigLuaShared->FindScripts(path, pathID, outPut);
 		return;
 	}
 
@@ -400,7 +401,7 @@ void CLuaShared::FindScripts(const std::string& path, const std::string& pathID,
 		LuaFindResult result;
 		result.fileName = pFilename;
 		result.isFolder = g_pFullFileSystem->FindIsDirectory( findHandle );
-		out.push_back( result );
+		outPut.push_back( result );
 
 		pFilename = g_pFullFileSystem->FindNext( findHandle );
 	}
