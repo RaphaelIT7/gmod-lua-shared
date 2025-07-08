@@ -286,6 +286,24 @@ LJLIB_CF(table_pack)
 }
 #endif
 
+LJLIB_CF(table_setreadonly)
+{
+  GCtab *t = lj_lib_checktab(L, 1);
+  int readOnly = lj_lib_checkint(L, 2) != 0;
+  
+  lj_tab_setreadonly(t, readOnly);
+  return 0;
+}
+
+LJLIB_CF(table_isreadonly)
+{
+  GCtab *t = lj_lib_checktab(L, 1);
+  int readOnly = lj_lib_checkint(L, 2) != 0;
+  
+  lua_pushboolean(L, lj_tab_isreadonly(t));
+  return 1;
+}
+
 LJLIB_NOREG LJLIB_CF(table_new)		LJLIB_REC(.)
 {
   int32_t a = lj_lib_checkint(L, 1);
@@ -296,7 +314,7 @@ LJLIB_NOREG LJLIB_CF(table_new)		LJLIB_REC(.)
 
 LJLIB_NOREG LJLIB_CF(table_clear)	LJLIB_REC(.)
 {
-  lj_tab_clear(lj_lib_checktab(L, 1));
+  lj_tab_clear(L, lj_lib_checktab(L, 1));
   return 0;
 }
 

@@ -166,6 +166,11 @@ TValue *lj_meta_tset(lua_State *L, cTValue *o, cTValue *k)
     cTValue *mo;
     if (LJ_LIKELY(tvistab(o))) {
       GCtab *t = tabV(o);
+      if (isreadonly(t))
+      {
+        lj_err_msg(L, LJ_ERR_READONLY);
+      }
+
       cTValue *tv = lj_tab_get(L, t, k);
       if (LJ_LIKELY(!tvisnil(tv))) {
 	t->nomm = 0;  /* Invalidate negative metamethod cache. */

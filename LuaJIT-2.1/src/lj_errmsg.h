@@ -21,6 +21,7 @@ ERRDEF(TABOV,	"table overflow")
 ERRDEF(NANIDX,	"table index is NaN")
 ERRDEF(NILIDX,	"table index is nil")
 ERRDEF(NEXTIDX,	"invalid key to " LUA_QL("next"))
+ERRDEF(READONLY, "table is in read only")
 
 /* Metamethod resolving. */
 ERRDEF(BADCALL,	"attempt to call a %s value")
