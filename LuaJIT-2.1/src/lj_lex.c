@@ -371,17 +371,20 @@ static LexToken lex_scan(LexState *ls, TValue *tv)
       lex_next(ls);
       if (ls->c != '/' && ls->c != '*') return '/';
       if (ls->c == '*') {  // Long comment "/* */".
+        lex_next(ls);
         for(;;) {
-          lex_next(ls);
           if (ls->c == '*') {
             lex_next(ls);
             if (ls->c == '/') {
               lex_next(ls);
               break;
+            } else {
+              continue;
             }
           } else if (ls->c == LEX_EOF) { // should we throw an error?
             break;
           }
+          lex_next(ls);
         }
       } else {
         /* Short comment "//" */
