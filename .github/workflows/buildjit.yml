@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-windows-64:
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
         name: Checkout
@@ -39,7 +39,7 @@ jobs:
           retention-days: 1
 
   build-windows-32:
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
         name: Checkout
