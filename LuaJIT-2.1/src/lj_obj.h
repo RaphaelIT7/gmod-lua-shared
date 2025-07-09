@@ -60,7 +60,7 @@ typedef struct GCRef {
 } GCRef;
 
 /* Common GC header for all collectable objects. */
-#define GCHeader	GCRef nextgc; uint8_t marked; uint8_t gct
+#define GCHeader	GCRef nextgc; uint8_t marked; uint8_t gct // We can't just raise gct since that fks up the entire gc for some reason
 /* This occupies 6 bytes, so use the next 2 bytes for non-32 bit fields. */
 
 #if LJ_GC64
@@ -217,7 +217,7 @@ typedef const TValue cTValue;
 #define tvref(r)	(mref(r, TValue))
 
 /* More external and GCobj tags for internal objects. */
-#define LAST_TT		LUA_TTHREAD
+#define LAST_TT		LUA_VEC3
 #define LUA_TPROTO	(LAST_TT+1)
 #define LUA_TCDATA	(LAST_TT+2)
 
@@ -270,8 +270,9 @@ typedef const TValue cTValue;
 #define LJ_TCDATA		(~10u)
 #define LJ_TTAB			(~11u)
 #define LJ_TUDATA		(~12u)
+#define LJ_TVEC3		(~13u)
 /* This is just the canonical number type used in some places. */
-#define LJ_TNUMX		(~13u)
+#define LJ_TNUMX		(~14u)
 
 /* Integers have itype == LJ_TISNUM doubles have itype < LJ_TISNUM */
 #if LJ_64 && !LJ_GC64
@@ -522,6 +523,23 @@ typedef struct GCtab {
 #define setfreetop(t, n, v)	(setmref((n)->freetop, (v)))
 #endif
 
+/* -- Vector object ------------------------------------------------------ */
+
+typedef struct GCvec3 {
+  GCHeader;
+  uint8_t unused1;
+  int8_t unused2;
+#if LJ_GC64
+  float x, y, z, pad;
+#else
+  float x, y;
+#endif
+  GCRef metatable;  /* Must be at same offset in GCudata. */
+#if !LJ_GC64
+  float z;
+#endif
+} GCvec3;
+
 /* -- State objects ------------------------------------------------------- */
 
 /* VM states. */
@@ -761,6 +779,7 @@ typedef union GCobj {
   GCcdata cd;
   GCtab tab;
   GCudata ud;
+  GCvec3 vec3;
 } GCobj;
 
 /* Macros to convert a GCobj pointer into a specific value. */
@@ -772,6 +791,7 @@ typedef union GCobj {
 #define gco2cd(o)	check_exp((o)->gch.gct == ~LJ_TCDATA, &(o)->cd)
 #define gco2tab(o)	check_exp((o)->gch.gct == ~LJ_TTAB, &(o)->tab)
 #define gco2ud(o)	check_exp((o)->gch.gct == ~LJ_TUDATA, &(o)->ud)
+#define gco2vec3(o) check_exp((o)->gch.gct == ~LJ_TVEC3, &(o)->vec3)
 
 /* Macro to convert any collectable object into a GCobj pointer. */
 #define obj2gco(v)	((GCobj *)(v))
@@ -804,6 +824,7 @@ typedef union GCobj {
 #define tvisnumber(o)	(itype(o) <= LJ_TISNUM)
 #define tvisint(o)	(LJ_DUALNUM && itype(o) == LJ_TISNUM)
 #define tvisnum(o)	(itype(o) < LJ_TISNUM)
+#define tvisvec3(o)	(itype(o) == LJ_TVEC3)
 
 #define tvistruecond(o)	(itype(o) < LJ_TISTRUECOND)
 #define tvispri(o)	(itype(o) >= LJ_TISPRI)
@@ -865,6 +886,7 @@ static LJ_AINLINE void *lightudV(global_State *g, cTValue *o)
 #define cdataV(o)	check_exp(tviscdata(o), &gcval(o)->cd)
 #define tabV(o)		check_exp(tvistab(o), &gcval(o)->tab)
 #define udataV(o)	check_exp(tvisudata(o), &gcval(o)->ud)
+#define vec3V(o)	check_exp(tvisvec3(o), &gcval(o)->vec3)
 #define numV(o)		check_exp(tvisnum(o), (o)->n)
 #define intV(o)		check_exp(tvisint(o), (int32_t)(o)->i)
 
@@ -943,6 +965,7 @@ define_setV(setfuncV, GCfunc, LJ_TFUNC)
 define_setV(setcdataV, GCcdata, LJ_TCDATA)
 define_setV(settabV, GCtab, LJ_TTAB)
 define_setV(setudataV, GCudata, LJ_TUDATA)
+define_setV(setvec3V, GCvec3, LJ_TVEC3)
 
 #define setnumV(o, x)		((o)->n = (x))
 #define setnanV(o)		((o)->u64 = U64x(fff80000,00000000))

@@ -324,7 +324,7 @@ LJ_DATA const uint8_t lj_ir_mode[IR__MAX+1];
   _(UDATA, IRTSIZE_PGC) \
   _(FLOAT, 4) _(NUM, 8) _(I8, 1) _(U8, 1) _(I16, 2) _(U16, 2) \
   _(INT, 4) _(U32, 4) _(I64, 8) _(U64, 8) \
-  _(SOFTFP, 4)  /* There is room for 8 more types. */
+  _(SOFTFP, 4) _(VEC, IRTSIZE_PGC)  /* There is room for 7 more types. */
 
 /* IR result type and flags (8 bit). */
 typedef enum {
@@ -384,6 +384,7 @@ typedef struct IRType1 { uint8_t irt; } IRType1;
 #define irt_isi64(t)		(irt_type(t) == IRT_I64)
 #define irt_isu64(t)		(irt_type(t) == IRT_U64)
 #define irt_isp32(t)		(irt_type(t) == IRT_P32)
+#define irt_isvec(t)		(irt_type(t) == IRT_VEC)
 
 #define irt_isfp(t)		(irt_isnum(t) || irt_isfloat(t))
 #define irt_isinteger(t)	(irt_typerange((t), IRT_I8, IRT_INT))
@@ -519,6 +520,7 @@ typedef uint32_t TRef;
 #define tref_isudata(tr)	(tref_istype((tr), IRT_UDATA))
 #define tref_isnum(tr)		(tref_istype((tr), IRT_NUM))
 #define tref_isint(tr)		(tref_istype((tr), IRT_INT))
+#define tref_isvec(tr)		(tref_istype((tr), IRT_VEC))
 
 #define tref_isbool(tr)		(tref_typerange((tr), IRT_FALSE, IRT_TRUE))
 #define tref_ispri(tr)		(tref_typerange((tr), IRT_NIL, IRT_TRUE))
@@ -595,6 +597,7 @@ typedef union IRIns {
 #define ir_kptr(ir) \
   check_exp((ir)->o == IR_KPTR || (ir)->o == IR_KKPTR, \
     mref((ir)[LJ_GC64].ptr, void))
+#define ir_kvec(ir) (gco2vec(ir_kgc((ir))))
 
 /* A store or any other op with a non-weak guard has a side-effect. */
 static LJ_AINLINE int ir_sideeff(IRIns *ir)

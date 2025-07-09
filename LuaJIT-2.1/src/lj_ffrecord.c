@@ -1569,6 +1569,18 @@ static void LJ_FASTCALL recff_debug_getmetatable(jit_State *J, RecordFFData *rd)
   J->base[0] = mt ? mtref : TREF_NIL;
 }
 
+/* -- Vector library fast functions ------------------------------------------ */
+
+static void LJ_FASTCALL recff_vector_new(jit_State *J, RecordFFData *rd)
+{
+  TRef tx = lj_ir_tonum(J, J->base[0]);
+  TRef ty = lj_ir_tonum(J, J->base[1]);
+  TRef tz = lj_ir_tonum(J, J->base[2]);
+
+  J->base[0] = lj_ir_call(J, IRCALL_lj_alloc_vec3, tx, ty, tz);
+  UNUSED(rd);
+}
+
 /* -- Record calls to fast functions -------------------------------------- */
 
 #include "lj_recdef.h"

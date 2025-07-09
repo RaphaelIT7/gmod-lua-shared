@@ -548,20 +548,10 @@ LJLIB_CF(print)
       L->top--;
     }
     if (i)
-      GMOD_LuaPrint("\t", L);
-      //putchar('\t');
-    //fwrite(str, 1, size, stdout);
-
-  	char* pStr = (char*)malloc( size + 1 ); // Workaround for numbers adding memory to str. I should look into it again later.
-  	strncpy( pStr, str, size );
-  	pStr[ size ] = '\0';
-
-    GMOD_LuaPrint( pStr, L );
-    free(pStr);
+      putchar('\t');
+    fwrite(str, 1, size, stdout);
   }
-  //putchar('\n');
-
-  GMOD_LuaPrint("\n", L);
+  putchar('\n');
 
   return 0;
 }

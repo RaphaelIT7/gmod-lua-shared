@@ -1004,6 +1004,18 @@ LUALIB_API void *luaL_checkudata(lua_State *L, int idx, const char *tname)
   return p;
 }
 
+LUALIB_API GCvec3 *luaL_checkvec3(lua_State *L, int idx)
+{
+  TValue *o = index2adr(L, idx);
+  if (LJ_LIKELY(tvisvec3(o))) {
+    return vec3V(o);
+  } else {
+    lj_err_argt(L, idx, LJ_TVEC3);
+  }
+
+  return NULL;
+}
+
 /* -- Object setters ------------------------------------------------------ */
 
 LUA_API void lua_settable(lua_State *L, int idx)

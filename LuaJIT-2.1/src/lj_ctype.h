@@ -32,7 +32,7 @@ enum {
   CT_BITFIELD,		/* Struct/union bitfield. */
   CT_CONSTVAL,		/* Constant value. */
   CT_EXTERN,		/* External reference. */
-  CT_KW			/* Keyword. */
+  CT_KW,			/* Keyword. */
 };
 
 LJ_STATIC_ASSERT(((int)CT_PTR & (int)CT_ARRAY) == CT_PTR);

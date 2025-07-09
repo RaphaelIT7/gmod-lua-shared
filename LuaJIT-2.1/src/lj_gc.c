@@ -17,6 +17,7 @@
 #include "lj_tab.h"
 #include "lj_func.h"
 #include "lj_udata.h"
+#include "lj_vec.h"
 #include "lj_meta.h"
 #include "lj_state.h"
 #include "lj_frame.h"
@@ -319,6 +320,14 @@ static void gc_traverse_thread(global_State *g, lua_State *th)
   lj_state_shrinkstack(th, gc_traverse_frames(g, th));
 }
 
+/* Traverse a vec3 object. */
+static void gc_traverse_vec3(global_State *g, GCvec3 *v) {
+  if (gcref(v->metatable)) {
+    gc_markobj(g, gcref(v->metatable));
+    white2gray(gcref(v->metatable));
+  }
+}
+
 /* Propagate one gray object. Traverse it and turn it black. */
 static size_t propagatemark(global_State *g)
 {
@@ -349,6 +358,8 @@ static size_t propagatemark(global_State *g)
     black2gray(o);  /* Threads are never black. */
     gc_traverse_thread(g, th);
     return sizeof(lua_State) + sizeof(TValue) * th->stacksize;
+  } else if (LJ_LIKELY(gct == ~LJ_TVEC3)) {
+    gc_traverse_vec3(g, gco2vec3(o));
   } else {
 #if LJ_HASJIT
     GCtrace *T = gco2trace(o);
@@ -376,7 +387,7 @@ static size_t gc_propagate_gray(global_State *g)
 /* Type of GC free functions. */
 typedef void (LJ_FASTCALL *GCFreeFunc)(global_State *g, GCobj *o);
 
-/* GC free functions for LJ_TSTR .. LJ_TUDATA. ORDER LJ_T */
+/* GC free functions for LJ_TSTR .. LJ_TVEC3. ORDER LJ_T */
 static const GCFreeFunc gc_freefunc[] = {
   (GCFreeFunc)lj_str_free,
   (GCFreeFunc)lj_func_freeuv,
@@ -394,7 +405,8 @@ static const GCFreeFunc gc_freefunc[] = {
   (GCFreeFunc)0,
 #endif
   (GCFreeFunc)lj_tab_free,
-  (GCFreeFunc)lj_udata_free
+  (GCFreeFunc)lj_udata_free,
+  (GCFreeFunc)lj_vec3_free,
 };
 
 /* Full sweep of a GC list. */

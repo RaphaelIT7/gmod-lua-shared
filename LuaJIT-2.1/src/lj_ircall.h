@@ -9,6 +9,7 @@
 #include "lj_obj.h"
 #include "lj_ir.h"
 #include "lj_jit.h"
+#include "lj_vec.h"
 
 /* C call info for CALL* instructions. */
 typedef struct CCallInfo {
@@ -185,7 +186,7 @@ typedef struct CCallInfo {
   _(ANY,	lj_tab_new_ah,		3,   A, TAB, CCI_L|CCI_T) \
   _(ANY,	lj_tab_new1,		2,  FA, TAB, CCI_L|CCI_T) \
   _(ANY,	lj_tab_dup,		2,  FA, TAB, CCI_L|CCI_T) \
-  _(ANY,	lj_tab_clear,		1,  FS, NIL, 0) \
+  _(ANY,	lj_tab_clear,		1,  FS, NIL, CCI_L|CCI_T) \
   _(ANY,	lj_tab_newkey,		3,   S, PGC, CCI_L|CCI_T) \
   _(ANY,	lj_tab_keyindex,	2,  FL, INT, 0) \
   _(ANY,	lj_vm_next,		2,  FL, PTR, 0) \
@@ -265,6 +266,7 @@ typedef struct CCallInfo {
   _(FFI32,	lj_carith_sar64,	2,   N, U64, XA_64|CCI_NOFPRCLOBBER) \
   _(FFI32,	lj_carith_rol64,	2,   N, U64, XA_64|CCI_NOFPRCLOBBER) \
   _(FFI32,	lj_carith_ror64,	2,   N, U64, XA_64|CCI_NOFPRCLOBBER) \
+  _(ANY, lj_alloc_vec3, 3, A, VEC, CCI_L|CCI_T) \
   \
   /* End of list. */
 
