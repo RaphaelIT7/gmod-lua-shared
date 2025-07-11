@@ -31,7 +31,10 @@ LJLIB_CF(debug_getregistry)
 
 LJLIB_CF(debug_getmetatable)	LJLIB_REC(.)
 {
-  lj_lib_checkany(L, 1);
+  TValue* o = lj_lib_checkany(L, 1);
+  if (o && tviscdata(o))
+    lj_err_arg(L, 1, LJ_ERR_DENYCDATA);
+
   if (!lua_getmetatable(L, 1)) {
     setnilV(L->top-1);
   }
@@ -40,6 +43,10 @@ LJLIB_CF(debug_getmetatable)	LJLIB_REC(.)
 
 LJLIB_CF(debug_setmetatable)
 {
+  TValue* o = lj_lib_checkany(L, 1);
+  if (o && tviscdata(o))
+    lj_err_arg(L, 1, LJ_ERR_DENYCDATA);
+
   lj_lib_checktabornil(L, 2);
   L->top = L->base+2;
   lua_setmetatable(L, 1);
@@ -49,15 +56,26 @@ LJLIB_CF(debug_setmetatable)
   return 1;
 }
 
+void blockDebug(lua_State* L, GCfunc* func)
+{
+  if (func && isblockdebug(func->c))
+    lj_err_arg(L, 1, LJ_ERR_BLOCKDEBUG);
+}
+
 LJLIB_CF(debug_getfenv)
 {
-  lj_lib_checkany(L, 1);
+  TValue* o = lj_lib_checkany(L, 1);
+  if (o && tvisfunc(o))
+    blockDebug(L, o);
   lua_getfenv(L, 1);
   return 1;
 }
 
 LJLIB_CF(debug_setfenv)
 {
+  TValue* o = lj_lib_checkany(L, 1);
+  if (o && tvisfunc(o))
+    blockDebug(L, o);
   lj_lib_checktab(L, 2);
   L->top = L->base+2;
   if (!lua_setfenv(L, 1))
@@ -202,7 +220,7 @@ static int debug_getupvalue(lua_State *L, int get)
 {
   int32_t n = lj_lib_checkint(L, 2);
   const char *name;
-  lj_lib_checkfunc(L, 1);
+  blockDebug(L, lj_lib_checkfunc(L, 1));
   name = get ? lua_getupvalue(L, 1, n) : lua_setupvalue(L, 1, n);
   if (name) {
     lua_pushstring(L, name);
@@ -228,6 +246,7 @@ LJLIB_CF(debug_setupvalue)
 LJLIB_CF(debug_upvalueid)
 {
   GCfunc *fn = lj_lib_checkfunc(L, 1);
+  blockDebug(L, fn);
   int32_t n = lj_lib_checkint(L, 2) - 1;
   if ((uint32_t)n >= fn->l.nupvalues)
     lj_err_arg(L, 2, LJ_ERR_IDXRNG);
@@ -244,6 +263,7 @@ LJLIB_CF(debug_upvaluejoin)
   for (i = 0; i < 2; i++) {
     int32_t n;
     fn[i] = lj_lib_checkfunc(L, 2*i+1);
+    blockDebug(L, fn[i]);
     if (!isluafunc(fn[i]))
       lj_err_arg(L, 2*i+1, LJ_ERR_NOLFUNC);
     n = lj_lib_checkint(L, 2*i+2) - 1;
