@@ -610,7 +610,7 @@ LJLIB_CF(jit_profile_dumpstack)
 
 #include "lj_libdef.h"
 
-static int luaopen_jit_profile(lua_State *L)
+LUALIB_API int luaopen_jit_profile(lua_State *L)
 {
   LJ_LIB_REG(L, NULL, jit_profile);
   return 1;
