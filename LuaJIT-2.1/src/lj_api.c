@@ -281,9 +281,9 @@ LUALIB_API void luaL_checkany(lua_State *L, int idx)
 
   if (mt)
   {
-    GCstr* str = lj_str_new(L, "MetaName", 8);
+    GCstr* str = lj_str_newlit(L, "MetaName");
     cTValue* val = lj_tab_getstr(mt, str);
-    lj_str_free(G(L), str);
+    // lj_str_free(G(L), str); // Lua GC takes care of our string
 
     if (val && tvisstr(val))
     {
