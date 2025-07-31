@@ -246,8 +246,8 @@ TValue *lj_meta_cat(lua_State *L, TValue *top, int left)
   int fromc = 0;
   if (left < 0) { left = -left; fromc = 1; }
   do {
-    if (!(tvisstr(top) || tvisnumber(top) || tvisbuf(top)) ||
-	!(tvisstr(top-1) || tvisnumber(top-1) || tvisbuf(top-1))) {
+    if (!(tvisstr(top) || tvisnumber(top) || tvisbuf(top) || tvisbool(top)) ||
+	!(tvisstr(top-1) || tvisnumber(top-1) || tvisbuf(top-1) || tvisbool(top-1))) {
       cTValue *mo = lj_meta_lookup(L, top-1, MM_concat);
       if (tvisnil(mo)) {
 	mo = lj_meta_lookup(L, top, MM_concat);
@@ -303,6 +303,12 @@ TValue *lj_meta_cat(lua_State *L, TValue *top, int left)
 	  lj_buf_putmem(sb, sbx->r, sbufxlen(sbx));
 	} else if (tvisint(o)) {
 	  lj_strfmt_putint(sb, intV(o));
+	} else if (tvisbool(o)) {
+	  if (boolV(o)) {
+	   lj_buf_putmem(sb, "true", 4);
+	  } else {
+	    lj_buf_putmem(sb, "false", 5);
+	  }
 	} else {
 	  lj_strfmt_putfnum(sb, STRFMT_G14, numV(o));
 	}
