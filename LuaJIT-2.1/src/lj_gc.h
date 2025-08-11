@@ -23,9 +23,6 @@ enum {
 #define LJ_GC_CDATA_FIN	0x10
 #define LJ_GC_FIXED	0x20
 #define LJ_GC_SFIXED	0x40
-#define LJ_GC_ISCDATA   0x80
-#define LJ_GC_READONLY	0x80
-#define LJ_GC_BLOCKDEBUG  0x08 // Same as LJ_GC_WEAKKEY but we can use it for functions
 
 #define LJ_GC_WHITES	(LJ_GC_WHITE0 | LJ_GC_WHITE1)
 #define LJ_GC_COLORS	(LJ_GC_WHITES | LJ_GC_BLACK)
@@ -47,14 +44,6 @@ enum {
 #define black2gray(x)	((x)->gch.marked &= (uint8_t)~LJ_GC_BLACK)
 #define fixstring(s)	((s)->marked |= LJ_GC_FIXED)
 #define markfinalized(x)	((x)->gch.marked |= LJ_GC_FINALIZED)
-
-#define isreadonly(x)	((x)->marked & LJ_GC_READONLY)
-#define markreadonly(x) ((x)->marked |= LJ_GC_READONLY)
-#define unmarkreadonly(x) ((x)->marked &= ~LJ_GC_READONLY)
-
-#define isblockdebug(x) ((x).marked & LJ_GC_BLOCKDEBUG)
-#define markblockdebug(x) ((x).marked |= LJ_GC_BLOCKDEBUG)
-#define unmarkblockdebug(x) ((x).marked &= ~LJ_GC_BLOCKDEBUG)
 
 /* Collector. */
 LJ_FUNC size_t lj_gc_separateudata(global_State *g, int all);

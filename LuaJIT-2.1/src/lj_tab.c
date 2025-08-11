@@ -13,7 +13,6 @@
 #include "lj_gc.h"
 #include "lj_err.h"
 #include "lj_tab.h"
-#include "lj_lib.h"
 
 /* -- Object hashing ------------------------------------------------------ */
 
@@ -202,13 +201,8 @@ GCtab * LJ_FASTCALL lj_tab_dup(lua_State *L, const GCtab *kt)
 }
 
 /* Clear a table. */
-void LJ_FASTCALL lj_tab_clear(lua_State* L, GCtab *t)
+void LJ_FASTCALL lj_tab_clear(GCtab *t)
 {
-  if (isreadonly(t))
-  {
-  	lj_err_msg(L, LJ_ERR_READONLY);
-  }
-
   clearapart(t);
   if (t->hmask > 0) {
     Node *node = noderef(t->node);
@@ -235,11 +229,6 @@ void LJ_FASTCALL lj_tab_free(global_State *g, GCtab *t)
 /* Resize a table to fit the new array/hash part sizes. */
 void lj_tab_resize(lua_State *L, GCtab *t, uint32_t asize, uint32_t hbits)
 {
-  if (isreadonly(t))
-  {
-  	lj_err_msg(L, LJ_ERR_READONLY);
-  }
-
   Node *oldnode = noderef(t->node);
   uint32_t oldasize = t->asize;
   uint32_t oldhmask = t->hmask;
@@ -445,11 +434,6 @@ cTValue *lj_tab_get(lua_State *L, GCtab *t, cTValue *key)
 /* Insert new key. Use Brent's variation to optimize the chain length. */
 TValue *lj_tab_newkey(lua_State *L, GCtab *t, cTValue *key)
 {
-  if (isreadonly(t))
-  {
-  	lj_err_msg(L, LJ_ERR_READONLY);
-  }
-
   Node *n = hashkey(t, key);
   if (!tvisnil(&n->val) || t->hmask == 0) {
     Node *nodebase = noderef(t->node);
@@ -525,11 +509,6 @@ TValue *lj_tab_newkey(lua_State *L, GCtab *t, cTValue *key)
 
 TValue *lj_tab_setinth(lua_State *L, GCtab *t, int32_t key)
 {
-  if (isreadonly(t))
-  {
-  	lj_err_msg(L, LJ_ERR_READONLY);
-  }
-
   TValue k;
   Node *n;
   k.n = (lua_Number)key;
@@ -543,11 +522,6 @@ TValue *lj_tab_setinth(lua_State *L, GCtab *t, int32_t key)
 
 TValue *lj_tab_setstr(lua_State *L, GCtab *t, const GCstr *key)
 {
-  if (isreadonly(t))
-  {
-  	lj_err_msg(L, LJ_ERR_READONLY);
-  }
-
   TValue k;
   Node *n = hashstr(t, key);
   do {
@@ -560,11 +534,6 @@ TValue *lj_tab_setstr(lua_State *L, GCtab *t, const GCstr *key)
 
 TValue *lj_tab_set(lua_State *L, GCtab *t, cTValue *key)
 {
-  if (isreadonly(t))
-  {
-  	lj_err_msg(L, LJ_ERR_READONLY);
-  }
-
   Node *n;
   t->nomm = 0;  /* Invalidate negative metamethod cache. */
   if (tvisstr(key)) {
@@ -715,17 +684,3 @@ MSize LJ_FASTCALL lj_tab_len_hint(GCtab *t, size_t hint)
 }
 #endif
 
-void LJ_FASTCALL lj_tab_setreadonly(GCtab *t, int readOnly)
-{
-  if (readOnly != 0)
-  {
-  	markreadonly(t);
-  } else {
-  	unmarkreadonly(t);
-  }
-}
-
-int LJ_FASTCALL lj_tab_isreadonly(GCtab *t)
-{
-  return isreadonly(t);
-}

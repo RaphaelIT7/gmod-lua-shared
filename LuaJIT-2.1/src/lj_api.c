@@ -26,9 +26,6 @@
 #include "lj_strscan.h"
 #include "lj_strfmt.h"
 
-#include "lj_ctype.h"
-#include "lj_cconv.h"
-
 /* -- Common helper functions --------------------------------------------- */
 
 #define lj_checkapi_slot(idx) \
@@ -233,18 +230,16 @@ LUA_API int lua_type(lua_State *L, int idx)
 #endif
   } else if (o == niltv(L)) {
     return LUA_TNONE;
-  } else if(tviscdata(o)) {
-    return LUA_TUSERDATA; // we would return 10 which conflicts with gmod!
-  }  /* Magic internal/external tag conversion. ORDER LJ_T */
-  
-  uint32_t t = ~itype(o);
+  } else {  /* Magic internal/external tag conversion. ORDER LJ_T */
+    uint32_t t = ~itype(o);
 #if LJ_64
-  int tt = (int)((U64x(75a06,98042110) >> 4*t) & 15u);
+    int tt = (int)((U64x(75a06,98042110) >> 4*t) & 15u);
 #else
-  int tt = (int)(((t < 8 ? 0x98042110u : 0x75a06u) >> 4*(t&7)) & 15u);
+    int tt = (int)(((t < 8 ? 0x98042110u : 0x75a06u) >> 4*(t&7)) & 15u);
 #endif
-  lj_assertL(tt != LUA_TNIL || tvisnil(o), "bad tag conversion");
-  return tt;
+    lj_assertL(tt != LUA_TNIL || tvisnil(o), "bad tag conversion");
+    return tt;
+  }
 }
 
 LUALIB_API void luaL_checktype(lua_State *L, int idx, int tt)
@@ -262,37 +257,25 @@ LUALIB_API void luaL_checkany(lua_State *L, int idx)
 // Based off https://github.com/meepen/gluajit/blob/master/src/lj_api.c#L225-L247
 /*extern "C"*/ const char* GMODLUA_GetUserType(lua_State* L, int iStackPos)
 {
-  static char strName[128];
-  const char* strTypeName = "UserData";
-  cTValue *o = index2adr(L, iStackPos);
-  GCtab *mt = NULL;
-  if (tvistab(o))
-    mt = tabref(tabV(o)->metatable);
-  else if (tvisudata(o))
-    mt = tabref(udataV(o)->metatable);
-  else if (tviscdata(o))
-  {
-    strTypeName = "cdata";
-    CTState *cts = ctype_cts(L);
-    CType *ct = ctype_raw(cts, cdataV(o)->ctypeid);
-    mt = tabV(lj_tab_getinth(cts->miscmap, -(int32_t)ctype_typeid(cts, ct)));
-  } else
-    mt = tabref(basemt_obj(G(L), o));
+	static char strName[128];
+	const char* strTypeName = "UserData";
+	if (lua_getmetatable(L, iStackPos))
+	{
+		lua_pushstring(L, "MetaName");
+		lua_gettable(L, -2);
 
-  if (mt)
-  {
-    GCstr* str = lj_str_newlit(L, "MetaName");
-    cTValue* val = lj_tab_getstr(mt, str);
-    // lj_str_free(G(L), str); // Lua GC takes care of our string
+		if (lua_isstring(L, -1))
+		{
+			strncpy(strName, lua_tostring(L, -1), sizeof(strName));
+			strTypeName = strName;
+		}
 
-    if (val && tvisstr(val))
-    {
-      strncpy(strName, strdata(strV(val)), sizeof(strName));
-      strTypeName = strName;
-    }
-  }
+		lua_pop(L, 1);
+	}
 
-  return strTypeName;
+	lua_pop(L, 1);
+
+	return strTypeName;
 }
 
 LUA_API const char *lua_typename(lua_State *L, int t, int stackpos)

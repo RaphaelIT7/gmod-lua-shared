@@ -31,13 +31,6 @@ jobs:
           retention-days: 1
 
       - uses: actions/upload-artifact@v4
-        name: Upload luajit executable (64x)
-        with:
-          name: luajit.exe (64x)
-          path: LuaJIT-2.1/src/luajit.exe
-          retention-days: 1
-
-      - uses: actions/upload-artifact@v4
         if: false
         name: Upload luajit.lib
         with:
@@ -70,17 +63,10 @@ jobs:
           retention-days: 1
 
       - uses: actions/upload-artifact@v4
-        name: Upload luajit executable (32x)
-        with:
-          name: luajit.exe
-          path: LuaJIT-2.1/src/luajit.exe
-          retention-days: 1
-
-      - uses: actions/upload-artifact@v4
         if: false
         name: Upload luajit.lib
         with:
-          name: luajit_32.lib (32x)
+          name: luajit_32.lib
           path: LuaJIT-2.1/src/luajit_32.lib
           retention-days: 1
 
@@ -110,13 +96,6 @@ jobs:
           path: LuaJIT-2.1/src/libluajit_64.a
           retention-days: 1
 
-      - uses: actions/upload-artifact@v4
-        name: Upload luajit executable (64x)
-        with:
-          name: luajit (64x)
-          path: LuaJIT-2.1/src/luajit
-          retention-days: 1
-
   build-linux-32:
     runs-on: ubuntu-latest
     container: debian:bullseye
@@ -142,11 +121,4 @@ jobs:
         with:
           name: libluajit_32.a
           path: LuaJIT-2.1/src/libluajit_32.a
-          retention-days: 1
-
-      - uses: actions/upload-artifact@v4
-        name: Upload luajit executable (32x)
-        with:
-          name: luajit (32x)
-          path: LuaJIT-2.1/src/luajit
           retention-days: 1

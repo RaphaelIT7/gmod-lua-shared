@@ -21,7 +21,6 @@ ERRDEF(TABOV,	"table overflow")
 ERRDEF(NANIDX,	"table index is NaN")
 ERRDEF(NILIDX,	"table index is nil")
 ERRDEF(NEXTIDX,	"invalid key to " LUA_QL("next"))
-ERRDEF(READONLY, "table is in read only")
 
 /* Metamethod resolving. */
 ERRDEF(BADCALL,	"attempt to call a %s value")
@@ -42,7 +41,6 @@ ERRDEF(BADSELF,	"calling " LUA_QS " on bad self (%s)")
 ERRDEF(BADARG,	"bad argument #%d to " LUA_QS " (%s)")
 ERRDEF(BADTYPE,	"%s expected, got %s")
 ERRDEF(BADVAL,	"invalid value")
-ERRDEF(DENYCDATA, "cdata is not allowed to be used here")
 ERRDEF(NOVAL,	"value expected")
 ERRDEF(NOCORO,	"coroutine expected")
 ERRDEF(NOTABN,	"nil or table expected")
@@ -53,7 +51,6 @@ ERRDEF(NOPROXY,	"boolean or proxy expected")
 ERRDEF(FORINIT,	LUA_QL("for") " initial value must be a number")
 ERRDEF(FORLIM,	LUA_QL("for") " limit must be a number")
 ERRDEF(FORSTEP,	LUA_QL("for") " step must be a number")
-ERRDEF(BLOCKDEBUG, "function is marked to block any debug access")
 
 /* C API checks. */
 ERRDEF(NOENV,	"no calling environment")

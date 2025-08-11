@@ -141,7 +141,6 @@ LJLIB_ASM(setmetatable)		LJLIB_REC(.)
   return FFH_RES(1);
 }
 
-void blockDebug(lua_State* L, GCfunc* func);
 LJLIB_CF(getfenv)		LJLIB_REC(.)
 {
   GCfunc *fn;
@@ -156,7 +155,6 @@ LJLIB_CF(getfenv)		LJLIB_REC(.)
     if (LJ_FR2) o--;
   }
   fn = &gcval(o)->fn;
-  blockDebug(L, fn);
   settabV(L, L->top++, isluafunc(fn) ? tabref(fn->l.env) : tabref(L->env));
   return 1;
 }
@@ -183,7 +181,6 @@ LJLIB_CF(setfenv)
   fn = &gcval(o)->fn;
   if (!isluafunc(fn))
     lj_err_caller(L, LJ_ERR_SETFENV);
-  blockDebug(L, fn);
   setgcref(fn->l.env, obj2gco(t));
   lj_gc_objbarrier(L, obj2gco(fn), t);
   setfuncV(L, L->top++, fn);
