@@ -23,7 +23,7 @@ class ILuaInterface;
 
 class ILuaObject
 {
-private: // Virtual functions are unsafe since the offsets are wrong on Windows.
+public: // Virtual functions are unsafe since the offsets are wrong on Windows.
 	//virtual ~ILuaObject();
 	virtual void Set( ILuaObject *obj ) = 0;
 	virtual void SetFromStack( int i ) = 0;
